@@ -16,13 +16,43 @@
 package net.vpg.bot.framework;
 
 public class Ratelimit {
-    public final long inflictedAt;
-    public final long inflictedOn;
-    public boolean informed;
+    private final long inflictedAt;
+    private final long inflictedOn;
+    private final long cooldown;
+    private boolean informed;
 
-    public Ratelimit(long i) {
-        informed = false;
-        inflictedAt = System.currentTimeMillis();
-        inflictedOn = i;
+    public Ratelimit(long i, long cooldown) {
+        this.informed = false;
+        this.inflictedAt = System.currentTimeMillis();
+        this.inflictedOn = i;
+        this.cooldown = cooldown;
+    }
+
+    public long getInflictedAt() {
+        return inflictedAt;
+    }
+
+    public long getInflictedOn() {
+        return inflictedOn;
+    }
+
+    public long getCooldown() {
+        return cooldown;
+    }
+
+    public boolean isInformed() {
+        return informed;
+    }
+
+    public void setInformed(boolean informed) {
+        this.informed = informed;
+    }
+
+    public long getCooldownLeft() {
+        return cooldown + inflictedAt - System.currentTimeMillis();
+    }
+
+    public String getCooldownString() {
+        return Util.toString(getCooldownLeft());
     }
 }

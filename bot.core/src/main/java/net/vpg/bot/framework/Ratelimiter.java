@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 public interface Ratelimiter {
     default void ratelimit(long id) {
-        getRatelimited().put(id, new Ratelimit(id));
+        getRatelimited().put(id, new Ratelimit(id, getCooldown()));
     }
 
     default boolean isRatelimited(long userId) {
@@ -28,18 +28,29 @@ public interface Ratelimiter {
     }
 
     default boolean isRatelimited(Ratelimit rl) {
-        return rl != null && calculateCooldownLeft(rl.inflictedAt) >= 0;
-    }
-
-    default long calculateCooldownLeft(long inflictedAt) {
-        return getCooldown() + inflictedAt - System.currentTimeMillis();
+        return rl != null && rl.getCooldownLeft() >= 0;
     }
 
     default boolean ifRatelimited(long id, Consumer<Ratelimit> action) {
-        Ratelimit ratelimit = getRatelimitFor(id);
+        return ifRatelimited(getRatelimitFor(id), action);
+    }
+
+    default boolean ifRatelimited(Ratelimit ratelimit, Consumer<Ratelimit> action) {
         boolean isRatelimited = isRatelimited(ratelimit);
         if (isRatelimited) {
             action.accept(ratelimit);
+        }
+        return isRatelimited;
+    }
+
+    default boolean checkRatelimited(long id, Sender sender) {
+        return checkRatelimited(getRatelimitFor(id), sender);
+    }
+
+    default boolean checkRatelimited(Ratelimit ratelimit, Sender sender) {
+        boolean isRatelimited = isRatelimited(ratelimit);
+        if (isRatelimited) {
+            onRatelimit(sender, ratelimit);
         }
         return isRatelimited;
     }

@@ -18,7 +18,10 @@ package net.vpg.bot.commands;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.vpg.bot.framework.*;
+import net.vpg.bot.framework.Bot;
+import net.vpg.bot.framework.Ratelimit;
+import net.vpg.bot.framework.Ratelimiter;
+import net.vpg.bot.framework.Sender;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -127,13 +130,13 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
 
     @Override
     public void onRatelimit(Sender e, Ratelimit ratelimit) {
-        if (!ratelimit.informed) {
+        if (!ratelimit.isInformed()) {
             e.send("You have to wait for **")
-                .append(Util.toString(calculateCooldownLeft(ratelimit.inflictedAt)))
+                .append(ratelimit.getCooldownString())
                 .append("** before using this command again.")
                 .setEphemeral(true)
                 .queue();
-            ratelimit.informed = true;
+            ratelimit.setInformed(true);
         }
     }
 
