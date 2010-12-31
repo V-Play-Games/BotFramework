@@ -26,7 +26,6 @@
   <artifactId>bot.commands</artifactId>
   <packaging>pom</packaging>
   <modules>
-    <module>bot.commands.fun</module>
     <module>bot.commands.game2048</module>
     <module>bot.commands.general</module>
     <module>bot.commands.guess</module>
@@ -34,6 +33,7 @@
     <module>bot.commands.meme</module>
     <module>bot.commands.mod</module>
     <module>bot.commands.ttt</module>
+    <module>bot.commands.word</module>
     <module>bot.commands.all</module>
   </modules>
   <name>Bot Commands</name>
