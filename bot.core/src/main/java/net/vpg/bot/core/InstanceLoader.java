@@ -21,6 +21,7 @@ import io.github.classgraph.ScanResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -55,11 +56,28 @@ public class InstanceLoader {
             .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
     public <T> void loadAllInstances(Class<T> clazz, Consumer<T> newInstanceConsumer, BiConsumer<Class<? extends T>, ? super Throwable> errorConsumer, Object... parameters) {
-        Class<?>[] paramTypes = Arrays.stream(parameters).map(Object::getClass).toArray(Class[]::new);
+        Class<?>[] actualParameterTypes = Arrays.stream(parameters).map(Object::getClass).toArray(Class[]::new);
         getAllClasses(clazz).forEach(c -> {
             try {
-                newInstanceConsumer.accept(c.getConstructor(paramTypes).newInstance(parameters));
+                T instance = null;
+                outer:
+                for (Constructor<?> constructor : c.getDeclaredConstructors()) {
+                    Class<?>[] formalParameterTypes = constructor.getParameterTypes();
+                    if (formalParameterTypes.length != actualParameterTypes.length) continue;
+                    for (int i = 0; i < formalParameterTypes.length; i++) {
+                        if (!formalParameterTypes[i].isAssignableFrom(actualParameterTypes[i])) {
+                            continue outer;
+                        }
+                    }
+                    instance = (T) constructor.newInstance(parameters);
+                    break;
+                }
+                if (instance == null) {
+                    throw new NoSuchMethodException(clazz.getName() + "(" + Arrays.stream(actualParameterTypes).map(Class::getName).collect(Collectors.joining(", ")) + ")");
+                }
+                newInstanceConsumer.accept(instance);
             } catch (Throwable t) {
                 errorConsumer.accept(c, t);
             }

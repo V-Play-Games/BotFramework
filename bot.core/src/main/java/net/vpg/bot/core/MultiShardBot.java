@@ -34,9 +34,8 @@ class MultiShardBot extends Bot {
     public MultiShardBot(BotBuilder builder) throws LoginException {
         super(builder);
         this.shardManager = (builder.light
-            ? DefaultShardManagerBuilder.createLight(token)
-            : DefaultShardManagerBuilder.createDefault(token))
-            .enableIntents(GatewayIntent.getIntents(builder.intents))
+            ? DefaultShardManagerBuilder.createLight(token, builder.getIntents())
+            : DefaultShardManagerBuilder.createDefault(token, builder.getIntents()))
             .addEventListeners(processor)
             .setShardsTotal(shardsTotal)
             .setActivity(Activity.watching("My Loading"))

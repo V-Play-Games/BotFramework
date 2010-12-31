@@ -36,8 +36,9 @@ public class SingleShardBot extends Bot {
 
     SingleShardBot(BotBuilder builder) throws LoginException {
         super(builder);
-        this.jda = (builder.light ? JDABuilder.createLight(token) : JDABuilder.createDefault(token))
-            .enableIntents(GatewayIntent.getIntents(builder.intents))
+        this.jda = (builder.light
+            ? JDABuilder.createLight(token, builder.getIntents())
+            : JDABuilder.createDefault(token, builder.getIntents()))
             .addEventListeners(processor)
             .setActivity(Activity.watching("My Loading"))
             .build();

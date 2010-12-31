@@ -81,6 +81,11 @@ public class BotBuilder implements SerializableData {
     }
 
     @Nonnull
+    public EnumSet<GatewayIntent> getIntents() {
+        return GatewayIntent.getIntents(intents);
+    }
+
+    @Nonnull
     public BotBuilder setShardsTotal(int shardsTotal) {
         this.shardsTotal = shardsTotal;
         return this;
