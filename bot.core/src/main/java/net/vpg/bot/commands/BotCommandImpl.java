@@ -15,19 +15,17 @@
  */
 package net.vpg.bot.commands;
 
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.Ratelimit;
-import net.vpg.bot.framework.Ratelimiter;
-import net.vpg.bot.framework.Sender;
+import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
+import net.vpg.bot.framework.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BotCommandImpl extends CommandData implements BotCommand, Ratelimiter {
     protected final Map<Long, Ratelimit> ratelimited = new HashMap<>();
+    protected List<CommandPrivilege> defaultPrivileges = null;
     protected long cooldown;
     protected int minArgs;
     protected int maxArgs;
@@ -81,7 +79,7 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
     }
 
     public void setCooldown(long cooldown, TimeUnit cooldownUnit) {
-        this.cooldown = (cooldownUnit == null ? TimeUnit.MILLISECONDS : cooldownUnit).toMillis(cooldown);
+        this.cooldown = cooldownUnit == null ? cooldown : cooldownUnit.toMillis(cooldown);
     }
 
     @Override
@@ -105,7 +103,7 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
     @Override
     public void run(CommandReceivedEvent e) {
         long aid = e.getUser().getIdLong();
-        if (ifRatelimited(aid, rl -> onRatelimit(e, rl)) || !runChecks(e)) {
+        if (checkRatelimited(aid, e) || !runChecks(e)) {
             return;
         }
         if (!e.isSlashCommand()) { // Slash Commands bypass arg checks
@@ -122,19 +120,20 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
         } catch (Exception exc) {
             e.reportTrouble(exc);
             e.send("There was some trouble processing your request. Please contact the developer.")
-                .queue(null, x -> e.getChannel()
-                    .sendMessage("There was some trouble processing your request. Please contact the developer.")
-                    .queue()
-                );
+                .setEphemeral(true)
+                .queue();
         }
     }
 
     @Override
-    public void onButtonClick(ButtonClickEvent e, String input) {
-    }
-
-    @Override
     public void finalizeCommand(Command c) {
+        if (getDefaultPrivileges() == null) return;
+        Map<Long, CommandPrivilege> defaultPrivilegeMap = Util.group(defaultPrivileges, CommandPrivilege::getIdLong);
+        c.getJDA().getGuildCache().forEach(guild -> c.retrievePrivileges(guild).queue(privileges -> {
+            if (!defaultPrivilegeMap.equals(Util.group(privileges, CommandPrivilege::getIdLong))) {
+                c.updatePrivileges(guild, defaultPrivileges).queue();
+            }
+        }));
     }
 
     @Override
@@ -162,5 +161,14 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
     @Override
     public CommandData toCommandData() {
         return this;
+    }
+
+    @Override
+    public List<CommandPrivilege> getDefaultPrivileges() {
+        return defaultPrivileges;
+    }
+
+    public void setDefaultPrivileges(List<CommandPrivilege> defaultPrivileges) {
+        this.defaultPrivileges = defaultPrivileges;
     }
 }

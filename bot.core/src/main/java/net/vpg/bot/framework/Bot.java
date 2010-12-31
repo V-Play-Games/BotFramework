@@ -33,6 +33,7 @@ import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.database.Database;
 import net.vpg.bot.entities.Entity;
 import net.vpg.bot.entities.EntityInfo;
+import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
@@ -236,19 +236,24 @@ public class Bot implements Entity {
         entityInfoMap.putAll(getScanResult()
             .getAllClasses()
             .stream()
-            .filter(x -> !x.isAbstract() && !x.isInterface() && x.implementsInterface(Entity.class.getName()))
+            .filter(x -> !x.isAbstract() && x.isStandardClass() && x.implementsInterface(Entity.class.getName()))
             .map(ClassInfo::loadClass)
-            .collect(Collectors.toMap(UnaryOperator.identity(), c -> {
+            .map(c -> {
+                EntityInfo<?> info;
                 try {
-                    return (EntityInfo<?>)c.getMethod("getInfo").invoke(null);
+                    info = (EntityInfo<?>) c.getMethod("getInfo").invoke(null);
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                     try {
-                        return (EntityInfo<?>)c.getField("INFO").get(null);
+                        info = (EntityInfo<?>) c.getField("INFO").get(null);
                     } catch (NoSuchFieldException | IllegalAccessException ex) {
-                        return null;
+                        info = null;
+                        logger.warn("Couldn't load EntityInfo for {}", c);
                     }
                 }
-            })));
+                return new DefaultKeyValue<>(c, info);
+            })
+            .filter(pair -> pair.getValue() != null)
+            .collect(Collectors.toMap(DefaultKeyValue::getKey, DefaultKeyValue::getValue)));
         entityInfoMap.values().forEach(info -> {
             if (info.isDBObject) {
                 loadDBEntity(info);
@@ -273,11 +278,10 @@ public class Bot implements Entity {
 
     public <T extends Entity> void loadDBEntity(EntityInfo<T> info) {
         if (!isDatabaseEnabled()) return;
-        getDatabase().getCollection(info.identifier).find()
-            .forEach(document -> {
-                T entity = info.entityConstructor.apply(Util.toDataObject(document), this);
-                info.entityMap.put(entity.getId(), entity);
-            });
+        getDatabase().getCollection(info.identifier).find().forEach(document -> {
+            T entity = info.entityConstructor.apply(Util.toDataObject(document), this);
+            info.entityMap.put(entity.getId(), entity);
+        });
     }
 
     public void startSync() {
@@ -344,7 +348,7 @@ public class Bot implements Entity {
         });
         JDA primaryShard = getPrimaryShard();
         primaryShard.retrieveCommands().queue(commandList -> {
-            Map<String, Command> commandMap = commandList.stream().collect(Util.groupingBy(Command::getName));
+            Map<String, Command> commandMap = Util.group(commandList, Command::getName);
             commands.values()
                 .stream()
                 .map(BotCommand::toCommandData)

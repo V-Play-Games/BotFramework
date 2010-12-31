@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.vpg.bot.commands;
+package net.vpg.bot.commands.admin;
 
 import net.dv8tion.jda.api.Permission;
+import net.vpg.bot.commands.mod.ModCommand;
 
-public interface ModCommand extends BotCommand {
-    Permission getRequiredPermission();
-
-    default boolean runChecks(CommandReceivedEvent e) {
-        if (!e.isFromGuild()) {
-            e.send("This command only works in guilds").queue();
-            return false;
-        }
-        if (!e.getMember().hasPermission(getRequiredPermission())) {
-            e.send("You do not have the required permission to do that!").queue();
-            return false;
-        }
-        return true;
+public interface AdminCommand extends ModCommand {
+    @Override
+    default Permission getRequiredPermission() {
+        return Permission.ADMINISTRATOR;
     }
 }

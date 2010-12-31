@@ -129,7 +129,7 @@ public class Util {
     }
 
     public static boolean equals(CommandData data, Command cmd) {
-        Map<String, OptionData> options = data.getOptions().stream().collect(Util.groupingBy(OptionData::getName));
+        Map<String, OptionData> options = Util.group(data.getOptions(), OptionData::getName);
         return cmd == null || !(cmd.getName().equals(data.getName()) &&
             cmd.getDescription().equals(data.getDescription()) &&
             cmd.getOptions().stream().map(o1 -> {
@@ -152,5 +152,13 @@ public class Util {
 
     public static <T, K> Collector<T, ?, Map<K, T>> groupingBy(Function<? super T, ? extends K> keyMapper) {
         return Collectors.toMap(keyMapper, UnaryOperator.identity());
+    }
+
+    public static <T, K> Map<K, T> group(List<T> list, Function<? super T, ? extends K> keyMapper) {
+        return list.stream().collect(groupingBy(keyMapper));
+    }
+
+    public static boolean isRatelimited(Ratelimit rl) {
+        return rl != null && rl.getCooldownLeft() >= 0;
     }
 }

@@ -52,8 +52,9 @@ public class CommandReceivedEvent implements Sender {
     private final Member selfMember;
     private Message message;
     private SlashCommandEvent slash;
-    private boolean isSlashCommand;
+    private final boolean isSlashCommand;
     private boolean forceNotLog;
+    private CommandReplyAction action;
     private Supplier<CommandReplyAction> actionSupplier;
     private Throwable trouble;
     private List<String> args;
@@ -365,8 +366,9 @@ public class CommandReceivedEvent implements Sender {
         return args.get(index);
     }
 
+    @Override
     public CommandReplyAction deferSend() {
-        return actionSupplier.get().setTask(this::log);
+        return action == null ? action = actionSupplier.get().setTask(this::log) : action;
     }
 
     public void reportTrouble(Throwable t) {
@@ -379,34 +381,31 @@ public class CommandReceivedEvent implements Sender {
     }
 
     public void log(CommandReplyAction action) {
-        String output = action.getContent();
-        DataObject log = DataObject.empty();
-        log.put("id", processId)
-            .put("time", timeCreated.toEpochSecond())
-            .put("input", isSlashCommand ? slash.getCommandString() : content)
-            .put("output", output)
+        if (forceNotLog) return;
+        String in = isSlashCommand ? slash.getCommandString() : content;
+        String out = action.getContent();
+        DataObject log = DataObject.empty()
+            .put("id", processId)
+            .put("time", getTimeCreated().toEpochSecond())
+            .put("input", in)
+            .put("output", out)
             .put("args", args)
             .put("command", command.toString())
-            .put("userId", user.getIdLong())
-            .put("channelId", channel.getIdLong())
-            .put("channelName", channel.getName())
-            .put("messageId", messageId)
-            .put("trouble", trouble);
-        if (isFromGuild()) {
-            log.put("guild", guild.getIdLong());
-            log.put("guildName", guild.getName());
-        }
-        if (!forceNotLog) {
-            String error = trouble == null ? "None" : String.format("%s: %s\n\t at %s", trouble.getClass(), trouble.getMessage(), trouble.getStackTrace()[0]);
-            bot.getLogChannel(getJDA()).sendMessageEmbeds(new EmbedBuilder()
-                .setTitle("Process id " + processId)
-                .setDescription(String.format("Error: %s\nUsed in %s by %s", error, !isFromGuild() ? "the DM" : "#" + channel.getName(), user.toString()))
-                .addField("Input", this.content.length() > 1024 ? this.content.substring(0, 1021) + "..." : this.content, false)
-                .addField("Output", output.length() > 1024 ? output.substring(0, 1021) + "..." : output, false)
-                .build())
-                .addFile(Util.makeFileOf(log, "log-file-" + processId + ".json"))
-                .queue();
-        }
+            .put("user", getUser())
+            .put("channel", getChannel())
+            .put("trouble", trouble)
+            .put("guild", getGuild());
+        String error = trouble == null
+            ? "None"
+            : String.format("%s: %s\n\t at %s", trouble.getClass(), trouble.getMessage(), trouble.getStackTrace()[0]);
+        bot.getLogChannel(getJDA()).sendMessageEmbeds(new EmbedBuilder()
+            .setTitle("Process id " + processId)
+            .setDescription(String.format("Error: %s\nUsed in %s by %s", error, getChannel(), getUser()))
+            .addField("Input", in.length() > 1024 ? in.substring(0, 1021) + "..." : in, false)
+            .addField("Output", out.length() > 1024 ? out.substring(0, 1021) + "..." : out, false)
+            .build())
+            .addFile(Util.makeFileOf(log, "log-file-" + processId + ".json"))
+            .queue();
         //noinspection ResultOfMethodCallIgnored
         action.content("");
     }

@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.CommandReceivedEvent;
-import net.vpg.bot.commands.ModCommand;
 import net.vpg.bot.framework.Bot;
 import net.vpg.bot.framework.GuildSettings;
 import net.vpg.bot.framework.Util;

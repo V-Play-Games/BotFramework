@@ -15,10 +15,10 @@
  */
 package net.vpg.bot.commands;
 
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.vpg.bot.framework.Bot;
 import net.vpg.bot.framework.Ratelimit;
 
@@ -46,8 +46,6 @@ public interface BotCommand {
 
     void run(CommandReceivedEvent e);
 
-    void onButtonClick(ButtonClickEvent e, String input);
-
     void onCommandRun(CommandReceivedEvent e) throws Exception;
 
     void onSlashCommandRun(CommandReceivedEvent e) throws Exception;
@@ -65,4 +63,6 @@ public interface BotCommand {
     Map<Long, Ratelimit> getRateLimited();
 
     CommandData toCommandData();
+
+    List<CommandPrivilege> getDefaultPrivileges();
 }
