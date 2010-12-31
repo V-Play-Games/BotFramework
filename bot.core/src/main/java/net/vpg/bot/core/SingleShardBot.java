@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.vpg.bot.core;
 
 import net.dv8tion.jda.api.JDA;
@@ -21,15 +22,10 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
-import net.dv8tion.jda.api.utils.data.DataObject;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
-
-import static net.dv8tion.jda.api.requests.GatewayIntent.*;
 
 public class SingleShardBot extends Bot {
     protected final JDA jda;
@@ -77,7 +73,6 @@ public class SingleShardBot extends Bot {
         } else {
             loggers.put(-1, syncChannels.get(0).getIdLong());
         }
-
     }
 
     @Override

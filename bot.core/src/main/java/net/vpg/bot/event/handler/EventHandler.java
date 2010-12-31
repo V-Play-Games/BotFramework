@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.vpg.bot.event.handler;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.vpg.bot.core.Bot;
 
 public class EventHandler extends ListenerAdapter {
     protected boolean closed;
