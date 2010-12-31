@@ -28,7 +28,7 @@ public abstract class AbstractCRA<R extends RestAction<?>> implements CommandRep
     protected Consumer<CommandReplyAction> task;
     protected String content;
 
-    protected AbstractCRA(@Nonnull R action) {
+    protected AbstractCRA(R action) {
         this.action = action;
     }
 

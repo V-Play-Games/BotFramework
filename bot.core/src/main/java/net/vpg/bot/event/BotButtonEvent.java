@@ -24,10 +24,11 @@ import net.vpg.bot.core.Util;
 import javax.annotation.Nonnull;
 
 public class BotButtonEvent extends ButtonInteractionEvent implements Sender {
-    final String method;
-    final String[] args;
-    final Bot bot;
+    private final String method;
+    private final String[] args;
+    private final Bot bot;
     CommandReplyAction action;
+    Sender edit;
 
     public BotButtonEvent(ButtonInteractionEvent e, Bot bot) {
         super(e.getJDA(), e.getResponseNumber(), e.getInteraction());
@@ -60,5 +61,13 @@ public class BotButtonEvent extends ButtonInteractionEvent implements Sender {
     @Override
     public CommandReplyAction deferSend() {
         return action == null ? action = CommandReplyAction.reply(this) : action;
+    }
+
+    public Sender asReplySender() {
+        return this;
+    }
+
+    public Sender asEditSender() {
+        return edit == null ? edit = Sender.ofEdit(this) : edit;
     }
 }

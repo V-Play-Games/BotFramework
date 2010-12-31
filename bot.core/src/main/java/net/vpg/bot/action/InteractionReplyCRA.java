@@ -15,23 +15,19 @@
  */
 package net.vpg.bot.action;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.utils.AttachmentOption;
-import net.dv8tion.jda.internal.requests.restaction.interactions.ReplyCallbackActionImpl;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class InteractionReplyCRA extends AbstractCRA<ReplyCallbackActionImpl> {
-    protected InteractionReplyCRA(ReplyCallbackActionImpl action) {
+public class InteractionReplyCRA extends InteractionCRA<ReplyCallbackAction> {
+    protected InteractionReplyCRA(ReplyCallbackAction action) {
         super(action);
     }
 
@@ -99,21 +95,5 @@ public class InteractionReplyCRA extends AbstractCRA<ReplyCallbackActionImpl> {
     public CommandReplyAction addFile(File file, String name, AttachmentOption... options) {
         action.addFile(file, name, options);
         return this;
-    }
-
-    @Override
-    public void queue(Consumer<? super Message> success, Consumer<? super Throwable> failure) {
-        action.queue(hook -> hook.retrieveOriginal().queue(success, failure), failure);
-    }
-
-    @Override
-    public Message complete(boolean shouldQueue) throws RateLimitedException {
-        return action.complete(shouldQueue).retrieveOriginal().complete(shouldQueue);
-    }
-
-    @Nonnull
-    @Override
-    public CompletableFuture<Message> submit(boolean shouldQueue) {
-        return action.submit(shouldQueue).thenApply(hook -> hook.retrieveOriginal().complete());
     }
 }
