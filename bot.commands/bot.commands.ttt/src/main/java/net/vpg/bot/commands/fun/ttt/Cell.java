@@ -21,9 +21,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 public class Cell {
-    final String id;
-    final int row;
-    final int column;
+    private final String id;
+    private final int row;
+    private final int column;
     CellType type;
 
     public Cell(int row, int column, Board board) {

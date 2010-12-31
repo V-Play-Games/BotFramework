@@ -23,8 +23,8 @@ public class AI {
         }
     }
 
-    public static Cell getBestMove(Board board, CellType ai) {
-        Cell safeMove = board.getWinningMoveFor(ai.other());
+    private static Cell getBestMove(Board board, CellType ai) {
+        Cell safeMove = getWinningMove(board, ai.other());
         if (safeMove != null) {
             return safeMove;
         }
@@ -32,7 +32,7 @@ public class AI {
         int bestScore = -100;
         for (Cell cell : board.getCellsOfType(CellType.BLANK)) {
             cell.setType(ai);
-            int score = minimax(board, ai);
+            int score = getScore(board, ai);
             cell.setType(CellType.BLANK);
             if (score > bestScore) {
                 bestScore = score;
@@ -42,24 +42,90 @@ public class AI {
         return bestMove;
     }
 
-    public static int minimax(Board board, CellType ai) {
+    private static int getScore(Board board, CellType type) {
         Player winner = board.getWinner();
         if (winner != null) {
-            return winner.type == ai ? 1 : -1;
+            return winner.type == type ? 1 : -1;
         } else if (board.checkTie()) {
             return 0;
         }
-        CellType human = ai.other();
-        boolean aiLosing = board.getCellCountOfType(human) > board.getCellCountOfType(ai);
-        int bestScore = aiLosing ? -1 : 1;
+        CellType other = type.other();
+        boolean losing = board.getCellCountOfType(other) > board.getCellCountOfType(type);
+        int bestScore = losing ? -1 : 1;
         for (Cell cell : board.getCellsOfType(CellType.BLANK)) {
-            cell.setType(aiLosing ? ai : human);
-            int currentScore = minimax(board, ai);
+            cell.setType(losing ? type : other);
+            int currentScore = getScore(board, type);
             cell.setType(CellType.BLANK);
-            if (aiLosing ? currentScore > bestScore : currentScore < bestScore) {
+            if (losing ? currentScore > bestScore : currentScore < bestScore) {
                 bestScore = currentScore;
             }
         }
         return bestScore;
+    }
+
+    private static Cell getWinningMove(Board board, CellType type) {
+        // check rows
+        for (int i = 0; i < 3; i++) {
+            int count = 0;
+            Cell emptyPosition = null;
+            for (int j = 0; j < 3; j++) {
+                Cell cell = board.cells[i][j];
+                if (cell.isBlank()) {
+                    emptyPosition = cell;
+                } else if (cell.type == type) {
+                    count++;
+                }
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
+
+        // check columns
+        for (int i = 0; i < 3; i++) {
+            int count = 0;
+            Cell emptyPosition = null;
+            for (int j = 0; j < 3; j++) {
+                Cell cell = board.cells[j][i];
+                if (cell.isBlank()) {
+                    emptyPosition = cell;
+                } else if (cell.type == type) {
+                    count++;
+                }
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
+
+        // check diagonals
+        int count = 0;
+        Cell emptyPosition = null;
+        for (int i = 0; i < 3; i++) {
+            Cell cell = board.cells[i][i];
+            if (cell.isBlank()) {
+                emptyPosition = cell;
+            } else if (cell.type == type) {
+                count++;
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
+
+        count = 0;
+        emptyPosition = null;
+        for (int i = 0; i < 3; i++) {
+            Cell cell = board.cells[i][2 - i];
+            if (cell.isBlank()) {
+                emptyPosition = cell;
+            } else if (cell.type == type) {
+                count++;
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
+        return null;
     }
 }
