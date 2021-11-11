@@ -65,7 +65,7 @@ public class Connection implements Closeable {
     }
 
     private Response requestData(String url) throws IOException {
-        assert client != null : new IllegalStateException();
+        assert client != null : new IllegalStateException("The Connection was closed!");
         return client.newCall(new Request.Builder().url(url).build()).execute();
     }
 
