@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Component;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.dv8tion.jda.internal.requests.Route;
 import net.dv8tion.jda.internal.requests.restaction.MessageActionImpl;
 
 import javax.annotation.Nonnull;
@@ -36,49 +35,58 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public class CommandReplyAction extends MessageActionImpl {
-    private Consumer<CommandReplyAction> tasks;
+    private Consumer<CommandReplyAction> task;
     private int flags;
 
     public CommandReplyAction(Message message) {
         this(message, null);
     }
 
-    public CommandReplyAction(Message message, Consumer<CommandReplyAction> tasks) {
-        this(message.getJDA(), message.getId(), message.getChannel(), tasks);
+    public CommandReplyAction(Message message, Consumer<CommandReplyAction> task) {
+        this(message.getJDA(), message.getId(), message.getChannel(), task);
     }
 
     public CommandReplyAction(MessageChannel tc) {
         this(tc, null);
     }
 
-    public CommandReplyAction(MessageChannel tc, Consumer<CommandReplyAction> tasks) {
-        this(tc.getJDA(), null, tc, tasks);
+    public CommandReplyAction(MessageChannel tc, Consumer<CommandReplyAction> task) {
+        this(tc.getJDA(), null, tc, task);
     }
 
     public CommandReplyAction(Interaction interaction) {
         this(interaction, null);
     }
 
-    public CommandReplyAction(Interaction interaction, Consumer<CommandReplyAction> tasks) {
-        this(interaction.getJDA(), null, interaction.getMessageChannel(), interaction.getHook(), tasks);
+    public CommandReplyAction(Interaction interaction, Consumer<CommandReplyAction> task) {
+        this(interaction.getJDA(), null, interaction.getMessageChannel(), interaction.getHook(), task);
     }
 
-    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, Consumer<CommandReplyAction> tasks) {
+    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, Consumer<CommandReplyAction> task) {
         super(jda, messageId, channel);
-        this.tasks = tasks;
+        this.task = task;
     }
 
-    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, InteractionHook hook, Consumer<CommandReplyAction> tasks) {
-        this(jda, messageId, channel, tasks);
+    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, InteractionHook hook, Consumer<CommandReplyAction> task) {
+        this(jda, messageId, channel, task);
         this.withHook(hook);
     }
 
-    public void setTasks(Consumer<CommandReplyAction> tasks) {
-        this.tasks = tasks;
+    public void setTask(Consumer<CommandReplyAction> task) {
+        this.task = task;
+    }
+
+    public void appendTask(Consumer<CommandReplyAction> tasks) {
+        appendTask(tasks, Consumer::andThen);
+    }
+
+    public void appendTask(Consumer<CommandReplyAction> tasks, BinaryOperator<Consumer<CommandReplyAction>> combiner) {
+        this.task = combiner.apply(this.task, tasks);
     }
 
     public String getContent() {
@@ -88,11 +96,6 @@ public class CommandReplyAction extends MessageActionImpl {
     @Override
     public CommandReplyAction withHook(InteractionHook hook) {
         return (CommandReplyAction) super.withHook(hook);
-    }
-
-    @Override
-    public Route.CompiledRoute finalizeRoute() {
-        return super.finalizeRoute();
     }
 
     @Nonnull
@@ -105,22 +108,6 @@ public class CommandReplyAction extends MessageActionImpl {
     @Override
     public CommandReplyAction deadline(long timestamp) {
         return (CommandReplyAction) super.deadline(timestamp);
-    }
-
-    @Nonnull
-    @Override
-    public MessageChannel getChannel() {
-        return super.getChannel();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return super.isEmpty();
-    }
-
-    @Override
-    public boolean isEdit() {
-        return super.isEdit();
     }
 
     @Nonnull
@@ -387,6 +374,6 @@ public class CommandReplyAction extends MessageActionImpl {
     @Override
     public void queue(Consumer<? super Message> success, Consumer<? super Throwable> failure) {
         super.queue(success, failure);
-        tasks.accept(this);
+        task.accept(this);
     }
 }
