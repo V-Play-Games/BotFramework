@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,33 +16,24 @@
 package net.vpg.bot.framework.commands;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Component;
-import net.dv8tion.jda.api.requests.Request;
-import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.api.utils.AttachmentOption;
-import net.dv8tion.jda.api.utils.data.DataArray;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.dv8tion.jda.internal.requests.RestActionImpl;
 import net.dv8tion.jda.internal.requests.Route;
 import net.dv8tion.jda.internal.requests.restaction.MessageActionImpl;
-import okhttp3.RequestBody;
-import org.apache.commons.collections4.map.CaseInsensitiveMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
@@ -278,53 +269,8 @@ public class CommandReplyAction extends MessageActionImpl {
     }
 
     @Override
-    public RequestBody asMultipart() {
-        return super.asMultipart();
-    }
-
-    @Override
-    public RequestBody asJSON() {
-        return super.asJSON();
-    }
-
-    @Override
     public DataObject getJSON() {
         return super.getJSON().put("flags", flags);
-    }
-
-    @Override
-    public void checkFileAmount() {
-        super.checkFileAmount();
-    }
-
-    @Override
-    public void checkEdit() {
-        super.checkEdit();
-    }
-
-    @Override
-    public void checkPermission(Permission perm) {
-        super.checkPermission(perm);
-    }
-
-    @Override
-    public boolean hasPermission(Permission perm) {
-        return super.hasPermission(perm);
-    }
-
-    @Override
-    public RequestBody finalizeData() {
-        return super.finalizeData();
-    }
-
-    @Override
-    public void handleSuccess(Response response, Request<Message> request) {
-        super.handleSuccess(response, request);
-    }
-
-    @Override
-    public void finalize() {
-        super.finalize();
     }
 
     @Nonnull
@@ -406,8 +352,7 @@ public class CommandReplyAction extends MessageActionImpl {
     }
 
     @Nonnull
-    public CommandReplyAction setEphemeral(boolean ephemeral)
-    {
+    public CommandReplyAction setEphemeral(boolean ephemeral) {
         if (ephemeral)
             this.flags |= 64;
         else
@@ -433,63 +378,10 @@ public class CommandReplyAction extends MessageActionImpl {
         return (CommandReplyAction) super.mentionRoles(roleIds);
     }
 
-    @Override
-    public RestActionImpl<Message> priority() {
-        return super.priority();
-    }
-
-    @Nonnull
-    @Override
-    public JDA getJDA() {
-        return super.getJDA();
-    }
-
-    @Nullable
-    @Override
-    public BooleanSupplier getCheck() {
-        return super.getCheck();
-    }
-
     @Nonnull
     @Override
     public CommandReplyAction setCheck(BooleanSupplier checks) {
         return (CommandReplyAction) super.setCheck(checks);
-    }
-
-    @Nonnull
-    @Override
-    public CompletableFuture<Message> submit(boolean shouldQueue) {
-        return super.submit(shouldQueue);
-    }
-
-    @Override
-    public Message complete(boolean shouldQueue) throws RateLimitedException {
-        return super.complete(shouldQueue);
-    }
-
-    @Override
-    public CaseInsensitiveMap<String, String> finalizeHeaders() {
-        return super.finalizeHeaders();
-    }
-
-    @Override
-    public BooleanSupplier finalizeChecks() {
-        return super.finalizeChecks();
-    }
-
-    @Override
-    public RequestBody getRequestBody(DataObject object) {
-        return super.getRequestBody(object);
-    }
-
-    @Override
-    public RequestBody getRequestBody(DataArray array) {
-        return super.getRequestBody(array);
-    }
-
-    @Override
-    public void handleResponse(Response response, Request<Message> request) {
-        super.handleResponse(response, request);
     }
 
     @Override
