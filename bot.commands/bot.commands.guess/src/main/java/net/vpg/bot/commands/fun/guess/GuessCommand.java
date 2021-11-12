@@ -47,6 +47,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
 
     public void checkGuess(GuildMessageReceivedEvent e) {
         GuessGame game = GuessGame.get(e.getAuthor().getId());
+        if (game == null) return;
         if (game.isCorrect(e.getMessage().getContentRaw())) {
             game.close(Sender.fromMessage(e.getMessage()), GuessGame.WON);
         } else {

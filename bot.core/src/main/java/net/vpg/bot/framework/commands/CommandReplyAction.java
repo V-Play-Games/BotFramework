@@ -48,7 +48,8 @@ public class CommandReplyAction extends MessageActionImpl {
     }
 
     public CommandReplyAction(Message message, Consumer<CommandReplyAction> task) {
-        this(message.getJDA(), message.getId(), message.getChannel(), task);
+        this(message.getJDA(), null, message.getChannel(), task);
+        reference(message);
     }
 
     public CommandReplyAction(MessageChannel tc) {
@@ -374,6 +375,7 @@ public class CommandReplyAction extends MessageActionImpl {
     @Override
     public void queue(Consumer<? super Message> success, Consumer<? super Throwable> failure) {
         super.queue(success, failure);
-        task.accept(this);
+        if (task != null)
+            task.accept(this);
     }
 }
