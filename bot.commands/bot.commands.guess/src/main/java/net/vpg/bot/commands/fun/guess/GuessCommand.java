@@ -16,14 +16,10 @@
 package net.vpg.bot.commands.fun.guess;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.ButtonHandler;
-import net.vpg.bot.framework.Sender;
-import net.vpg.bot.framework.Util;
+import net.vpg.bot.framework.*;
 import net.vpg.bot.framework.commands.BotCommandImpl;
 import net.vpg.bot.framework.commands.CommandReceivedEvent;
 import net.vpg.bot.framework.commands.NoArgsCommand;
@@ -39,9 +35,9 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
         if (GuessGame.get(e.getUser().getId()) != null) return;
         GuessGame game = new GuessGame(e);
         e.sendEmbeds(new EmbedBuilder()
-                .setTitle("Who's that Pokemon?")
-                .setDescription("Guess the Pokemon based on its given description in 30 seconds or less!\n> " + game.getText())
-                .build())
+            .setTitle("Who's that Pokemon?")
+            .setDescription("Guess the Pokemon based on its given description in 30 seconds or less!\n> " + game.getText())
+            .build())
             .setActionRow(
                 Button.primary("guess:" + game.getUserId() + ":h", "Get a hint"),
                 Button.primary("guess:" + game.getUserId() + ":x", "Give up")
@@ -65,15 +61,15 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
         }
 
         @Override
-        public void handle(ButtonClickEvent e, String[] args) {
+        public void handle(BotButtonEvent e) {
             String userId = e.getUser().getId();
-            if (!args[0].equals(userId)) return;
+            if (!e.getArg(0).equals(userId)) return;
             GuessGame game = GuessGame.get(userId);
             if (game == null) {
                 e.deferEdit().setActionRows().queue();
                 return;
             }
-            switch (args[1]) {
+            switch (e.getArg(1)) {
                 case "h":
                     e.editComponents(ActionRow.of(Button.primary("guess:" + game.getUserId() + ":x", "Give up")))
                         .setEmbeds(new EmbedBuilder()

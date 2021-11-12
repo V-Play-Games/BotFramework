@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,12 +18,12 @@ package net.vpg.bot.commands.fun.game2048;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.restaction.interactions.UpdateInteractionAction;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.framework.Bot;
+import net.vpg.bot.framework.BotButtonEvent;
 import net.vpg.bot.framework.ButtonHandler;
 import net.vpg.bot.framework.commands.BotCommandImpl;
 import net.vpg.bot.framework.commands.CommandReceivedEvent;
@@ -89,11 +89,11 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
         }
 
         @Override
-        public void handle(ButtonClickEvent e, String[] args) {
-            if (!args[0].equals(e.getUser().getId())) {
+        public void handle(BotButtonEvent e) {
+            if (!e.getArg(0).equals(e.getUser().getId())) {
                 return;
             }
-            Move move = Move.fromKey(args[1].charAt(0));
+            Move move = Move.fromKey(e.getArg(1).charAt(0));
             if (move == null) {
                 e.editMessage("The game was cancelled!").setActionRows().queue();
                 return;
