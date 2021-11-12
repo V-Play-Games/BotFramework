@@ -99,10 +99,8 @@ public class EventHandler extends ListenerAdapter {
     public void onReady(@Nonnull ReadyEvent e) {
         try {
             // init on last shard only
-            if (shardsInit.get() == e.getJDA().getShardInfo().getShardTotal() - 1)
+            if (shardsInit.incrementAndGet() == e.getJDA().getShardInfo().getShardTotal())
                 bot.load();
-            else
-                shardsInit.incrementAndGet();
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
