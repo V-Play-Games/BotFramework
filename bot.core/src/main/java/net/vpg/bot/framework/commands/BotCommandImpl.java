@@ -20,13 +20,11 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.vpg.bot.framework.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BotCommandImpl extends CommandData implements BotCommand, Ratelimiter {
+    protected final Map<Long, Ratelimit> ratelimited = new HashMap<>();
     protected long cooldown;
     protected int minArgs;
     protected int maxArgs;
@@ -38,6 +36,11 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
         this.bot = bot;
         this.aliases = new ArrayList<>();
         Collections.addAll(this.aliases, aliases);
+    }
+
+    @Override
+    public Map<Long, Ratelimit> getRatelimited() {
+        return ratelimited;
     }
 
     @Override

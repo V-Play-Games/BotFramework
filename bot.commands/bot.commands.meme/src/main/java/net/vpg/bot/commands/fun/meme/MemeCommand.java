@@ -64,7 +64,7 @@ public class MemeCommand extends BotCommandImpl {
 
     @Override
     public void onSlashCommandRun(CommandReceivedEvent e) throws Exception {
-        execute(e, e.getString("subreddit", ""), ((TextChannel) e.getChannel()).isNSFW());
+        execute(e, e.getString("subreddit"), ((TextChannel) e.getChannel()).isNSFW());
     }
 
     public void execute(CommandReceivedEvent e, String subreddit, boolean allowNSFW) throws IOException {

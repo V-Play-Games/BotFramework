@@ -49,7 +49,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
         GuessGame game = GuessGame.get(e.getAuthor().getId());
         if (game == null) return;
         if (game.isCorrect(e.getMessage().getContentRaw())) {
-            game.close(Sender.fromMessage(e.getMessage()), GuessGame.WON);
+            game.close(Sender.of(e.getMessage()), GuessGame.WON);
         } else {
             e.getMessage().addReaction("U+274C").queue();
         }
@@ -83,7 +83,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
                     break;
                 case "x":
                     e.editComponents().queue();
-                    game.close(Sender.fromChannel(e.getChannel()), GuessGame.FORFEIT);
+                    game.close(Sender.of(e.getChannel()), GuessGame.FORFEIT);
                     break;
             }
         }

@@ -15,7 +15,6 @@
  */
 package net.vpg.bot.commands.fun.game2048;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -29,35 +28,16 @@ import net.vpg.bot.framework.commands.BotCommandImpl;
 import net.vpg.bot.framework.commands.CommandReceivedEvent;
 import net.vpg.bot.framework.commands.NoArgsCommand;
 
-import java.util.Arrays;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import static net.dv8tion.jda.api.entities.Message.MentionType.EMOTE;
+import java.util.List;
 
 public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
     public static DataObject emotes = DataObject.fromJson(Game2048Command.class.getResourceAsStream("emotes.json"));
-    private static Queue<Board> spareBoards = new LinkedBlockingQueue<>();
 
     public Game2048Command(Bot bot) {
         super(bot, "2048", "Play the classic 2048 game in a 4x4 box");
     }
 
-    private static EmbedBuilder toEmbed(Board board) {
-        return new EmbedBuilder().setDescription(
-            Arrays.stream(board.getCells())
-                .map(row -> Arrays.stream(row)
-                    .map(Cell::getValue)
-                    .map(Object::toString)
-                    .map(emotes::getString)
-                    .collect(Collectors.joining("")))
-                .collect(Collectors.joining("\n"))
-        ).setFooter("Score: " + board.getScore());
-    }
-
-    private static ActionRow getButtons(long id) {
+    private static ActionRow getButtons(String id) {
         return ActionRow.of(
             Button.primary("2048:" + id + ":l", Emoji.fromUnicode("\u2B05")),
             Button.primary("2048:" + id + ":u", Emoji.fromUnicode("\u2B06")),
@@ -67,19 +47,10 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
         );
     }
 
-    private static Board getBoard() {
-        Board board = spareBoards.isEmpty() ? new Board(4) : spareBoards.poll();
-        board.getCellsAsStream().forEach(cell -> cell.setType(CellType.C0));
-        return board;
-    }
-
     @Override
     public void execute(CommandReceivedEvent e) {
-        Board board = getBoard();
-        board.setScore(0);
-        board.spawn();
-        board.spawn();
-        e.sendEmbeds(toEmbed(board).build()).setActionRows(getButtons(e.getUser().getIdLong())).queue();
+        e.sendEmbeds(new Board(4).spawn().spawn().toEmbed())
+            .setActionRows(getButtons(e.getUser().getId())).queue();
     }
 
     public static class ButtonHandler2048 implements ButtonHandler {
@@ -98,12 +69,15 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
                 e.editMessage("The game was cancelled!").setActionRows().queue();
                 return;
             }
-            MessageEmbed embed = e.getMessage().getEmbeds().get(0);
-            Board board = boardFromString(embed.getDescription());
-            //noinspection ConstantConditions
-            board.setScore(Integer.parseInt(embed.getFooter().getText().replace("Score: ", "")));
+            List<MessageEmbed> embeds = e.getMessage().getEmbeds();
+            if (embeds.isEmpty()) {
+                // Will this ever happen though? better safe than sorry I guess
+                e.editComponents().queue();
+                return;
+            }
+            Board board = Board.fromEmbed(embeds.get(0));
             board.move(move);
-            UpdateInteractionAction action = e.deferEdit().setEmbeds(toEmbed(board).build());
+            UpdateInteractionAction action = e.deferEdit().setEmbeds(board.toEmbed());
             if (board.checkWin()) {
                 action.setContent("GG! You won!").setActionRows().queue();
             } else if (board.checkLose()) {
@@ -111,22 +85,6 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
             } else {
                 action.queue();
             }
-            spareBoards.offer(board);
-        }
-
-        private Board boardFromString(String input) {
-            Board board = getBoard();
-            CellType[] values = EMOTE.getPattern()
-                .matcher(input)
-                .replaceAll(result -> result.group(1) + '\n')
-                .lines()
-                .filter(s -> !s.isBlank())
-                .mapToInt(Integer::parseInt)
-                .mapToObj(CellType::forValue)
-                .toArray(CellType[]::new);
-            AtomicInteger i = new AtomicInteger();
-            board.getCellsAsStream().forEach(cell -> cell.setType(values[i.getAndIncrement()]));
-            return board;
         }
     }
 }

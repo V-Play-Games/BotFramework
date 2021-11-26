@@ -46,7 +46,7 @@ public class GuessGame {
         this.pokemon = GuessPokemon.get(String.valueOf(random.nextInt(GuessPokemon.CACHE.size()) + 1));
         this.text = Util.getRandom(pokemon.getFlavorTexts(), random);
         this.timeout = e.getJDA().getRateLimitPool()
-            .schedule(() -> close(Sender.fromChannel(e.getChannel()), TIMEOUT), 30, TimeUnit.SECONDS);
+            .schedule(() -> close(Sender.of(e.getChannel()), TIMEOUT), 30, TimeUnit.SECONDS);
         games.put(id, this);
     }
 

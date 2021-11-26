@@ -25,10 +25,14 @@ public class Cell {
     boolean modified;
 
     public Cell(int row, int column, Board board) {
+        this(row, column, board, CellType.C0);
+    }
+
+    public Cell(int row, int column, Board board, CellType type) {
         this.cells = board.cells;
         this.board = board;
         this.limit = board.size - 1;
-        this.type = CellType.C0;
+        this.type = type;
         setCoordinates(row, column);
     }
 
@@ -105,6 +109,10 @@ public class Cell {
         return modified;
     }
 
+    public void removeModify() {
+        this.modified = false;
+    }
+
     public void setModified(boolean modified) {
         this.modified = modified;
     }
@@ -154,9 +162,5 @@ public class Cell {
 
     public int getValue() {
         return type.getValue();
-    }
-
-    public String getFormatted() {
-        return type.getFormatted();
     }
 }

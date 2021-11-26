@@ -15,17 +15,23 @@
  */
 package net.vpg.bot.commands.fun.game2048;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.framework.Util;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static net.dv8tion.jda.api.entities.Message.MentionType.EMOTE;
+import static net.vpg.bot.commands.fun.game2048.Game2048Command.emotes;
 
 public class Board {
     final int size;
-    final Random random;
-    Cell[][] cells;
+    final Random random = new Random();
+    final Cell[][] cells;
     int score;
 
     public Board(int size) {
@@ -36,7 +42,32 @@ public class Board {
                 new Cell(i, j, this);
             }
         }
-        this.random = new Random();
+    }
+
+    private Board(int size, CellType[] types) {
+        this.size = size;
+        this.cells = new Cell[size][size];
+        int k = 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                new Cell(i, j, this, types[k++]);
+            }
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static Board fromEmbed(MessageEmbed embed) {
+        CellType[] values = EMOTE.getPattern()
+            .matcher(embed.getDescription())
+            .replaceAll(result -> result.group(1) + '\n')
+            .lines()
+            .filter(s -> !s.isBlank())
+            .mapToInt(Integer::parseInt)
+            .mapToObj(CellType::forValue)
+            .toArray(CellType[]::new);
+        Board board = new Board(4, values);
+        board.score = Integer.parseInt(embed.getFooter().getText().replace("Score: ", ""));
+        return board;
     }
 
     public Cell[][] getCells() {
@@ -47,7 +78,7 @@ public class Board {
         return Arrays.stream(cells).flatMap(Arrays::stream);
     }
 
-    public int move(Move move) {
+    public void move(Move move) {
         int row = move.row * (size - 1);
         int column = move.column * (size - 1);
         for (int runs = 0; runs < size; runs++, row += move.rowChange, column += move.columnChange) {
@@ -56,11 +87,10 @@ public class Board {
         spawn();
         int moveScore = getCellsAsStream()
             .filter(Cell::isModified)
-            .peek(cell -> cell.setModified(false))
+            .peek(Cell::removeModify)
             .mapToInt(Cell::getValue)
             .sum();
         score += moveScore;
-        return moveScore;
     }
 
     public boolean checkLose() {
@@ -71,34 +101,33 @@ public class Board {
         return getCellsAsStream().anyMatch(Cell::isFinal);
     }
 
-    public void spawn() {
+    public Board spawn() {
         Optional.of(getCellsAsStream().filter(Cell::isEmpty).toArray(Cell[]::new))
             .filter(emptyCells -> emptyCells.length != 0)
             .ifPresent(emptyCells -> Spawner.getInstance().spawn(Util.getRandom(emptyCells, random)));
-    }
-
-    public void setScore(int score) {
-        this.score = score;
+        return this;
     }
 
     public int getScore() {
         return score;
     }
 
+    public Board setScore(int score) {
+        this.score = score;
+        return this;
+    }
+
     public String toString() {
-        StringBuilder tor = new StringBuilder();
-        tor.append('+');
-        tor.append("------+".repeat(size));
-        int firstLineLen = tor.length();
-        tor.append('\n');
-        for (Cell[] row : cells) {
-            tor.append('|');
-            for (Cell cell : row) {
-                tor.append(' ').append(cell.getFormatted()).append(' ').append('|');
-            }
-            tor.append('\n');
-        }
-        tor.append(tor, 0, firstLineLen);
-        return tor.toString();
+        return Arrays.stream(cells)
+            .map(row -> Arrays.stream(row)
+                .map(Cell::getValue)
+                .map(Object::toString)
+                .map(emotes::getString)
+                .collect(Collectors.joining("")))
+            .collect(Collectors.joining("\n"));
+    }
+
+    public MessageEmbed toEmbed() {
+        return new EmbedBuilder().setDescription(toString()).setFooter("Score: " + score).build();
     }
 }

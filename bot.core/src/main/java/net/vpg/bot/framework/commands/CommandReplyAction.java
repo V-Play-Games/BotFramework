@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Component;
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.internal.requests.restaction.MessageActionImpl;
@@ -60,22 +61,34 @@ public class CommandReplyAction extends MessageActionImpl {
         this(tc.getJDA(), null, tc, task);
     }
 
+    public CommandReplyAction(ComponentInteraction interaction) {
+        this(interaction, null);
+    }
+
+    public CommandReplyAction(ComponentInteraction interaction, Consumer<CommandReplyAction> task) {
+        this(interaction, interaction.getMessageId(), task);
+    }
+
     public CommandReplyAction(Interaction interaction) {
         this(interaction, null);
     }
 
     public CommandReplyAction(Interaction interaction, Consumer<CommandReplyAction> task) {
-        this(interaction.getJDA(), null, interaction.getMessageChannel(), interaction.getHook(), task);
+        this(interaction, null, task);
     }
 
-    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, Consumer<CommandReplyAction> task) {
-        super(jda, messageId, channel);
-        this.task = task;
+    public CommandReplyAction(Interaction interaction, String messageId, Consumer<CommandReplyAction> task) {
+        this(interaction.getJDA(), messageId, interaction.getMessageChannel(), interaction.getHook(), task);
     }
 
     public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, InteractionHook hook, Consumer<CommandReplyAction> task) {
         this(jda, messageId, channel, task);
         this.withHook(hook);
+    }
+
+    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, Consumer<CommandReplyAction> task) {
+        super(jda, messageId, channel);
+        this.task = task;
     }
 
     public void setTask(Consumer<CommandReplyAction> task) {
@@ -87,7 +100,7 @@ public class CommandReplyAction extends MessageActionImpl {
     }
 
     public void appendTask(Consumer<CommandReplyAction> tasks, BinaryOperator<Consumer<CommandReplyAction>> combiner) {
-        this.task = combiner.apply(this.task, tasks);
+        this.task = this.task == null ? tasks : combiner.apply(this.task, tasks);
     }
 
     public String getContent() {

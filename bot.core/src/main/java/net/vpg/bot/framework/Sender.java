@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.vpg.bot.framework.commands.CommandReplyAction;
 
 import javax.annotation.CheckReturnValue;
@@ -26,23 +27,27 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface Sender {
-    static Sender fromInteraction(Interaction interaction) {
-        return fromFunction(interaction, CommandReplyAction::new);
+    static Sender of(ComponentInteraction interaction) {
+        return of(interaction, CommandReplyAction::new);
     }
 
-    static Sender fromMessage(Message message) {
-        return fromFunction(message, CommandReplyAction::new);
+    static Sender of(Interaction interaction) {
+        return of(interaction, CommandReplyAction::new);
     }
 
-    static Sender fromChannel(MessageChannel tc) {
-        return fromFunction(tc, CommandReplyAction::new);
+    static Sender of(Message message) {
+        return of(message, CommandReplyAction::new);
     }
 
-    static <T> Sender fromFunction(T t, Function<T, CommandReplyAction> converter) {
-        return fromSupplier(() -> converter.apply(t));
+    static Sender of(MessageChannel tc) {
+        return of(tc, CommandReplyAction::new);
     }
 
-    static Sender fromSupplier(Supplier<CommandReplyAction> supplier) {
+    static <T> Sender of(T t, Function<T, CommandReplyAction> converter) {
+        return () -> converter.apply(t);
+    }
+
+    static Sender of(Supplier<CommandReplyAction> supplier) {
         return supplier::get;
     }
 

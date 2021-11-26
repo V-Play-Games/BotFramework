@@ -15,19 +15,16 @@
  */
 package net.vpg.bot.framework;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public interface Ratelimiter {
-    Map<Long, Ratelimit> ratelimited = new HashMap<>();
-
-    default void ratelimit(long userId) {
-        ratelimited.put(userId, new Ratelimit(userId));
+    default void ratelimit(long id) {
+        getRatelimited().put(id, new Ratelimit(id));
     }
 
     default boolean isRatelimited(long userId) {
-        return isRatelimited(ratelimited.get(userId));
+        return isRatelimited(getRatelimitFor(userId));
     }
 
     default boolean isRatelimited(Ratelimit rl) {
@@ -38,14 +35,20 @@ public interface Ratelimiter {
         return getCooldown() + inflictedAt - System.currentTimeMillis();
     }
 
-    default boolean ifRatelimited(long userId, Consumer<Ratelimit> action) {
-        Ratelimit ratelimit = ratelimited.get(userId);
+    default boolean ifRatelimited(long id, Consumer<Ratelimit> action) {
+        Ratelimit ratelimit = getRatelimitFor(id);
         boolean isRatelimited = isRatelimited(ratelimit);
         if (isRatelimited) {
             action.accept(ratelimit);
         }
         return isRatelimited;
     }
+
+    default Ratelimit getRatelimitFor(long id) {
+        return getRatelimited().get(id);
+    }
+
+    Map<Long, Ratelimit> getRatelimited();
 
     long getCooldown();
 

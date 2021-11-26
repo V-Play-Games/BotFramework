@@ -35,6 +35,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
@@ -238,12 +239,24 @@ public class CommandReceivedEvent implements Sender {
         return slash.getOption(name);
     }
 
+    public <T> T getOption(String name, Function<OptionMapping, T> converter, T def) {
+        return optOption(name).map(converter).orElse(def);
+    }
+
     public String getString(String name) {
-        return getString(name, "");
+        return getString(name, null);
     }
 
     public String getString(String name, String def) {
-        return optOption(name).map(OptionMapping::getAsString).orElse(def);
+        return getOption(name, OptionMapping::getAsString, def);
+    }
+
+    public User getUser(String name) {
+        return getUser(name, null);
+    }
+
+    public User getUser(String name, User def) {
+        return getOption(name, OptionMapping::getAsUser, def);
     }
 
     public long getLong(String name) {
@@ -251,14 +264,11 @@ public class CommandReceivedEvent implements Sender {
     }
 
     public long getLong(String name, long def) {
-        return optOption(name).map(OptionMapping::getAsLong).orElse(def);
+        return getOption(name, OptionMapping::getAsLong, def);
     }
 
     public Optional<OptionMapping> optOption(String name) {
-        return getOptions()
-            .stream()
-            .filter(opt -> opt.getName().equals(name))
-            .findFirst();
+        return getOptions().stream().filter(opt -> opt.getName().equals(name)).findFirst();
     }
 
     public long getMessageId() {
