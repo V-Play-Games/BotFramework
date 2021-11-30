@@ -21,12 +21,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.restaction.interactions.UpdateInteractionAction;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.BotButtonEvent;
-import net.vpg.bot.framework.ButtonHandler;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.CommandReceivedEvent;
 import net.vpg.bot.commands.NoArgsCommand;
+import net.vpg.bot.framework.Bot;
+import net.vpg.bot.framework.BotButtonEvent;
+import net.vpg.bot.framework.ButtonHandler;
 
 import java.util.List;
 

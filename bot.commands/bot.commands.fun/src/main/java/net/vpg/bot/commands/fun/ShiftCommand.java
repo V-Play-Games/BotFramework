@@ -16,9 +16,9 @@
 package net.vpg.bot.commands.fun;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.vpg.bot.framework.Bot;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.framework.Bot;
 
 public class ShiftCommand extends BotCommandImpl {
     public ShiftCommand(Bot bot) {

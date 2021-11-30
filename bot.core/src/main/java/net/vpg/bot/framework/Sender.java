@@ -52,12 +52,12 @@ public interface Sender {
     }
 
     @CheckReturnValue
-    default CommandReplyAction send(String message)  {
+    default CommandReplyAction send(String message) {
         return deferSend().content(message);
     }
 
     @CheckReturnValue
-    default CommandReplyAction sendEmbeds(MessageEmbed... embeds)  {
+    default CommandReplyAction sendEmbeds(MessageEmbed... embeds) {
         return deferSend().setEmbeds(embeds);
     }
 

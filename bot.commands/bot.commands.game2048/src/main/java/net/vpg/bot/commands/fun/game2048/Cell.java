@@ -109,12 +109,12 @@ public class Cell {
         return modified;
     }
 
-    public void removeModify() {
-        this.modified = false;
-    }
-
     public void setModified(boolean modified) {
         this.modified = modified;
+    }
+
+    public void removeModify() {
+        this.modified = false;
     }
 
     private boolean tryMerge(Cell target) {

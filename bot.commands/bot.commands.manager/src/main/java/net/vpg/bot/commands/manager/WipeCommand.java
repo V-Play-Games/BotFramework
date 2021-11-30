@@ -15,10 +15,10 @@
  */
 package net.vpg.bot.commands.manager;
 
-import net.vpg.bot.framework.Bot;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.CommandReceivedEvent;
 import net.vpg.bot.commands.ManagerCommand;
+import net.vpg.bot.framework.Bot;
 
 public abstract class WipeCommand extends BotCommandImpl implements ManagerCommand {
     public WipeCommand(Bot bot) {

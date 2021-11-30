@@ -16,10 +16,12 @@
 package net.vpg.bot.commands.fun.game2048;
 
 public enum Move {
+    //@formatter:off
     UP   (0, 0, 0, 1),
     DOWN (1, 0, 0, 1),
     LEFT (0, 0, 1, 0),
     RIGHT(0, 1, 1, 0);
+    //@formatter:on
 
     final int row;
     final int column;

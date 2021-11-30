@@ -15,11 +15,11 @@
  */
 package net.vpg.bot.commands.manager;
 
-import net.vpg.bot.framework.Bot;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.CommandReceivedEvent;
 import net.vpg.bot.commands.ManagerCommand;
 import net.vpg.bot.commands.NoArgsCommand;
+import net.vpg.bot.framework.Bot;
 
 public class TerminalCommand extends BotCommandImpl implements NoArgsCommand, ManagerCommand {
     public TerminalCommand(Bot bot) {
