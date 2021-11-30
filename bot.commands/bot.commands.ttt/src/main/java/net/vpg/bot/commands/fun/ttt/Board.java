@@ -69,19 +69,19 @@ public class Board {
         for (int i = 0; i < 3; i++) {
             Cell[] row = cells[i];
             CellType mid = row[1].type;
-            if (!mid.isBlank() && row[0].type == mid && mid == row[2].type)
+            if (!mid.isBlank() && row[0].type == mid && row[2].type == mid)
                 return playerForType(mid);
         }
         // check columns
         for (int i = 0; i < 3; i++) {
             CellType mid = cells[1][i].type;
-            if (!mid.isBlank() && cells[0][i].type == mid && mid == cells[2][i].type)
+            if (!mid.isBlank() && cells[0][i].type == mid && cells[2][i].type == mid)
                 return playerForType(mid);
         }
         // check diagonals
         CellType mid = cells[1][1].type;
         if (!mid.isBlank() &&
-            (cells[2][0].type == mid && cells[0][2].type == mid) ||
+            (cells[2][2].type == mid && cells[0][0].type == mid) ||
             (cells[0][2].type == mid && cells[2][0].type == mid))
             return playerForType(mid);
         return null;
