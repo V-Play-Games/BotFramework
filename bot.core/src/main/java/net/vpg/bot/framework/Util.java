@@ -18,13 +18,12 @@ package net.vpg.bot.framework;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.framework.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.CommandReceivedEvent;
 import org.bson.Document;
 
 import java.io.File;
@@ -53,10 +52,6 @@ public class Util {
 
     public static String getPrefix(MessageReceivedEvent e, Bot bot) {
         return Util.getPrefix(e.isFromGuild(), e.getGuild(), bot);
-    }
-
-    public static String getPrefix(GuildMessageReceivedEvent e, Bot bot) {
-        return GuildSettings.get(e.getGuild().getId(), bot).getPrefix();
     }
 
     public static String getPrefix(boolean isFromGuild, Guild guild, Bot bot) {

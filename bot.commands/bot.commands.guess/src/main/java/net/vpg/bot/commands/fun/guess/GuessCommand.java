@@ -16,18 +16,18 @@
 package net.vpg.bot.commands.fun.guess;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.framework.*;
-import net.vpg.bot.framework.commands.BotCommandImpl;
-import net.vpg.bot.framework.commands.CommandReceivedEvent;
-import net.vpg.bot.framework.commands.NoArgsCommand;
 
 public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
     public GuessCommand(Bot bot) {
         super(bot, "guess", "Guess a Pokemon name by the given description of it");
-        bot.getShardManager().addEventListener(Util.subscribeTo(GuildMessageReceivedEvent.class, this::checkGuess));
+        bot.getShardManager().addEventListener(Util.subscribeTo(MessageReceivedEvent.class, this::checkGuess));
     }
 
     @Override
@@ -45,7 +45,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
             .queue(game::setMessage);
     }
 
-    public void checkGuess(GuildMessageReceivedEvent e) {
+    public void checkGuess(MessageReceivedEvent e) {
         GuessGame game = GuessGame.get(e.getAuthor().getId());
         if (game == null) return;
         if (game.isCorrect(e.getMessage().getContentRaw())) {

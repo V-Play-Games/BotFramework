@@ -23,8 +23,8 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.vpg.bot.framework.commands.BotCommand;
-import net.vpg.bot.framework.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.BotCommand;
+import net.vpg.bot.commands.CommandReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;

@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.entities.GuessPokemon;
 import net.vpg.bot.framework.Sender;
 import net.vpg.bot.framework.Util;
-import net.vpg.bot.framework.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.CommandReceivedEvent;
 
 import java.util.HashMap;
 import java.util.Map;

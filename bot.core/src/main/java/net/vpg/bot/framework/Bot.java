@@ -34,7 +34,7 @@ import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.database.Database;
 import net.vpg.bot.entities.Entity;
 import net.vpg.bot.entities.EntityInfo;
-import net.vpg.bot.framework.commands.BotCommand;
+import net.vpg.bot.commands.BotCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

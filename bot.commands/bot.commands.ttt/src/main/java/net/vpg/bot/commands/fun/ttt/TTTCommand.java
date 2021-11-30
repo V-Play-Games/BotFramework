@@ -23,9 +23,8 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import net.vpg.bot.framework.Bot;
 import net.vpg.bot.framework.BotButtonEvent;
 import net.vpg.bot.framework.ButtonHandler;
-import net.vpg.bot.framework.Sender;
-import net.vpg.bot.framework.commands.BotCommandImpl;
-import net.vpg.bot.framework.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.commands.CommandReceivedEvent;
 
 import java.util.List;
 
@@ -53,9 +52,9 @@ public class TTTCommand extends BotCommandImpl {
 //        return Button.primary("ttt:" + id + ":h", "How to Play");
 //    }
 
-    public static void start(Sender sender, Board board) {
+    public static void start(CommandReceivedEvent e, Board board) {
         doAITurn(board);
-        sendTurn(sender, board);
+        sendTurn(e, board);
     }
 
     private static void doAITurn(Board board) {
@@ -66,9 +65,16 @@ public class TTTCommand extends BotCommandImpl {
         }
     }
 
-    private static void sendTurn(Sender sender, Board board) {
+    private static void sendTurn(CommandReceivedEvent e, Board board) {
         Player thisTurn = board.getThisTurn();
-        sender.send(String.format("It is <@%s>'s turn! (Playing as %s)", thisTurn.id, thisTurn.type))
+        e.send(String.format("It is <@%s>'s turn! (Playing as %s)", thisTurn.id, thisTurn.type))
+            .setActionRows(board.getActionRows())
+            .queue();
+    }
+
+    private static void sendTurn(BotButtonEvent e, Board board) {
+        Player thisTurn = board.getThisTurn();
+        e.editMessage(String.format("It is <@%s>'s turn! (Playing as %s)", thisTurn.id, thisTurn.type))
             .setActionRows(board.getActionRows())
             .queue();
     }
@@ -109,10 +115,10 @@ public class TTTCommand extends BotCommandImpl {
             String id = e.getArg(0);
             String clicker = e.getUser().getId();
             if (!id.contains(clicker)) return;
-            Board board = null;
+            Board board = Board.get(id);
             switch (e.getArg(1)) {
                 case "p":
-                    sendTurn(Sender.of(e), board);
+                    sendTurn(e, board);
                     break;
                 case "x":
                     e.editMessage("<@" + clicker + "> denied the challenge!").setActionRows().queue();
@@ -128,9 +134,9 @@ public class TTTCommand extends BotCommandImpl {
                     doAITurn(board);
                     Player winner = board.getWinner();
                     if (winner == null) {
-                        sendTurn(Sender.of(e), board);
+                        sendTurn(e, board);
                     } else {
-                        e.editMessage("<@" + winner.id + "> won the match!").queue();
+                        e.editMessage("<@" + winner.id + "> won the match!").setActionRows(board.getActionRows()).queue();
                         board.remove();
                     }
                     break;

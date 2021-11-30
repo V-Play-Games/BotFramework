@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
-import net.vpg.bot.framework.commands.CommandReplyAction;
+import net.vpg.bot.commands.CommandReplyAction;
 
 import javax.annotation.CheckReturnValue;
 import java.util.function.Function;

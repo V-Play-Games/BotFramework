@@ -66,5 +66,10 @@
       <artifactId>bot.commands.mod</artifactId>
       <version>${framework.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.v-play-games</groupId>
+      <artifactId>bot.commands.ttt</artifactId>
+      <version>${framework.version}</version>
+    </dependency>
   </dependencies>
 </project>

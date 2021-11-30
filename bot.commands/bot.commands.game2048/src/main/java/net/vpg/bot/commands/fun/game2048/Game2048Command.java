@@ -24,9 +24,9 @@ import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.framework.Bot;
 import net.vpg.bot.framework.BotButtonEvent;
 import net.vpg.bot.framework.ButtonHandler;
-import net.vpg.bot.framework.commands.BotCommandImpl;
-import net.vpg.bot.framework.commands.CommandReceivedEvent;
-import net.vpg.bot.framework.commands.NoArgsCommand;
+import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.NoArgsCommand;
 
 import java.util.List;
 

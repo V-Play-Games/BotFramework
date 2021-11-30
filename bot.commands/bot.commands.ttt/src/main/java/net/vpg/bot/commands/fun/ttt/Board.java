@@ -37,10 +37,14 @@ public class Board {
         this.cells = new Cell[3][3];
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                new Cell(i, j, this);
+                cells[i][j] = new Cell(i, j, this);
             }
         }
         boards.put(id, this);
+    }
+
+    public static Board get(String id) {
+        return boards.get(id);
     }
 
     public Cell[][] getCells() {
@@ -78,7 +82,7 @@ public class Board {
         CellType mid = cells[1][1].type;
         if (!mid.isBlank() &&
             (cells[2][0].type == mid && cells[0][2].type == mid) ||
-            (cells[0][2].type == mid && cells[3][0].type == mid))
+            (cells[0][2].type == mid && cells[2][0].type == mid))
             return playerForType(mid);
         return null;
     }

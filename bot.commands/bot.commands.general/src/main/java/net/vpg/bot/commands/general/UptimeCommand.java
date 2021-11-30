@@ -18,9 +18,9 @@ package net.vpg.bot.commands.general;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.commands.BotCommandImpl;
-import net.vpg.bot.framework.commands.CommandReceivedEvent;
-import net.vpg.bot.framework.commands.NoArgsCommand;
+import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.NoArgsCommand;
 
 import java.time.Instant;
 
