@@ -57,7 +57,7 @@ public class GuildSettings extends DatabaseObject {
     }
 
     public static EntityInfo<GuildSettings> getInfo() {
-        return new EntityInfo<>(COLLECTION_NAME, GuildSettings::createNew, CACHE);
+        return new EntityInfo<>(COLLECTION_NAME, GuildSettings::new, CACHE);
     }
 
     public static GuildSettings get(String id, Bot bot) {

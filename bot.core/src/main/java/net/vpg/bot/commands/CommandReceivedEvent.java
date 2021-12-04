@@ -31,13 +31,11 @@ import net.vpg.bot.framework.Sender;
 import net.vpg.bot.framework.Util;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public class CommandReceivedEvent implements Sender {
     private final String prefix;
     private final long messageId;
@@ -60,7 +58,7 @@ public class CommandReceivedEvent implements Sender {
     private Throwable trouble;
     private List<String> args;
 
-    public CommandReceivedEvent(MessageReceivedEvent e, String[] args, BotCommand command, String prefix) {
+    public CommandReceivedEvent(MessageReceivedEvent e, List<String> args, BotCommand command, String prefix) {
         this(e.getJDA(),
             e.getMessageIdLong(),
             e.getChannel(),
@@ -72,7 +70,7 @@ public class CommandReceivedEvent implements Sender {
             e.getMessage().getTimeCreated(),
             prefix,
             false);
-        this.args = Arrays.asList(args);
+        this.args = args;
         this.message = e.getMessage();
         actionSupplier = () -> new CommandReplyAction(message, this::log);
     }
@@ -121,7 +119,7 @@ public class CommandReceivedEvent implements Sender {
         this.selfMember = guild.getMember(jda.getSelfUser());
     }
 
-    public static void run(MessageReceivedEvent e, String[] args, BotCommand command, String prefix) {
+    public static void run(MessageReceivedEvent e, List<String> args, BotCommand command, String prefix) {
         command.run(new CommandReceivedEvent(e, args, command, prefix));
     }
 

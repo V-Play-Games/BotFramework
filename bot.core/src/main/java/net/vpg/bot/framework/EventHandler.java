@@ -16,7 +16,6 @@
 package net.vpg.bot.framework;
 
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ExceptionEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -28,7 +27,7 @@ import net.vpg.bot.commands.CommandReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -56,22 +55,43 @@ public class EventHandler extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
-        String prefix = Util.getPrefix(e, bot);
         if (closed) {
-            if (e.getMessage().getContentRaw().equalsIgnoreCase(prefix + "activate") && bot.isManager(e.getAuthor().getIdLong())) {
+            if (e.getMessage().getContentRaw().equalsIgnoreCase(bot.getPrefix() + "activate")
+                && bot.isManager(e.getAuthor().getIdLong())) {
                 closed = false;
                 e.getChannel().sendMessage("Thanks for activating me again!").queue();
             }
-        } else if (!e.getAuthor().isBot() && (!e.isFromGuild() || ((TextChannel) e.getChannel()).canTalk())) {
-            Message message = e.getMessage();
-            String content = message.getContentRaw();
-            String[] args = Util.DELIMITER.split(content);
-            if (content.regionMatches(true, 0, prefix, 0, prefix.length())) {
-                Optional.ofNullable(bot.getCommands().get(args[0].substring(prefix.length()).toLowerCase()))
-                    .ifPresent(command -> CommandReceivedEvent.run(e, args, command, prefix));
-            } else if (getSelfMentionPattern().matcher(content).find()) {
-                e.getChannel().sendMessage("Prefix: " + prefix).queue();
+            return;
+        }
+        if (e.getAuthor().isBot() || (e.isFromGuild() && !e.getGuildChannel().canTalk())) {
+            return;
+        }
+        String prefix = Util.getPrefix(e, bot);
+        Message message = e.getMessage();
+        String content = message.getContentRaw();
+        String[] args = Util.DELIMITER.split(content);
+        int argLen = args.length;
+        if (argLen <= 1) return;
+        if (content.regionMatches(true, 0, prefix, 0, prefix.length())) {
+            boolean spaceAfterPrefix = args[0].length() == prefix.length();
+            String command;
+            int firstArg;
+            if (spaceAfterPrefix) {
+                int i = 1;
+                while (args[i++].isBlank()) {
+                    if (i == argLen) return; // shouldn't happen, as trailing spaces are not possible
+                }
+                command = args[i];
+                firstArg = i + 1;
+            } else {
+                command = args[0].substring(prefix.length());
+                firstArg = 1;
             }
+            BotCommand botCommand = bot.getCommands().get(command.toLowerCase());
+            if (botCommand != null)
+                CommandReceivedEvent.run(e, Arrays.asList(args).subList(firstArg, argLen), botCommand, prefix);
+        } else if (getSelfMentionPattern().matcher(content).find()) {
+            e.getChannel().sendMessage("Prefix: " + prefix).queue();
         }
     }
 
