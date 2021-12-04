@@ -40,7 +40,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class Util {
-    public static Pattern DELIMITER = Pattern.compile("[\n\\s]");
+    public static Pattern SPACE = Pattern.compile("\\s");
+    public static Pattern SPACE_WITH_LINE = Pattern.compile("[\\r\\n\\s]");
 
     private Util() {
         // Utility Class

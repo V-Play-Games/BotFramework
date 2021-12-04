@@ -40,8 +40,8 @@ public class CaseCommand extends BotCommandImpl {
     @Override
     public void onCommandRun(CommandReceivedEvent e) {
         execute(e,
-            String.join(" ", e.getArgsFrom(2)),
-            e.getArg(1).toLowerCase());
+            e.getArgsFrom(1, " "),
+            e.getArg(0).toLowerCase());
     }
 
     @Override

@@ -29,6 +29,7 @@ public class PrefixCommand extends BotCommandImpl implements ModCommand {
         super(bot, "prefix", "Set the custom prefix of the server");
         addOption(OptionType.STRING, "prefix", "The custom prefix to use", true);
         setMinArgs(1);
+        setMaxArgs(1);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class PrefixCommand extends BotCommandImpl implements ModCommand {
 
     @Override
     public void onCommandRun(CommandReceivedEvent e) {
-        execute(e, e.getArg(1));
+        execute(e, e.getArg(0));
     }
 
     @Override
@@ -56,7 +57,7 @@ public class PrefixCommand extends BotCommandImpl implements ModCommand {
             e.send("Provide a valid prefix!").queue();
             return;
         }
-        String prefix = Util.DELIMITER.split(input)[0];
+        String prefix = Util.SPACE_WITH_LINE.split(input)[0];
         if (prefix.isBlank() || Util.containsAny(prefix, "@everyone", "@here")) {
             e.send("Provide a valid prefix! `" + prefix + "` is not allowed.").queue();
             return;

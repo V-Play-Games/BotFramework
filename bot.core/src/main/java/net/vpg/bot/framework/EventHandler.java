@@ -69,7 +69,7 @@ public class EventHandler extends ListenerAdapter {
         String prefix = Util.getPrefix(e, bot);
         Message message = e.getMessage();
         String content = message.getContentRaw();
-        String[] args = Util.DELIMITER.split(content);
+        String[] args = Util.SPACE.split(content);
         int argLen = args.length;
         if (argLen <= 1) return;
         if (content.regionMatches(true, 0, prefix, 0, prefix.length())) {

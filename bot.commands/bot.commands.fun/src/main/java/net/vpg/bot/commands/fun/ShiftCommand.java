@@ -30,7 +30,7 @@ public class ShiftCommand extends BotCommandImpl {
 
     @Override
     public void onCommandRun(CommandReceivedEvent e) {
-        execute(e, String.join(" ", e.getArgsFrom(2)), Long.parseLong(e.getArg(1)));
+        execute(e, e.getArgsFrom(1, " "), Long.parseLong(e.getArg(0)));
     }
 
     @Override

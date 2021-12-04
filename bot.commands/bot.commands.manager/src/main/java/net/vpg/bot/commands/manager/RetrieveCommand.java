@@ -29,7 +29,7 @@ public abstract class RetrieveCommand extends BotCommandImpl implements ManagerC
 
     @Override
     public void onCommandRun(CommandReceivedEvent e) {
-        execute(e, e.getArg(1));
+        execute(e, e.getArg(0));
     }
 
     @Override

@@ -96,22 +96,24 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
         if (ifRatelimited(aid, rl -> onRatelimit(e, rl)) || !runChecks(e)) {
             return;
         }
-        int args = e.getArgs() != null ? e.getArgs().size() - 1 : 0;
-        if (!e.isSlashCommand() && (minArgs > args || args > (maxArgs == 0 ? args : maxArgs))) {
-            onInsufficientArgs(e);
-            return;
+        if (!e.isSlashCommand()) { // Slash Commands bypass arg checks
+            int args = e.getArgs().size();
+            if (minArgs > args || (maxArgs != 0 && args > maxArgs)) {
+                onInsufficientArgs(e);
+                return;
+            }
         }
         try {
             if (e.isSlashCommand()) onSlashCommandRun(e);
             else onCommandRun(e);
             ratelimit(aid);
         } catch (Exception exc) {
+            e.reportTrouble(exc);
             e.send("There was some trouble processing your request. Please contact the developer.")
                 .queue(null, x -> e.getChannel()
                     .sendMessage("There was some trouble processing your request. Please contact the developer.")
                     .queue()
                 );
-            e.reportTrouble(exc);
         }
     }
 

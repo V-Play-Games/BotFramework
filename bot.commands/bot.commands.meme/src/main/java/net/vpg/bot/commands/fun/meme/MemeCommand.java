@@ -16,36 +16,22 @@
 package net.vpg.bot.commands.fun.meme;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.CommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.Util;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MemeCommand extends BotCommandImpl {
-    public static final List<Meme> randomMemes = new ArrayList<>();
-    public final Connection conn = new Connection();
+    private final Connection connection = new Connection();
 
     public MemeCommand(Bot bot) {
         super(bot, "meme", "Pulls a random meme from Reddit");
         addOption(OptionType.STRING, "subreddit", "The subreddit to pull a meme from");
         setCooldown(10, TimeUnit.SECONDS);
         setMaxArgs(1);
-        bot.getPrimaryShard().getRateLimitPool().execute(() -> {
-            try {
-                randomMemes.addAll(conn.getMemes(10));
-                randomMemes.addAll(conn.getMemes(10, "PokemonMasters"));
-                randomMemes.addAll(conn.getMemes(10, "Pokemon"));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     @Override
@@ -59,21 +45,17 @@ public class MemeCommand extends BotCommandImpl {
 
     @Override
     public void onCommandRun(CommandReceivedEvent e) throws IOException {
-        execute(e, e.getArgs().size() == 2 ? e.getArg(1) : "", ((TextChannel) e.getChannel()).isNSFW());
+        execute(e, e.getArgs().size() == 1 ? e.getArg(0) : "");
     }
 
     @Override
     public void onSlashCommandRun(CommandReceivedEvent e) throws Exception {
-        execute(e, e.getString("subreddit"), ((TextChannel) e.getChannel()).isNSFW());
+        execute(e, e.getString("subreddit"));
     }
 
-    public void execute(CommandReceivedEvent e, String subreddit, boolean allowNSFW) throws IOException {
-        Meme meme = conn.getMeme(subreddit);
-        if (meme.nsfw) {
-            if (!allowNSFW) meme = Util.getRandom(randomMemes);
-        } else {
-            randomMemes.add(meme);
-        }
+    public void execute(CommandReceivedEvent e, String subreddit) throws IOException {
+        Meme meme = connection.getMeme(subreddit);
+        if (meme.nsfw && !e.getTextChannel().isNSFW()) return;
         e.sendEmbeds(new EmbedBuilder()
             .setTitle(meme.title, meme.postLink)
             .setDescription("Meme by u/" + meme.author + " in r/" + meme.subreddit)

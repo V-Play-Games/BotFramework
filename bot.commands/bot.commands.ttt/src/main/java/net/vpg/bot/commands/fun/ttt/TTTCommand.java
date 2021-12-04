@@ -95,8 +95,7 @@ public class TTTCommand extends BotCommandImpl {
     @Override
     public void onCommandRun(CommandReceivedEvent e) {
         List<User> mentions = e.getMessage().getMentionedUsers();
-        List<String> args = e.getArgs();
-        execute(e, args.isEmpty() ? null : args.get(0), mentions.isEmpty() ? null : mentions.get(0));
+        execute(e, e.getArgs().isEmpty() ? null : e.getArg(0), mentions.isEmpty() ? null : mentions.get(0));
     }
 
     @Override

@@ -29,7 +29,7 @@ public class ReverseCommand extends BotCommandImpl {
 
     @Override
     public void onCommandRun(CommandReceivedEvent e) {
-        execute(e, e.getContent().replace(e.getArg(0) + " ", ""));
+        execute(e, e.getArgsFrom(0, " "));
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ReverseCommand extends BotCommandImpl {
         execute(e, e.getString("text"));
     }
 
-    public void execute(CommandReceivedEvent e, String reverse) {
-        e.send(new StringBuilder(reverse).reverse().toString()).queue();
+    public void execute(CommandReceivedEvent e, String input) {
+        e.send(new StringBuilder(input).reverse().toString()).queue();
     }
 }

@@ -187,6 +187,10 @@ public class CommandReceivedEvent implements Sender {
         return slash.getTextChannel();
     }
 
+    public NewsChannel getNewsChannel() {
+        return slash.getNewsChannel();
+    }
+
     public VoiceChannel getVoiceChannel() {
         return slash.getVoiceChannel();
     }
@@ -316,7 +320,7 @@ public class CommandReceivedEvent implements Sender {
     }
 
     public boolean isFromType(ChannelType type) {
-        return channel.getType() == type;
+        return getChannelType() == type;
     }
 
     public boolean isFromGuild() {
@@ -341,6 +345,10 @@ public class CommandReceivedEvent implements Sender {
 
     public List<String> getArgsFrom(int index) {
         return args.subList(index, args.size());
+    }
+
+    public String getArgsFrom(int index, String delimiter) {
+        return String.join(delimiter, getArgsFrom(index));
     }
 
     public String getArg(int index) {
