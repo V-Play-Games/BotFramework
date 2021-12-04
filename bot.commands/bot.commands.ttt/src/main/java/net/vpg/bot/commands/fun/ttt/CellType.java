@@ -52,4 +52,8 @@ public enum CellType {
     public boolean isBlank() {
         return this == BLANK;
     }
+
+    public CellType other() {
+        return this == X ? O : X;
+    }
 }

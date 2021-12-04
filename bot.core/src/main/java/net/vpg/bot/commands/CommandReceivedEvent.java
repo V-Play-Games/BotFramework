@@ -176,27 +176,37 @@ public class CommandReceivedEvent implements Sender {
     }
 
     public GuildChannel getGuildChannel() {
-        return slash.getGuildChannel();
+        if (channel instanceof GuildChannel)
+            return (GuildChannel) channel;
+        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to GuildChannel");
     }
 
     public MessageChannel getMessageChannel() {
-        return slash.getMessageChannel();
+        return channel;
     }
 
     public TextChannel getTextChannel() {
-        return slash.getTextChannel();
+        if (channel instanceof TextChannel)
+            return (TextChannel) channel;
+        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to TextChannel");
     }
 
     public NewsChannel getNewsChannel() {
-        return slash.getNewsChannel();
+        if (channel instanceof NewsChannel)
+            return (NewsChannel) channel;
+        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to NewsChannel");
     }
 
     public VoiceChannel getVoiceChannel() {
-        return slash.getVoiceChannel();
+        if (channel instanceof VoiceChannel)
+            return (VoiceChannel) channel;
+        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to VoiceChannel");
     }
 
     public PrivateChannel getPrivateChannel() {
-        return slash.getPrivateChannel();
+        if (channel instanceof PrivateChannel)
+            return (PrivateChannel) channel;
+        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to PrivateChannel");
     }
 
     public String getCommandPath() {

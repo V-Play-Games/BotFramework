@@ -15,6 +15,7 @@
  */
 package net.vpg.bot.commands.fun.ttt;
 
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.internal.interactions.ButtonImpl;
@@ -48,8 +49,16 @@ public class Cell {
         return column;
     }
 
+    public Emoji getEmoji() {
+        return type.getEmoji();
+    }
+
+    public boolean isBlank() {
+        return type.isBlank();
+    }
+
     // The returned button has id -> ttt:player1-player2-time:c:row:column:type
     public Button getButton() {
-        return new ButtonImpl("ttt:" + id + ":" + type.identifier, null, ButtonStyle.PRIMARY, type != CellType.BLANK, type.emoji);
+        return new ButtonImpl("ttt:" + id + ":" + type.identifier, null, ButtonStyle.PRIMARY, type != CellType.BLANK, getEmoji());
     }
 }

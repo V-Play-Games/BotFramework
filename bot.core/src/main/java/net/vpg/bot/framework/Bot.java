@@ -24,11 +24,9 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.AllowedMentions;
-import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 import net.dv8tion.jda.api.utils.data.DataArray;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.commands.BotCommand;
@@ -301,7 +299,7 @@ public class Bot implements Entity {
     }
 
     public void startSync() {
-        getPrimaryShard().getRateLimitPool().scheduleWithFixedDelay(() -> {
+        getPrimaryShard().getRateLimitPool().scheduleAtFixedRate(() -> {
             syncCount.incrementAndGet();
             String message = "Sync [" + syncCount + "]";
             logger.info(message);
@@ -309,7 +307,7 @@ public class Bot implements Entity {
                 getSyncChannel().sendMessage(message).queue(m -> syncMessageId = m.getIdLong());
             else
                 getSyncChannel().editMessageById(syncMessageId, message).queue();
-        }, 1, 1, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
     public void loadLoggers() {
@@ -319,13 +317,14 @@ public class Bot implements Entity {
         if (category == null) return;
         shardManager.getShardCache()
             .stream()
-            .forEach(shard -> {
-                int id = shard.getShardInfo().getShardId();
+            .map(JDA::getShardInfo)
+            .map(JDA.ShardInfo::getShardId)
+            .forEach(id -> {
                 List<TextChannel> channels = resources.getTextChannelsByName("shard-" + id, true);
                 if (channels.isEmpty()) {
-                    category.createTextChannel("shard-" + id).queue(tc -> addLogger(shard, tc.getIdLong()));
+                    category.createTextChannel("shard-" + id).queue(tc -> loggers.put(id, tc.getIdLong()));
                 } else {
-                    addLogger(shard, channels.get(0).getIdLong());
+                    loggers.put(id, channels.get(0).getIdLong());
                 }
             });
         List<TextChannel> channels = resources.getTextChannelsByName("sync", true);
@@ -333,20 +332,6 @@ public class Bot implements Entity {
             category.createTextChannel("sync").queue(tc -> loggers.put(-1, tc.getIdLong()));
         } else {
             loggers.put(-1, channels.get(0).getIdLong());
-        }
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void addLogger(JDA shard, long id) {
-        loggers.put(shard.getShardInfo().getShardId(), id);
-        SnowflakeCacheView<Guild> guildCache = shard.getGuildCache();
-        if (!guildCache.isEmpty()) {
-            TextChannel logChannel = shardManager.getTextChannelById(id);
-            logChannel.sendMessage("GuildCache").queue();
-            guildCache.stream()
-                .map(Guild::toString)
-                .map(logChannel::sendMessage)
-                .forEach(RestAction::queue);
         }
     }
 

@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class Board {
     public static final Map<String, Board> boards = new HashMap<>();
@@ -30,9 +31,9 @@ public class Board {
     Player player2;
 
     public Board(String player1, String player2, boolean firstIsX) {
-        this.player1 = new Player(player1, CellType.O);
-        this.player2 = new Player(player2, CellType.X);
-        if (firstIsX) switchSides();
+        this.player1 = new Player(player1, firstIsX ? CellType.X : CellType.O);
+        this.player2 = new Player(player2, firstIsX ? CellType.O : CellType.X);
+        if (!firstIsX) switchSides();
         this.id = player1 + "-" + player2 + "-" + System.currentTimeMillis();
         this.cells = new Cell[3][3];
         for (int i = 0; i < 3; i++) {
@@ -49,6 +50,10 @@ public class Board {
 
     public Cell[][] getCells() {
         return cells;
+    }
+
+    public Stream<Cell> getCellsAsStream() {
+        return Arrays.stream(cells).flatMap(Arrays::stream);
     }
 
     public Cell getCell(int row, int column) {
@@ -70,20 +75,90 @@ public class Board {
             Cell[] row = cells[i];
             CellType mid = row[1].type;
             if (!mid.isBlank() && row[0].type == mid && row[2].type == mid)
-                return playerForType(mid);
+                return playerOfType(mid);
         }
         // check columns
         for (int i = 0; i < 3; i++) {
             CellType mid = cells[1][i].type;
             if (!mid.isBlank() && cells[0][i].type == mid && cells[2][i].type == mid)
-                return playerForType(mid);
+                return playerOfType(mid);
         }
         // check diagonals
         CellType mid = cells[1][1].type;
         if (!mid.isBlank() &&
             (cells[2][2].type == mid && cells[0][0].type == mid) ||
             (cells[0][2].type == mid && cells[2][0].type == mid))
-            return playerForType(mid);
+            return playerOfType(mid);
+        return null;
+    }
+
+    public boolean checkTie() {
+        return getCellsAsStream().noneMatch(Cell::isBlank);
+    }
+
+    public Cell getWinningMoveFor(CellType winner) {
+        // check rows
+        for (int i = 0; i < 3; i++) {
+            int count = 0;
+            Cell emptyPosition = null;
+            for (int j = 0; j < 3; j++) {
+                Cell cell = cells[i][j];
+                if (cell.isBlank()) {
+                    emptyPosition = cell;
+                } else if (cell.type == winner) {
+                    count++;
+                }
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
+
+        // check columns
+        for (int i = 0; i < 3; i++) {
+            int count = 0;
+            Cell emptyPosition = null;
+            for (int j = 0; j < 3; j++) {
+                Cell cell = cells[j][i];
+                if (cell.isBlank()) {
+                    emptyPosition = cell;
+                } else if (cell.type == winner) {
+                    count++;
+                }
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
+
+        // check diagonals
+        int count = 0;
+        Cell emptyPosition = null;
+        for (int i = 0; i < 3; i++) {
+            Cell cell = cells[i][i];
+            if (cell.isBlank()) {
+                emptyPosition = cell;
+            } else if (cell.type == winner) {
+                count++;
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
+
+        count = 0;
+        emptyPosition = null;
+        for (int i = 0; i < 3; i++) {
+            Cell cell = cells[i][2 - i];
+            if (cell.isBlank()) {
+                emptyPosition = cell;
+            } else if (cell.type == winner) {
+                count++;
+            }
+            if (count == 2) {
+                return emptyPosition;
+            }
+        }
         return null;
     }
 
@@ -97,7 +172,15 @@ public class Board {
         return player1 = next;
     }
 
-    public Player playerForType(CellType type) {
+    public Cell[] getCellsOfType(CellType type) {
+        return getCellsAsStream().filter(cell -> cell.type == type).toArray(Cell[]::new);
+    }
+
+    public int getCellCountOfType(CellType type) {
+        return (int) getCellsAsStream().filter(cell -> cell.type == type).count();
+    }
+
+    public Player playerOfType(CellType type) {
         if (type == player1.type)
             return player1;
         if (type == player2.type)

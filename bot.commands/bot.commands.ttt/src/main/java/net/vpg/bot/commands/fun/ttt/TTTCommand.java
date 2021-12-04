@@ -44,7 +44,7 @@ public class TTTCommand extends BotCommandImpl {
     private static ActionRow confirmationButtons(String id) {
         return ActionRow.of(
             Button.primary("ttt:" + id + ":p", "Play"),
-            Button.primary("ttt:" + id + ":x", "Decline")
+            Button.primary("ttt:" + id + ":x", "Cancel")
         );
     }
 
@@ -81,13 +81,14 @@ public class TTTCommand extends BotCommandImpl {
 
     public void execute(CommandReceivedEvent e, String play_as, User opponent) {
         String player1 = e.getUser().getId();
+        String player2 = opponent == null || opponent.getId().equals(player1) ? "ai" : opponent.getId();
         boolean firstIsX = "X".equalsIgnoreCase(play_as);
-        if (opponent == null) { // Single-player: no confirmation needed
-            start(e, new Board(player1, "ai", firstIsX));
+        Board board = new Board(player1, player2, firstIsX);
+        if (player2.equals("ai")) { // Single-player: no confirmation needed
+            start(e, board);
         } else {
-            Board board = new Board(player1, opponent.getId(), firstIsX);
-            e.send(e.getUser().getAsMention() + " has challenged " + opponent.getAsMention() + " to a TicTacToe Duel!")
-                .setActionRows(confirmationButtons(board.player2.id))
+            e.send(e.getUser().getAsMention() + " has challenged <@" + player2 + "> to a TicTacToe Duel!")
+                .setActionRows(confirmationButtons(board.id))
                 .queue();
         }
     }
@@ -115,12 +116,15 @@ public class TTTCommand extends BotCommandImpl {
             String clicker = e.getUser().getId();
             if (!id.contains(clicker)) return;
             Board board = Board.get(id);
+            if (board == null) return;
             switch (e.getArg(1)) {
                 case "p":
-                    sendTurn(e, board);
+                    if (board.player2.id.equals(clicker)) {
+                        sendTurn(e, board);
+                    }
                     break;
                 case "x":
-                    e.editMessage("<@" + clicker + "> denied the challenge!").setActionRows().queue();
+                    e.editMessage("<@" + clicker + "> cancelled the challenge!").setActionRows().queue();
                     break;
                 case "c":
                     Player thisTurn = board.getThisTurn();
@@ -133,7 +137,11 @@ public class TTTCommand extends BotCommandImpl {
                     doAITurn(board);
                     Player winner = board.getWinner();
                     if (winner == null) {
-                        sendTurn(e, board);
+                        if (board.checkTie()) {
+                            e.editMessage("It's a tie! Nobody won.").setActionRows(board.getActionRows()).queue();
+                        } else {
+                            sendTurn(e, board);
+                        }
                     } else {
                         e.editMessage("<@" + winner.id + "> won the match!").setActionRows(board.getActionRows()).queue();
                         board.remove();

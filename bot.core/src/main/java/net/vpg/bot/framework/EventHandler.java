@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -71,16 +73,14 @@ public class EventHandler extends ListenerAdapter {
         String content = message.getContentRaw();
         String[] args = Util.SPACE.split(content);
         int argLen = args.length;
-        if (argLen <= 1) return;
         if (content.regionMatches(true, 0, prefix, 0, prefix.length())) {
             boolean spaceAfterPrefix = args[0].length() == prefix.length();
             String command;
             int firstArg;
             if (spaceAfterPrefix) {
+                if (argLen <= 1) return;
                 int i = 1;
-                while (args[i++].isBlank()) {
-                    if (i == argLen) return; // shouldn't happen, as trailing spaces are not possible
-                }
+                while (args[i].isBlank()) i++;
                 command = args[i];
                 firstArg = i + 1;
             } else {
@@ -88,8 +88,12 @@ public class EventHandler extends ListenerAdapter {
                 firstArg = 1;
             }
             BotCommand botCommand = bot.getCommands().get(command.toLowerCase());
-            if (botCommand != null)
-                CommandReceivedEvent.run(e, Arrays.asList(args).subList(firstArg, argLen), botCommand, prefix);
+            if (botCommand != null) {
+                List<String> finalArgs = firstArg == argLen
+                    ? Collections.emptyList()
+                    : Arrays.asList(args).subList(firstArg, argLen);
+                CommandReceivedEvent.run(e, finalArgs, botCommand, prefix);
+            }
         } else if (getSelfMentionPattern().matcher(content).find()) {
             e.getChannel().sendMessage("Prefix: " + prefix).queue();
         }
