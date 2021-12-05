@@ -17,13 +17,12 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>bot.commands</artifactId>
     <groupId>com.github.v-play-games</groupId>
-    <version>0.0.2</version>
+    <version>0.0.2-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <packaging>pom</packaging>
 
   <artifactId>bot.commands.all</artifactId>
 
@@ -34,42 +33,42 @@
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.fun</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.game2048</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.general</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.guess</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.manager</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.meme</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.mod</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
       <artifactId>bot.commands.ttt</artifactId>
-      <version>${framework.version}</version>
+      <version>${bot.framework.version}</version>
     </dependency>
   </dependencies>
 </project>

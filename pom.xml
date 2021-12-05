@@ -17,12 +17,12 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.github.v-play-games</groupId>
     <artifactId>maven-deploy</artifactId>
     <version>1.0.1</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
 
   <artifactId>bot.framework</artifactId>
   <version>0.0.2-SNAPSHOT</version>
@@ -34,7 +34,7 @@
 
   <properties>
     <project.build.id>BotFramework</project.build.id>
-    <framework.version>${project.version}</framework.version>
+    <bot.framework.version>${project.version}</bot.framework.version>
   </properties>
 
   <name>Bot Framework</name>
