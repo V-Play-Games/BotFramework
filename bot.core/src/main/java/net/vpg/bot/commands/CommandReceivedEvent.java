@@ -72,7 +72,7 @@ public class CommandReceivedEvent implements Sender {
             false);
         this.args = args;
         this.message = e.getMessage();
-        actionSupplier = () -> new CommandReplyAction(message, this::log);
+        this.actionSupplier = () -> new CommandReplyAction(message);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -88,8 +88,8 @@ public class CommandReceivedEvent implements Sender {
             e.getTimeCreated(),
             "/",
             true);
-        slash = e;
-        actionSupplier = () -> new CommandReplyAction(e, this::log);
+        this.slash = e;
+        this.actionSupplier = () -> new CommandReplyAction(e);
     }
 
     public CommandReceivedEvent(JDA jda,
@@ -366,7 +366,7 @@ public class CommandReceivedEvent implements Sender {
     }
 
     public CommandReplyAction deferSend() {
-        return actionSupplier.get();
+        return actionSupplier.get().setTask(this::log);
     }
 
     public void reportTrouble(Throwable t) {

@@ -44,17 +44,14 @@ public class AI {
 
     public static int minimax(Board board, CellType ai) {
         Player winner = board.getWinner();
-        CellType human = ai.other();
         if (winner != null) {
             return winner.type == ai ? 1 : -1;
         } else if (board.checkTie()) {
             return 0;
         }
-
+        CellType human = ai.other();
         boolean aiLosing = board.getCellCountOfType(human) > board.getCellCountOfType(ai);
-
         int bestScore = aiLosing ? -1 : 1;
-
         for (Cell cell : board.getCellsOfType(CellType.BLANK)) {
             cell.setType(aiLosing ? ai : human);
             int currentScore = minimax(board, ai);

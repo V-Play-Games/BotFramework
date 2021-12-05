@@ -45,62 +45,46 @@ public class CommandReplyAction extends MessageActionImpl {
     private int flags;
 
     public CommandReplyAction(Message message) {
-        this(message, null);
-    }
-
-    public CommandReplyAction(Message message, Consumer<CommandReplyAction> task) {
-        this(message.getJDA(), null, message.getChannel(), task);
+        this(message.getJDA(), null, message.getChannel());
         reference(message);
     }
 
     public CommandReplyAction(MessageChannel tc) {
-        this(tc, null);
-    }
-
-    public CommandReplyAction(MessageChannel tc, Consumer<CommandReplyAction> task) {
-        this(tc.getJDA(), null, tc, task);
+        this(tc.getJDA(), null, tc);
     }
 
     public CommandReplyAction(ComponentInteraction interaction) {
-        this(interaction, null);
-    }
-
-    public CommandReplyAction(ComponentInteraction interaction, Consumer<CommandReplyAction> task) {
-        this(interaction, interaction.getMessageId(), task);
+        this(interaction, interaction.getMessageId());
     }
 
     public CommandReplyAction(Interaction interaction) {
         this(interaction, null);
     }
 
-    public CommandReplyAction(Interaction interaction, Consumer<CommandReplyAction> task) {
-        this(interaction, null, task);
+    public CommandReplyAction(Interaction interaction, String messageId) {
+        this(interaction.getJDA(), messageId, interaction.getMessageChannel(), interaction.getHook());
     }
 
-    public CommandReplyAction(Interaction interaction, String messageId, Consumer<CommandReplyAction> task) {
-        this(interaction.getJDA(), messageId, interaction.getMessageChannel(), interaction.getHook(), task);
-    }
-
-    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, InteractionHook hook, Consumer<CommandReplyAction> task) {
-        this(jda, messageId, channel, task);
+    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, InteractionHook hook) {
+        this(jda, messageId, channel);
         this.withHook(hook);
     }
 
-    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel, Consumer<CommandReplyAction> task) {
+    public CommandReplyAction(JDA jda, String messageId, MessageChannel channel) {
         super(jda, messageId, channel);
+    }
+
+    public CommandReplyAction setTask(Consumer<CommandReplyAction> task) {
         this.task = task;
+        return this;
     }
 
-    public void setTask(Consumer<CommandReplyAction> task) {
-        this.task = task;
+    public CommandReplyAction appendTask(Consumer<CommandReplyAction> tasks) {
+        return appendTask(tasks, Consumer::andThen);
     }
 
-    public void appendTask(Consumer<CommandReplyAction> tasks) {
-        appendTask(tasks, Consumer::andThen);
-    }
-
-    public void appendTask(Consumer<CommandReplyAction> tasks, BinaryOperator<Consumer<CommandReplyAction>> combiner) {
-        this.task = this.task == null ? tasks : combiner.apply(this.task, tasks);
+    public CommandReplyAction appendTask(Consumer<CommandReplyAction> tasks, BinaryOperator<Consumer<CommandReplyAction>> combiner) {
+        return setTask(this.task == null ? tasks : combiner.apply(this.task, tasks));
     }
 
     public String getContent() {
