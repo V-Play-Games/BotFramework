@@ -25,6 +25,7 @@
   </parent>
 
   <artifactId>bot.commands.all</artifactId>
+  <packaging>pom</packaging>
 
   <name>All Commands</name>
   <description>Artifact for importing all commands</description>
