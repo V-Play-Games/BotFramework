@@ -23,7 +23,9 @@
     <artifactId>maven-deploy</artifactId>
     <version>1.0.1</version>
   </parent>
-
+  <properties>
+    <bot.framework.version>${project.version}</bot.framework.version>
+  </properties>
   <artifactId>bot.framework</artifactId>
   <version>0.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -31,12 +33,12 @@
     <module>bot.core</module>
     <module>bot.commands</module>
   </modules>
-
-  <properties>
-    <project.build.id>BotFramework</project.build.id>
-    <bot.framework.version>${project.version}</bot.framework.version>
-  </properties>
-
   <name>Bot Framework</name>
   <description>Parent POM for all artifacts related to Bot Framework</description>
+  <url>http://github.com/V-Play-Games/BotFramework</url>
+  <scm>
+    <connection>scm:git:git://github.com/V-Play-Games/BotFramework.git</connection>
+    <developerConnection>scm:git:ssh://github.com:V-Play-Games/BotFramework.git</developerConnection>
+    <url>https://github.com/V-Play-Games/BotFramework</url>
+  </scm>
 </project>
