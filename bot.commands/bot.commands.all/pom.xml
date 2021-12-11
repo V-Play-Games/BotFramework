@@ -23,13 +23,9 @@
     <groupId>com.github.v-play-games</groupId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>bot.commands.all</artifactId>
-  <packaging>pom</packaging>
-
   <name>All Commands</name>
   <description>Artifact for importing all commands</description>
-
   <dependencies>
     <dependency>
       <groupId>com.github.v-play-games</groupId>
