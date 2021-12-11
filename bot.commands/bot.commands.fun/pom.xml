@@ -23,9 +23,7 @@
     <artifactId>bot.commands</artifactId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>bot.commands.fun</artifactId>
-
   <name>Fun Commands</name>
   <description>Fun but sometimes very useless commands</description>
 </project>

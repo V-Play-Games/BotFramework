@@ -23,9 +23,7 @@
     <artifactId>bot.commands</artifactId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>bot.commands.game2048</artifactId>
-
   <name>2048 Command</name>
   <description>2048 command to play the classic 2048 game</description>
 </project>

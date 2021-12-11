@@ -23,24 +23,21 @@
     <artifactId>bot.framework</artifactId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>bot.commands</artifactId>
   <packaging>pom</packaging>
   <modules>
     <module>bot.commands.fun</module>
-    <module>bot.commands.general</module>
-    <module>bot.commands.manager</module>
-    <module>bot.commands.mod</module>
     <module>bot.commands.game2048</module>
-    <module>bot.commands.meme</module>
+    <module>bot.commands.general</module>
     <module>bot.commands.guess</module>
-    <module>bot.commands.all</module>
+    <module>bot.commands.manager</module>
+    <module>bot.commands.meme</module>
+    <module>bot.commands.mod</module>
     <module>bot.commands.ttt</module>
+    <module>bot.commands.all</module>
   </modules>
-
   <name>Bot Commands</name>
   <description>Parent POM for command-specific artifacts</description>
-
   <dependencies>
     <dependency>
       <groupId>com.github.v-play-games</groupId>

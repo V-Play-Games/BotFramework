@@ -23,9 +23,7 @@
     <groupId>com.github.v-play-games</groupId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>bot.commands.ttt</artifactId>
-
   <name>TicTacToe Command</name>
   <description>Allows you to play tic tac toe</description>
 </project>

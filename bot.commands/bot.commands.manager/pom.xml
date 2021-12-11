@@ -23,9 +23,7 @@
     <artifactId>bot.commands</artifactId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>bot.commands.manager</artifactId>
-
   <name>Manager Commands</name>
   <description>Commands locked to managers of bot</description>
 </project>

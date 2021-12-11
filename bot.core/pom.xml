@@ -23,12 +23,9 @@
     <artifactId>bot.framework</artifactId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
-
   <artifactId>bot.core</artifactId>
-
   <name>Bot Core</name>
   <description>The core and most important classes of the bot framework</description>
-
   <dependencies>
     <dependency>
       <groupId>net.dv8tion</groupId>
