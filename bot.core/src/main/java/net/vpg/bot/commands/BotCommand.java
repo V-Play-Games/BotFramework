@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface BotCommand {
+    void register();
+
     Bot getBot();
 
     List<String> getAliases();

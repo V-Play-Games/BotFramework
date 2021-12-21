@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.AllowedMentions;
 import net.dv8tion.jda.api.utils.data.DataArray;
 import net.dv8tion.jda.api.utils.data.DataObject;
+import net.vpg.bot.commands.BotCategory;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.database.Database;
 import net.vpg.bot.entities.Entity;
@@ -39,17 +40,15 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
@@ -66,6 +65,7 @@ public class Bot implements Entity {
     private final AtomicLong lastCommandId = new AtomicLong(1);
     private final Map<String, ButtonHandler> buttonHandlers = new HashMap<>();
     private final Map<String, BotCommand> commands = new HashMap<>();
+    private final Map<String, BotCategory> categories = new HashMap<>();
     private final Map<Class<?>, EntityInfo<?>> entityInfoMap = new HashMap<>();
     private final Map<Integer, Long> loggers = new HashMap<>();
     private final AtomicInteger syncCount = new AtomicInteger(0);
@@ -103,16 +103,6 @@ public class Bot implements Entity {
         return scanResult;
     }
 
-    public <T1, T2> Bot compute(T1 arg, BiFunction<T1, Bot, T2> function, BiConsumer<Bot, T2> action) {
-        action.accept(this, function.apply(arg, this));
-        return this;
-    }
-
-    public <T> Bot compute(Function<Bot, T> function, BiConsumer<Bot, T> action) {
-        action.accept(this, function.apply(this));
-        return this;
-    }
-
     public Database getDatabase() {
         return database;
     }
@@ -138,9 +128,8 @@ public class Bot implements Entity {
         return eventHandler;
     }
 
-    public Bot setEventHandler(EventHandler eventHandler) {
+    public void setEventHandler(EventHandler eventHandler) {
         this.eventHandler = eventHandler;
-        return this;
     }
 
     public String getPrefix() {
@@ -175,6 +164,10 @@ public class Bot implements Entity {
         return commands;
     }
 
+    public Map<String, BotCategory> getCategories() {
+        return categories;
+    }
+
     public Map<Class<?>, EntityInfo<?>> getEntityInfoMap() {
         return entityInfoMap;
     }
@@ -191,9 +184,8 @@ public class Bot implements Entity {
         return bootTime;
     }
 
-    public Bot setBootTime(Instant bootTime) {
+    public void setBootTime(Instant bootTime) {
         this.bootTime = bootTime;
-        return this;
     }
 
     public DataObject getProperties() {
@@ -205,11 +197,19 @@ public class Bot implements Entity {
     }
 
     public void registerCommand(String name, BotCommand command) {
-        this.commands.put(name, command);
+        commands.put(name, command);
     }
 
     public void removeCommand(String name) {
-        this.commands.remove(name);
+        commands.remove(name);
+    }
+
+    public void registerCategory(String name, BotCategory command) {
+        categories.put(name, command);
+    }
+
+    public void removeCategory(String name) {
+        categories.remove(name);
     }
 
     public void login() throws LoginException {
@@ -251,20 +251,15 @@ public class Bot implements Entity {
             .stream()
             .filter(x -> !x.isAbstract() && !x.isInterface() && x.implementsInterface(Entity.class.getName()))
             .map(ClassInfo::loadClass)
-            .map(c -> {
+            .collect(Collectors.toMap(UnaryOperator.identity(), c -> {
                 try {
-                    return c.getMethod("getInfo");
-                } catch (NoSuchMethodException e) {
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
-            .distinct()
-            .collect(Collectors.toMap(Method::getDeclaringClass, m -> {
-                try {
-                    return (EntityInfo<?>) m.invoke(null);
-                } catch (Exception e) {
-                    throw new InternalError(e);
+                    return (EntityInfo<?>)c.getMethod("getInfo").invoke(null);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    try {
+                        return (EntityInfo<?>)c.getField("INFO").get(null);
+                    } catch (NoSuchFieldException | IllegalAccessException ex) {
+                        return null;
+                    }
                 }
             })));
         entityInfoMap.values().forEach(info -> {
@@ -352,26 +347,28 @@ public class Bot implements Entity {
     }
 
     public void loadCommands() {
+        loadAllInstancesOf(BotCategory.class, category -> {
+            this.registerCategory(category.getName(), category);
+            logger.info("Loaded " + category + " Command");
+        }, this);
         loadAllInstancesOf(BotCommand.class, command -> {
-            this.registerCommand(command.getName(), command);
-            for (String alias : command.getAliases()) {
-                this.registerCommand(alias, command);
-            }
+            command.register();
             logger.info("Loaded " + command + " Command");
         }, this);
         loadAllInstancesOf(ButtonHandler.class, handler -> {
             buttonHandlers.put(handler.getName(), handler);
             logger.info("Loaded " + handler.getName() + " button handler");
         });
-        getPrimaryShard().retrieveCommands().queue(commandList -> {
+        JDA primaryShard = getPrimaryShard();
+        primaryShard.retrieveCommands().queue(commandList -> {
             Map<String, Command> commandMap = commandList.stream().collect(Util.groupingBy(Command::getName));
-            getPrimaryShard().updateCommands()
-                .addCommands(commands.values()
-                    .stream()
-                    .map(BotCommand::toCommandData)
-                    .filter(data -> Util.equals(data, commandMap.get(data.getName())))
-                    .collect(Collectors.toSet()))
-                .queue(c -> c.forEach(command -> commands.get(command.getName()).finalizeCommand(command)));
+            commands.values()
+                .stream()
+                .map(BotCommand::toCommandData)
+                .filter(data -> !Util.equals(data, commandMap.get(data.getName())))
+                .distinct()
+                .map(primaryShard::upsertCommand)
+                .forEach(action -> action.queue(command -> commands.get(command.getName()).finalizeCommand(command)));
         });
     }
 

@@ -33,12 +33,21 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
     protected int maxArgs;
     protected Bot bot;
     protected List<String> aliases;
+    protected boolean isRegistered;
 
     public BotCommandImpl(Bot bot, String name, String description, String... aliases) {
         super(name, description);
         this.bot = bot;
         this.aliases = new ArrayList<>();
         Collections.addAll(this.aliases, aliases);
+    }
+
+    @Override
+    public void register() {
+        if (!isRegistered) {
+            bot.registerCommand(getName(), this);
+            aliases.forEach(alias -> bot.registerCommand(alias, this));
+        }
     }
 
     @Override
