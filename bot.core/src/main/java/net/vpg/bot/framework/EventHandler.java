@@ -87,7 +87,7 @@ public class EventHandler extends ListenerAdapter {
                 command = args[0].substring(prefix.length());
                 firstArg = 1;
             }
-            BotCommand botCommand = bot.getCommands().get(command.toLowerCase());
+            BotCommand botCommand = bot.getCommands().get(command);
             if (botCommand != null) {
                 List<String> finalArgs = firstArg == argLen
                     ? Collections.emptyList()

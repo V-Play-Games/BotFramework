@@ -29,11 +29,11 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.AllowedMentions;
 import net.dv8tion.jda.api.utils.data.DataArray;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.commands.BotCategory;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.database.Database;
 import net.vpg.bot.entities.Entity;
 import net.vpg.bot.entities.EntityInfo;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +64,7 @@ public class Bot implements Entity {
     private final int maxShards;
     private final AtomicLong lastCommandId = new AtomicLong(1);
     private final Map<String, ButtonHandler> buttonHandlers = new HashMap<>();
-    private final Map<String, BotCommand> commands = new HashMap<>();
-    private final Map<String, BotCategory> categories = new HashMap<>();
+    private final Map<String, BotCommand> commands = new CaseInsensitiveMap<>();
     private final Map<Class<?>, EntityInfo<?>> entityInfoMap = new HashMap<>();
     private final Map<Integer, Long> loggers = new HashMap<>();
     private final AtomicInteger syncCount = new AtomicInteger(0);
@@ -164,10 +163,6 @@ public class Bot implements Entity {
         return commands;
     }
 
-    public Map<String, BotCategory> getCategories() {
-        return categories;
-    }
-
     public Map<Class<?>, EntityInfo<?>> getEntityInfoMap() {
         return entityInfoMap;
     }
@@ -202,14 +197,6 @@ public class Bot implements Entity {
 
     public void removeCommand(String name) {
         commands.remove(name);
-    }
-
-    public void registerCategory(String name, BotCategory command) {
-        categories.put(name, command);
-    }
-
-    public void removeCategory(String name) {
-        categories.remove(name);
     }
 
     public void login() throws LoginException {
@@ -347,10 +334,6 @@ public class Bot implements Entity {
     }
 
     public void loadCommands() {
-        loadAllInstancesOf(BotCategory.class, category -> {
-            this.registerCategory(category.getName(), category);
-            logger.info("Loaded " + category + " Command");
-        }, this);
         loadAllInstancesOf(BotCommand.class, command -> {
             command.register();
             logger.info("Loaded " + command + " Command");

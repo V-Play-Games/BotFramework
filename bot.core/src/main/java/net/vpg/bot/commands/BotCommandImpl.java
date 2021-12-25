@@ -150,10 +150,6 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
     }
 
     @Override
-    public void onHelpNeeded(CommandReceivedEvent e) {
-    }
-
-    @Override
     public String toString() {
         return bot.getPrefix() + name;
     }

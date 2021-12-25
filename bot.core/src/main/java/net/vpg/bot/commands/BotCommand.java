@@ -58,8 +58,6 @@ public interface BotCommand {
         e.send("Invalid Amount of Inputs!").queue();
     }
 
-    void onHelpNeeded(CommandReceivedEvent e);
-
     default boolean runChecks(CommandReceivedEvent e) {
         return true;
     }
