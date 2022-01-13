@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.vpg.bot.commands.action.CommandReplyAction;
 
 import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -71,6 +72,7 @@ public interface Sender {
         return new Sender() {
             CommandReplyAction action;
 
+            @Nonnull
             @Override
             public CommandReplyAction deferSend() {
                 return action == null ? action = supplier.get() : action;
@@ -78,16 +80,19 @@ public interface Sender {
         };
     }
 
+    @Nonnull
     @CheckReturnValue
     default CommandReplyAction send(String message) {
         return deferSend().setContent(message);
     }
 
+    @Nonnull
     @CheckReturnValue
     default CommandReplyAction sendEmbeds(MessageEmbed... embeds) {
         return deferSend().setEmbeds(embeds);
     }
 
+    @Nonnull
     @CheckReturnValue
     CommandReplyAction deferSend();
 }

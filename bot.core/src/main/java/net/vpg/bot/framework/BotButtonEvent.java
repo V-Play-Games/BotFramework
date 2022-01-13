@@ -18,6 +18,8 @@ package net.vpg.bot.framework;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.vpg.bot.commands.action.CommandReplyAction;
 
+import javax.annotation.Nonnull;
+
 public class BotButtonEvent extends ButtonClickEvent implements Sender {
     final String method;
     final String[] args;
@@ -51,6 +53,7 @@ public class BotButtonEvent extends ButtonClickEvent implements Sender {
         return args[index];
     }
 
+    @Nonnull
     @Override
     public CommandReplyAction deferSend() {
         return action == null ? action = CommandReplyAction.reply(this) : action;

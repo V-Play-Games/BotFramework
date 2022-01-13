@@ -31,6 +31,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public abstract class CommandReceivedEvent implements Sender {
@@ -188,6 +189,7 @@ public abstract class CommandReceivedEvent implements Sender {
         return member;
     }
 
+    @Nonnull
     @Override
     public CommandReplyAction deferSend() {
         return action == null ? action = actionSupplier.get().setTask(this::log) : action;
@@ -206,6 +208,9 @@ public abstract class CommandReceivedEvent implements Sender {
         if (loggingAllowed) return;
         String in = getInput();
         String out = action.getContent();
+        String error = trouble == null
+            ? "None"
+            : String.format("%s: %s\n\t at %s", trouble.getClass(), trouble.getMessage(), trouble.getStackTrace()[0]);
         DataObject log = DataObject.empty()
             .put("id", processId)
             .put("time", getTimeCreated().toString())
@@ -213,11 +218,8 @@ public abstract class CommandReceivedEvent implements Sender {
             .put("output", out)
             .put("user", getUser().toString())
             .put("channel", getChannel().toString())
-            .put("trouble", trouble.toString())
-            .put("guild", getGuild().toString());
-        String error = trouble == null
-            ? "None"
-            : String.format("%s: %s\n\t at %s", trouble.getClass(), trouble.getMessage(), trouble.getStackTrace()[0]);
+            .put("error", error)
+            .put("guild", Objects.toString(getGuild(), null));
         bot.getLogChannel(getJDA()).sendMessageEmbeds(new EmbedBuilder()
             .setTitle("Process id " + processId)
             .setDescription(String.format("Error: %s\nUsed in %s by %s", error, getChannel(), getUser()))
