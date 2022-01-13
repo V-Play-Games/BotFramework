@@ -20,11 +20,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
 import net.vpg.bot.commands.NoArgsCommand;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
 import net.vpg.bot.framework.*;
 
-public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
+public class GuessCommand extends BotCommandImpl implements NoArgsCommand, ButtonHandler {
     public GuessCommand(Bot bot) {
         super(bot, "guess", "Guess a Pokemon name by the given description of it");
         bot.getShardManager().addEventListener(Util.subscribeTo(MessageReceivedEvent.class, this::checkGuess));
@@ -55,37 +55,28 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
         }
     }
 
-    public static class GuessHandler implements ButtonHandler {
-        @Override
-        public String getName() {
-            return "guess";
+    @Override
+    public void handle(BotButtonEvent e) {
+        String userId = e.getUser().getId();
+        if (!e.getArg(0).equals(userId)) return;
+        GuessGame game = GuessGame.get(userId);
+        if (game == null) {
+            e.deferEdit().setActionRows().queue();
+            return;
         }
-
-        @Override
-        public void handle(BotButtonEvent e) {
-            String userId = e.getUser().getId();
-            if (!e.getArg(0).equals(userId)) return;
-            GuessGame game = GuessGame.get(userId);
-            if (game == null) {
-                e.deferEdit().setActionRows().queue();
-                return;
-            }
-            switch (e.getArg(1)) {
-                case "h":
-                    e.editComponents(ActionRow.of(Button.primary("guess:" + game.getUserId() + ":x", "Give up")))
-                        .setEmbeds(new EmbedBuilder()
-                            .setTitle("Who's that Pokemon?")
-                            .setDescription("Guess the Pokemon based on its given description in 30 seconds or less!" +
-                                "\n> " + game.getText() +
-                                "\nType: " + game.getPokemon().getType())
-                            .build())
-                        .queue();
-                    break;
-                case "x":
-                    e.editComponents().queue();
-                    game.close(Sender.of(e.getChannel()), GuessGame.FORFEIT);
-                    break;
-            }
+        switch (e.getArg(1)) {
+            case "h":
+                e.editComponents(ActionRow.of(Button.primary("guess:" + game.getUserId() + ":x", "Give up")))
+                    .setEmbeds(new EmbedBuilder()
+                        .setTitle("Who's that Pokemon?")
+                        .setDescription(String.format("Guess the Pokemon based on its given description in 30 seconds or less!\n> %s\nType: %s", game.getText(), game.getPokemon().getType()))
+                        .build())
+                    .queue();
+                break;
+            case "x":
+                e.editComponents().queue();
+                game.close(Sender.of(e.getChannel()), GuessGame.FORFEIT);
+                break;
         }
     }
 }

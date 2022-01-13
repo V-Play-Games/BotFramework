@@ -18,7 +18,9 @@ package net.vpg.bot.commands.mod;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 import net.vpg.bot.framework.GuildSettings;
 import net.vpg.bot.framework.Util;
@@ -32,33 +34,35 @@ public class PrefixCommand extends BotCommandImpl implements ModCommand {
     }
 
     @Override
+    public void register() {
+        if (bot.isDatabaseEnabled()) {
+            super.register();
+        }
+    }
+
+    @Override
     public Permission getRequiredPermission() {
         return Permission.MANAGE_SERVER;
     }
 
     @Override
-    public boolean runChecks(CommandReceivedEvent e) {
-        return bot.isDatabaseEnabled() && super.runChecks(e);
-    }
-
-    @Override
-    public void onCommandRun(CommandReceivedEvent e) {
+    public void onTextCommandRun(TextCommandReceivedEvent e) {
         execute(e, e.getArg(0));
     }
 
     @Override
-    public void onSlashCommandRun(CommandReceivedEvent e) {
+    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
         execute(e, e.getString("prefix"));
     }
 
     public void execute(CommandReceivedEvent e, String input) {
         if (input.isBlank()) {
-            e.send("Provide a valid prefix!").queue();
+            e.send("Provide a valid prefix!").setEphemeral(true).queue();
             return;
         }
         String prefix = Util.SPACE_WITH_LINE.split(input)[0];
-        if (prefix.isBlank() || Util.containsAny(prefix, "@everyone", "@here")) {
-            e.send("Provide a valid prefix! `" + prefix + "` is not allowed.").queue();
+        if (prefix.isBlank() || Util.containsAny(prefix, "`", "@everyone", "@here")) {
+            e.send("Provide a valid prefix! `" + prefix.replaceAll("`", "\\`") + "` is not allowed.").setEphemeral(true).queue();
             return;
         }
         GuildSettings.get(e.getGuild().getId(), prefix, bot).setPrefix(prefix);

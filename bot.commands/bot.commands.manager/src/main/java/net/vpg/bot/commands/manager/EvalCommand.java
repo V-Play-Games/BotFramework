@@ -17,7 +17,9 @@ package net.vpg.bot.commands.manager;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 
 import javax.script.*;
@@ -25,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EvalCommand extends BotCommandImpl implements ManagerCommand {
-    public static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+    public static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("groovy");
 
     public EvalCommand(Bot bot) {
         super(bot, "eval", "Evaluates an expression, or a piece of code");
@@ -33,15 +35,15 @@ public class EvalCommand extends BotCommandImpl implements ManagerCommand {
     }
 
     @Override
-    public void onSlashCommandRun(CommandReceivedEvent e) throws Exception {
-        execute(e, e.getString("script"));
-    }
-
-    @Override
-    public void onCommandRun(CommandReceivedEvent e) throws Exception {
+    public void onTextCommandRun(TextCommandReceivedEvent e) throws Exception {
         List<String> lines = Arrays.asList(e.getContent().split("\n"));
         String script = String.join("\n", lines.subList(2, lines.size() - 1));
         execute(e, script);
+    }
+
+    @Override
+    public void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception {
+        execute(e, e.getString("script"));
     }
 
     public void execute(CommandReceivedEvent e, String script) throws ScriptException {

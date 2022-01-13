@@ -17,7 +17,7 @@ package net.vpg.bot.commands.mod;
 
 import net.dv8tion.jda.api.Permission;
 import net.vpg.bot.commands.BotCommand;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
 
 public interface ModCommand extends BotCommand {
     Permission getRequiredPermission();

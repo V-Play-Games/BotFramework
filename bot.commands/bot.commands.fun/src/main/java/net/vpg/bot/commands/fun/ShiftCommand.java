@@ -17,7 +17,9 @@ package net.vpg.bot.commands.fun;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 
 public class ShiftCommand extends BotCommandImpl {
@@ -29,12 +31,12 @@ public class ShiftCommand extends BotCommandImpl {
     }
 
     @Override
-    public void onCommandRun(CommandReceivedEvent e) {
+    public void onTextCommandRun(TextCommandReceivedEvent e) {
         execute(e, e.getArgsFrom(1, " "), Long.parseLong(e.getArg(0)));
     }
 
     @Override
-    public void onSlashCommandRun(CommandReceivedEvent e) {
+    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
         execute(e, e.getString("text"), e.getLong("offset"));
     }
 

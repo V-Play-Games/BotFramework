@@ -19,6 +19,9 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 import net.vpg.bot.framework.Ratelimit;
 
@@ -46,9 +49,9 @@ public interface BotCommand {
 
     void run(CommandReceivedEvent e);
 
-    void onCommandRun(CommandReceivedEvent e) throws Exception;
+    void onTextCommandRun(TextCommandReceivedEvent e) throws Exception;
 
-    void onSlashCommandRun(CommandReceivedEvent e) throws Exception;
+    void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception;
 
     void finalizeCommand(Command c);
 

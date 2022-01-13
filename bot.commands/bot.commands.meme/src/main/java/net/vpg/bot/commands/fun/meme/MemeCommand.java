@@ -18,7 +18,9 @@ package net.vpg.bot.commands.fun.meme;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 
 import java.io.IOException;
@@ -44,12 +46,12 @@ public class MemeCommand extends BotCommandImpl {
     }
 
     @Override
-    public void onCommandRun(CommandReceivedEvent e) throws IOException {
+    public void onTextCommandRun(TextCommandReceivedEvent e) throws IOException {
         execute(e, e.getArgs().size() == 1 ? e.getArg(0) : "");
     }
 
     @Override
-    public void onSlashCommandRun(CommandReceivedEvent e) throws Exception {
+    public void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception {
         execute(e, e.getString("subreddit"));
     }
 

@@ -16,11 +16,13 @@
 package net.vpg.bot.framework;
 
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.vpg.bot.commands.action.CommandReplyAction;
 
-public class BotButtonEvent extends ButtonClickEvent {
+public class BotButtonEvent extends ButtonClickEvent implements Sender {
     final String method;
     final String[] args;
     final Bot bot;
+    CommandReplyAction action;
 
     public BotButtonEvent(ButtonClickEvent e, Bot bot) {
         super(e.getJDA(), e.getResponseNumber(), e.getInteraction());
@@ -47,5 +49,10 @@ public class BotButtonEvent extends ButtonClickEvent {
 
     public String getArg(int index) {
         return args[index];
+    }
+
+    @Override
+    public CommandReplyAction deferSend() {
+        return action == null ? action = CommandReplyAction.reply(this) : action;
     }
 }

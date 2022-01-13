@@ -18,6 +18,9 @@ package net.vpg.bot.commands;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.*;
 
 import java.util.*;
@@ -102,26 +105,30 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
 
     @Override
     public void run(CommandReceivedEvent e) {
-        long aid = e.getUser().getIdLong();
-        if (checkRatelimited(aid, e) || !runChecks(e)) {
+        long uid = e.getUser().getIdLong();
+        if (checkRatelimited(uid, e) || !runChecks(e)) {
             return;
         }
-        if (!e.isSlashCommand()) { // Slash Commands bypass arg checks
-            int args = e.getArgs().size();
-            if (minArgs > args || (maxArgs != 0 && args > maxArgs)) {
-                onInsufficientArgs(e);
-                return;
-            }
-        }
         try {
-            if (e.isSlashCommand()) onSlashCommandRun(e);
-            else onCommandRun(e);
-            ratelimit(aid);
+            if (e instanceof TextCommandReceivedEvent) {
+                TextCommandReceivedEvent text = (TextCommandReceivedEvent) e;
+                int args = text.getArgs().size();
+                if (minArgs > args || (maxArgs != 0 && args > maxArgs)) {
+                    onInsufficientArgs(e);
+                    return;
+                }
+                onTextCommandRun(text);
+            } else {
+                onSlashCommandRun((SlashCommandReceivedEvent) e);
+            }
+            ratelimit(uid);
         } catch (Exception exc) {
-            e.reportTrouble(exc);
-            e.send("There was some trouble processing your request. Please contact the developer.")
-                .setEphemeral(true)
-                .queue();
+            e.setTrouble(exc);
+            if (e.isReplySent()) {
+                e.send("There was some trouble processing your request. Please contact the developer.")
+                    .setEphemeral(true)
+                    .queue();
+            }
         }
     }
 

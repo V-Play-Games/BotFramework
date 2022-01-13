@@ -23,7 +23,8 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
 import org.bson.Document;
 
 import java.io.File;
@@ -48,7 +49,7 @@ public class Util {
     }
 
     public static String getPrefix(CommandReceivedEvent e) {
-        return !e.isSlashCommand() ? e.getPrefix() : Util.getPrefix(e.isFromGuild(), e.getGuild(), e.getBot());
+        return e instanceof SlashCommandReceivedEvent ? e.getPrefix() : Util.getPrefix(e.isFromGuild(), e.getGuild(), e.getBot());
     }
 
     public static String getPrefix(MessageReceivedEvent e, Bot bot) {

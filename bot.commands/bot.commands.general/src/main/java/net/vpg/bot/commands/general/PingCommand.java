@@ -17,8 +17,8 @@ package net.vpg.bot.commands.general;
 
 import net.dv8tion.jda.api.JDA;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
 import net.vpg.bot.commands.NoArgsCommand;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 
 public class PingCommand extends BotCommandImpl implements NoArgsCommand {

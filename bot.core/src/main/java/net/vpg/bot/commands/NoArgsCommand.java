@@ -15,14 +15,18 @@
  */
 package net.vpg.bot.commands;
 
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
+
 public interface NoArgsCommand extends BotCommand {
     @Override
-    default void onCommandRun(CommandReceivedEvent e) throws Exception {
+    default void onTextCommandRun(TextCommandReceivedEvent e) throws Exception {
         execute(e);
     }
 
     @Override
-    default void onSlashCommandRun(CommandReceivedEvent e) throws Exception {
+    default void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception {
         execute(e);
     }
 

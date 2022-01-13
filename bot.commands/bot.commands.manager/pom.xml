@@ -26,4 +26,11 @@
   <artifactId>bot.commands.manager</artifactId>
   <name>Manager Commands</name>
   <description>Commands locked to managers of bot</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-jsr223</artifactId>
+      <version>3.0.7</version>
+    </dependency>
+  </dependencies>
 </project>

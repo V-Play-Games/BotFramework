@@ -15,19 +15,31 @@
  */
 package net.vpg.bot.commands.manager;
 
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
-import net.vpg.bot.commands.NoArgsCommand;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 
-public class TerminalCommand extends BotCommandImpl implements NoArgsCommand, ManagerCommand {
+public class TerminalCommand extends BotCommandImpl implements ManagerCommand {
     public TerminalCommand(Bot bot) {
         super(bot, "terminal", "a");
+        addOption(OptionType.STRING, "message", "Message to echo to the terminal.", true);
     }
 
     @Override
-    public void execute(CommandReceivedEvent e) {
-        System.out.println(e.getContent());
+    public void onTextCommandRun(TextCommandReceivedEvent e) {
+        execute(e, e.getArgsFrom(0, " "));
+    }
+
+    @Override
+    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
+        execute(e, e.getString("key"));
+    }
+
+    public void execute(CommandReceivedEvent e, String content) {
+        System.out.println(content);
         e.send("Echoed the message to the terminal").queue();
     }
 }

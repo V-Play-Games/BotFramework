@@ -17,6 +17,7 @@ package net.vpg.bot.commands.fun.ttt;
 
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.vpg.bot.framework.Sender;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -169,7 +170,18 @@ public class Board {
     public Player switchSides() {
         Player next = player2;
         player2 = player1;
-        return player1 = next;
+        player1 = next;
+        if (player1.id.equals("ai")) {
+            AI.makeMove(this, player1.type);
+            return switchSides();
+        }
+        return player1;
+    }
+
+    public void send(Sender sender) {
+        sender.send(String.format("It is <@%s>'s turn! (Playing as %s)", player1.id, player1.type))
+            .setActionRows(getActionRows())
+            .queue();
     }
 
     public Cell[] getCellsOfType(CellType type) {

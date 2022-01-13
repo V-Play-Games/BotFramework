@@ -17,7 +17,9 @@ package net.vpg.bot.commands.manager;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
+import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.Bot;
 
 public abstract class RetrieveCommand extends BotCommandImpl implements ManagerCommand {
@@ -27,14 +29,14 @@ public abstract class RetrieveCommand extends BotCommandImpl implements ManagerC
     }
 
     @Override
-    public void onCommandRun(CommandReceivedEvent e) {
+    public void onTextCommandRun(TextCommandReceivedEvent e) {
         execute(e, e.getArg(0));
     }
 
     @Override
-    public void onSlashCommandRun(CommandReceivedEvent e) {
+    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
         execute(e, e.getString("key"));
     }
 
-    public abstract void execute(CommandReceivedEvent e, String arg);
+    public abstract void execute(CommandReceivedEvent e, String key);
 }

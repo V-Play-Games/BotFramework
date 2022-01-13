@@ -20,40 +20,67 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
-import net.vpg.bot.commands.CommandReplyAction;
+import net.vpg.bot.commands.action.CommandReplyAction;
 
 import javax.annotation.CheckReturnValue;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface Sender {
-    static Sender of(ComponentInteraction interaction) {
-        return of(interaction, CommandReplyAction::new);
+    static Sender of(Message message) {
+        return ofReply(message);
+    }
+
+    static Sender ofReply(Message message) {
+        return of(message, CommandReplyAction::reply);
+    }
+
+    static Sender ofEdit(Message message) {
+        return of(message, CommandReplyAction::edit);
     }
 
     static Sender of(Interaction interaction) {
-        return of(interaction, CommandReplyAction::new);
+        return of(interaction, CommandReplyAction::reply);
     }
 
-    static Sender of(Message message) {
-        return of(message, CommandReplyAction::new);
+    static Sender ofReply(Interaction interaction) {
+        return of(interaction, CommandReplyAction::reply);
+    }
+
+    static Sender of(ComponentInteraction interaction) {
+        return ofReply(interaction);
+    }
+
+    static Sender ofReply(ComponentInteraction interaction) {
+        return of(interaction, CommandReplyAction::reply);
+    }
+
+    static Sender ofEdit(ComponentInteraction interaction) {
+        return of(interaction, CommandReplyAction::edit);
     }
 
     static Sender of(MessageChannel tc) {
-        return of(tc, CommandReplyAction::new);
+        return of(tc, CommandReplyAction::send);
     }
 
     static <T> Sender of(T t, Function<T, CommandReplyAction> converter) {
-        return () -> converter.apply(t);
+        return of(() -> converter.apply(t));
     }
 
     static Sender of(Supplier<CommandReplyAction> supplier) {
-        return supplier::get;
+        return new Sender() {
+            CommandReplyAction action;
+
+            @Override
+            public CommandReplyAction deferSend() {
+                return action == null ? action = supplier.get() : action;
+            }
+        };
     }
 
     @CheckReturnValue
     default CommandReplyAction send(String message) {
-        return deferSend().content(message);
+        return deferSend().setContent(message);
     }
 
     @CheckReturnValue

@@ -18,7 +18,7 @@ package net.vpg.bot.commands.fun.guess;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.vpg.bot.commands.CommandReceivedEvent;
+import net.vpg.bot.commands.event.CommandReceivedEvent;
 import net.vpg.bot.entities.GuessPokemon;
 import net.vpg.bot.framework.Sender;
 import net.vpg.bot.framework.Util;
@@ -39,6 +39,7 @@ public class GuessGame {
     private final GuessPokemon pokemon;
     private final String text;
     private final ScheduledFuture<?> timeout;
+    private boolean closed;
     private Message message;
 
     public GuessGame(CommandReceivedEvent e) {
@@ -64,7 +65,7 @@ public class GuessGame {
     }
 
     public boolean isCorrect(String guess) {
-        return !timeout.isDone() && pokemon.getName().equalsIgnoreCase(guess);
+        return pokemon.getName().equalsIgnoreCase(guess);
     }
 
     public String getUserId() {
@@ -76,6 +77,8 @@ public class GuessGame {
     }
 
     public void close(Sender sender, int reason) {
+        if (closed) return;
+        closed = true;
         games.remove(id);
         if (reason != TIMEOUT) {
             timeout.cancel(true);
