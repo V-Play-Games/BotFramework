@@ -130,17 +130,15 @@ public class Util {
     }
 
     public static boolean equals(CommandData data, Command cmd) {
-        Map<String, OptionData> options = Util.group(data.getOptions(), OptionData::getName);
-        return cmd == null || !(cmd.getName().equals(data.getName()) &&
-            cmd.getDescription().equals(data.getDescription()) &&
-            cmd.getOptions().stream().map(o1 -> {
-                OptionData o2 = options.get(o1.getName());
-                return o2 != null &&
-                    o1.getType() == o2.getType() &&
-                    o1.getChoices().equals(o2.getChoices()) &&
-                    o1.getName().equals(o2.getName()) &&
-                    o1.getDescription().equals(o2.getDescription());
-            }).reduce(Boolean::logicalAnd).orElse(false));
+        return cmd != null &&
+            data.getName().equals(cmd.getName()) &&
+            data.getDescription().equals(cmd.getDescription()) &&
+            data.getOptions()
+                .stream()
+                .map(OptionData::toData)
+                .map(Command.Option::new)
+                .collect(Collectors.toList())
+                .equals(cmd.getOptions());
     }
 
     public static <T extends GenericEvent> EventListener subscribeTo(Class<T> eventType, Consumer<T> action) {

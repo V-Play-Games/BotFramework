@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.AllowedMentions;
@@ -349,11 +350,17 @@ public class Bot implements Entity {
         JDA primaryShard = getPrimaryShard();
         primaryShard.retrieveCommands().queue(commandList -> {
             Map<String, Command> commandMap = Util.group(commandList, Command::getName);
+            commandMap.entrySet()
+                .stream()
+                .filter(e -> !commands.containsKey(e.getKey()))
+                .map(Map.Entry::getValue)
+                .map(Command::delete)
+                .forEach(RestAction::queue);
             commands.values()
                 .stream()
+                .distinct()
                 .map(BotCommand::toCommandData)
                 .filter(data -> !Util.equals(data, commandMap.get(data.getName())))
-                .distinct()
                 .map(primaryShard::upsertCommand)
                 .forEach(action -> action.queue(command -> commands.get(command.getName()).finalizeCommand(command)));
         });
