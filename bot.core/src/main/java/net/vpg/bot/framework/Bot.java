@@ -72,24 +72,27 @@ public class Bot implements Entity {
     private final DataObject properties;
     private final ShardManager shardManager;
     private final List<Long> managers = new ArrayList<>();
+    private final ClassFilter classFilter = new ClassFilter();
+    private final EventHandlerProxy eventHandlerProxy = new EventHandlerProxy();
     private long syncMessageId;
-    private String id = "DEFAULT";
-    private EventHandler eventHandler;
+    private String id;
     private Instant bootTime;
     private Database database;
 
     public Bot(DataObject properties) {
         this.properties = properties;
-        this.token = properties.getString("token");
-        this.prefix = properties.getString("prefix");
-        this.ownerId = properties.getLong("ownerId");
-        this.maxShards = properties.getInt("maxShards");
-        this.resourceServer = properties.getLong("resourceServer");
-        this.logCategory = properties.getLong("logCategory");
+        id = properties.getString("token", "DEFAULT");
+        token = properties.getString("token");
+        prefix = properties.getString("prefix");
+        ownerId = properties.getLong("ownerId");
+        maxShards = properties.getInt("maxShards");
+        resourceServer = properties.getLong("resourceServer");
+        logCategory = properties.getLong("logCategory");
+        eventHandlerProxy.setSubject(new DefaultEventHandler(this));
         try {
             this.shardManager = DefaultShardManagerBuilder.createDefault(token)
                 .enableIntents(DIRECT_MESSAGES, GUILD_MEMBERS, GUILD_MESSAGES, GUILD_VOICE_STATES, GUILD_EMOJIS)
-                .addEventListeners(new EventHandler(this))
+                .addEventListeners(eventHandlerProxy)
                 .setShardsTotal(maxShards)
                 .setActivity(Activity.watching("My Loading"))
                 .build(false);
@@ -125,11 +128,11 @@ public class Bot implements Entity {
     }
 
     public EventHandler getEventHandler() {
-        return eventHandler;
+        return eventHandlerProxy.getSubject();
     }
 
     public void setEventHandler(EventHandler eventHandler) {
-        this.eventHandler = eventHandler;
+        eventHandlerProxy.setSubject(eventHandler);
     }
 
     public String getPrefix() {
@@ -198,6 +201,10 @@ public class Bot implements Entity {
 
     public void removeCommand(String name) {
         commands.remove(name);
+    }
+
+    public ClassFilter getClassFilter() {
+        return classFilter;
     }
 
     public void login() throws LoginException {
@@ -374,17 +381,18 @@ public class Bot implements Entity {
             .getAllClasses()
             .stream()
             .filter(x -> !x.isAbstract() && !x.isInterface() && x.implementsInterface(_interface.getName()))
-            .collect(Collectors.toSet())
-            .forEach(x -> {
+            .map(ClassInfo::loadClass)
+            .filter(classFilter.getPredicate())
+            .forEach(c -> {
                 try {
-                    T newObject = (T) x.loadClass().getConstructor(paramTypes).newInstance(parameters);
+                    T newObject = (T) c.getConstructor(paramTypes).newInstance(parameters);
                     newInstanceProcessor.accept(newObject);
                 } catch (Exception e) {
-                    errors.put(x.loadClass(), e);
+                    errors.put(c, e);
                 }
             });
         errors.forEach((k, v) -> {
-            logger.info("Failed to load " + k.getSimpleName() + "\n");
+            logger.info("Failed to load " + k.getName() + "\n");
             v.printStackTrace();
         });
     }
