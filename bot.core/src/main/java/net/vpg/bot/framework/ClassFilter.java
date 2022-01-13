@@ -14,26 +14,26 @@ public class ClassFilter implements Predicate<Class<?>> {
         return setEnabled(false, classes);
     }
 
-    public ClassFilter disable(String... regex) {
-        return setEnabled(false, regex);
+    public ClassFilter disable(String... classes) {
+        return setEnabled(false, classes);
     }
 
     public ClassFilter enable(Class<?>... classes) {
         return setEnabled(true, classes);
     }
 
-    public ClassFilter enable(String... regex) {
-        return setEnabled(true, regex);
+    public ClassFilter enable(String... classes) {
+        return setEnabled(true, classes);
     }
 
     public ClassFilter setEnabled(boolean enabled, Class<?>... classes) {
         return setEnabled(enabled, Arrays.stream(classes).map(Class::getName).toArray(String[]::new));
     }
 
-    public ClassFilter setEnabled(boolean enable, String... regex) {
+    public ClassFilter setEnabled(boolean enable, String... classes) {
         List<String> list = enable ? enabled : disabled;
         List<String> other = enable ? disabled : enabled;
-        for (String clazz : regex) {
+        for (String clazz : classes) {
             String pattern = clazz.replaceAll("\\.", "\\.");
             if (other.contains(pattern)) {
                 other.remove(pattern);

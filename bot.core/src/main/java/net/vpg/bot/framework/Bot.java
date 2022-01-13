@@ -88,6 +88,7 @@ public class Bot implements Entity {
         maxShards = properties.getInt("maxShards");
         resourceServer = properties.getLong("resourceServer");
         logCategory = properties.getLong("logCategory");
+        classFilter.enable("net.vpg.bot.*");
         eventHandlerProxy.setSubject(new DefaultEventHandler(this));
         try {
             this.shardManager = DefaultShardManagerBuilder.createDefault(token)
