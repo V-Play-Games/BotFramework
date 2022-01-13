@@ -34,7 +34,6 @@ public class Board {
     public Board(String player1, String player2, boolean firstIsX) {
         this.player1 = new Player(player1, firstIsX ? CellType.X : CellType.O);
         this.player2 = new Player(player2, firstIsX ? CellType.O : CellType.X);
-        if (!firstIsX) switchSides();
         this.id = player1 + "-" + player2 + "-" + System.currentTimeMillis();
         this.cells = new Cell[3][3];
         for (int i = 0; i < 3; i++) {
@@ -43,6 +42,7 @@ public class Board {
             }
         }
         boards.put(id, this);
+        if (!firstIsX) switchSides();
     }
 
     public static Board get(String id) {
