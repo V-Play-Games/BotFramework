@@ -383,7 +383,7 @@ public class Bot implements Entity {
             .stream()
             .filter(x -> !x.isAbstract() && !x.isInterface() && x.implementsInterface(_interface.getName()))
             .map(ClassInfo::loadClass)
-            .filter(classFilter.getPredicate())
+            .filter(classFilter.asPredicate())
             .forEach(c -> {
                 try {
                     T newObject = (T) c.getConstructor(paramTypes).newInstance(parameters);

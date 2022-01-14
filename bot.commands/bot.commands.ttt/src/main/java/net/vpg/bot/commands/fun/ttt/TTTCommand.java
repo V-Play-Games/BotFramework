@@ -29,7 +29,7 @@ import net.vpg.bot.framework.ButtonHandler;
 
 import java.util.List;
 
-public class TTTCommand extends BotCommandImpl implements ButtonHandler {
+public class TTTCommand extends BotCommandImpl {
     public TTTCommand(Bot bot) {
         super(bot, "ttt", "Play the classic TicTacToe game");
         addOptions(
@@ -70,41 +70,48 @@ public class TTTCommand extends BotCommandImpl implements ButtonHandler {
         execute(e, e.getString("play-as"), e.getUser("opponent").getId());
     }
 
-    @Override
-    public void handle(BotButtonEvent e) {
-        String id = e.getArg(0);
-        String clicker = e.getUser().getId();
-        if (!id.contains(clicker)) return;
-        Board board = Board.get(id);
-        if (board == null) return;
-        switch (e.getArg(1)) {
-            case "p":
-                if (board.player2.id.equals(clicker))
-                    board.send(e);
-                break;
-            case "x":
-                e.editMessage("<@" + clicker + "> cancelled the challenge!").setActionRows().queue();
-                break;
-            case "c":
-                Player thisTurn = board.getThisTurn();
-                if (!clicker.equals(thisTurn.id)) return;
-                assert CellType.forKey(e.getArg(4)) == CellType.BLANK; // should be blank to be clickable
-                int row = Integer.parseInt(e.getArg(2));
-                int column = Integer.parseInt(e.getArg(3));
-                board.getCell(row, column).setType(thisTurn.type);
-                board.switchSides();
-                Player winner = board.getWinner();
-                if (winner == null) {
-                    if (board.checkTie()) {
-                        e.editMessage("It's a tie! Nobody won.").setActionRows(board.getActionRows()).queue();
-                    } else {
+    public static class TTTButtonHandler implements ButtonHandler {
+        @Override
+        public String getName() {
+            return "ttt";
+        }
+
+        @Override
+        public void handle(BotButtonEvent e) {
+            String id = e.getArg(0);
+            String clicker = e.getUser().getId();
+            if (!id.contains(clicker)) return;
+            Board board = Board.get(id);
+            if (board == null) return;
+            switch (e.getArg(1)) {
+                case "p":
+                    if (board.player2.id.equals(clicker))
                         board.send(e);
+                    break;
+                case "x":
+                    e.editMessage("<@" + clicker + "> cancelled the challenge!").setActionRows().queue();
+                    break;
+                case "c":
+                    Player thisTurn = board.getThisTurn();
+                    if (!clicker.equals(thisTurn.id)) return;
+                    assert CellType.forKey(e.getArg(4)) == CellType.BLANK; // should be blank to be clickable
+                    int row = Integer.parseInt(e.getArg(2));
+                    int column = Integer.parseInt(e.getArg(3));
+                    board.getCell(row, column).setType(thisTurn.type);
+                    board.switchSides();
+                    Player winner = board.getWinner();
+                    if (winner == null) {
+                        if (board.checkTie()) {
+                            e.editMessage("It's a tie! Nobody won.").setActionRows(board.getActionRows()).queue();
+                        } else {
+                            board.send(e);
+                        }
+                    } else {
+                        e.editMessage("<@" + winner.id + "> won the match!").setActionRows(board.getActionRows()).queue();
+                        board.remove();
                     }
-                } else {
-                    e.editMessage("<@" + winner.id + "> won the match!").setActionRows(board.getActionRows()).queue();
-                    board.remove();
-                }
-                break;
+                    break;
+            }
         }
     }
 }

@@ -41,8 +41,8 @@ public class Board {
                 cells[i][j] = new Cell(i, j, this);
             }
         }
-        boards.put(id, this);
         if (!firstIsX) switchSides();
+        boards.put(id, this);
     }
 
     public static Board get(String id) {
