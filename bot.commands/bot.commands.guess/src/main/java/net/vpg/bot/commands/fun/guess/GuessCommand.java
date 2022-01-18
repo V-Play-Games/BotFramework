@@ -58,7 +58,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
     public static class GuessButtonHandler implements ButtonHandler {
         @Override
         public String getName() {
-            return "ttt";
+            return "guess";
         }
 
         @Override
