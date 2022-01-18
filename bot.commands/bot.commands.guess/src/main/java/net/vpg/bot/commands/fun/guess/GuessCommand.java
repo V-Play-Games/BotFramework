@@ -22,12 +22,15 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.commands.event.CommandReceivedEvent;
-import net.vpg.bot.framework.*;
+import net.vpg.bot.framework.Bot;
+import net.vpg.bot.framework.BotButtonEvent;
+import net.vpg.bot.framework.ButtonHandler;
+import net.vpg.bot.framework.Sender;
 
 public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
     public GuessCommand(Bot bot) {
         super(bot, "guess", "Guess a Pokemon name by the given description of it");
-        bot.getShardManager().addEventListener(Util.subscribeTo(MessageReceivedEvent.class, this::checkGuess));
+        bot.subscribeTo("guess", MessageReceivedEvent.class, this::checkGuess);
     }
 
     @Override

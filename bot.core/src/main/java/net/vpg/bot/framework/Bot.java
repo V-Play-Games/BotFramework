@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -202,6 +203,10 @@ public class Bot implements Entity {
 
     public void removeCommand(String name) {
         commands.remove(name);
+    }
+
+    public <T extends GenericEvent> void subscribeTo(String id, Class<T> type, Consumer<T> action) {
+        eventHandlerProxy.addSubscriber(id, type, action);
     }
 
     public ClassFilter getClassFilter() {
