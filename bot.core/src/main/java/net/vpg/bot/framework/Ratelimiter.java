@@ -23,16 +23,14 @@ public interface Ratelimiter {
         getRatelimited().put(id, new Ratelimit(id, getCooldown()));
     }
 
-    default boolean isRatelimited(long userId) {
-        return Util.isRatelimited(getRatelimit(userId));
+    default boolean isRatelimited(long id) {
+        Ratelimit ratelimit = getRatelimit(id);
+        return ratelimit != null && ratelimit.isRatelimited();
     }
 
     default boolean ifRatelimited(long id, Consumer<Ratelimit> action) {
-        return ifRatelimited(getRatelimit(id), action);
-    }
-
-    default boolean ifRatelimited(Ratelimit ratelimit, Consumer<Ratelimit> action) {
-        boolean isRatelimited = Util.isRatelimited(ratelimit);
+        Ratelimit ratelimit = getRatelimit(id);
+        boolean isRatelimited = ratelimit != null && ratelimit.isRatelimited();
         if (isRatelimited) {
             action.accept(ratelimit);
         }
@@ -40,11 +38,7 @@ public interface Ratelimiter {
     }
 
     default boolean checkRatelimited(long id, Sender sender) {
-        return checkRatelimited(getRatelimit(id), sender);
-    }
-
-    default boolean checkRatelimited(Ratelimit ratelimit, Sender sender) {
-        return ifRatelimited(ratelimit, rl -> onRatelimit(sender, ratelimit));
+        return ifRatelimited(id, rl -> onRatelimit(sender, rl));
     }
 
     default Ratelimit getRatelimit(long id) {

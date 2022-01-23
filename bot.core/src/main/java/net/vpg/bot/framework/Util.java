@@ -156,8 +156,4 @@ public class Util {
     public static <T, K> Map<K, T> group(List<T> list, Function<? super T, ? extends K> keyMapper) {
         return list.stream().collect(groupingBy(keyMapper));
     }
-
-    public static boolean isRatelimited(Ratelimit rl) {
-        return rl != null && rl.getCooldownLeft() >= 0;
-    }
 }

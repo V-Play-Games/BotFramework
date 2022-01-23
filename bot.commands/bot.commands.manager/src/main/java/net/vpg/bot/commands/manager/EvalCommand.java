@@ -54,10 +54,11 @@ public class EvalCommand extends BotCommandImpl implements ManagerCommand {
         bindings.put("guild", e.getGuild());
         bindings.put("channel", e.getChannel());
         bindings.put("author", e.getUser());
+        bindings.put("bot", e.getBot());
         bindings.put("jda", e.getJDA());
         bindings.put("script", script);
         bindings.put("startTime", startTime);
         Object result = engine.eval(script, bindings);
-        e.send("Successfully Executed in " + (System.currentTimeMillis() - startTime) + " ms\nResult:`" + (result == null ? "" : result.toString()) + "`").queue();
+        e.send("Successfully Executed in " + (System.currentTimeMillis() - startTime) + " ms" + (result == null ? "" : "\nResult:`" + result.toString()) + "`").queue();
     }
 }

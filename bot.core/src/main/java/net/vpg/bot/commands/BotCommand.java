@@ -35,8 +35,6 @@ public interface BotCommand {
 
     List<String> getAliases();
 
-    void removeAlias(String alias);
-
     String getName();
 
     String getDescription();

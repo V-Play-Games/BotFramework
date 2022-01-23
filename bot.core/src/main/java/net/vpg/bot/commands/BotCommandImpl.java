@@ -23,32 +23,35 @@ import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
 import net.vpg.bot.commands.event.TextCommandReceivedEvent;
 import net.vpg.bot.framework.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BotCommandImpl extends CommandData implements BotCommand, Ratelimiter {
     protected final Map<Long, Ratelimit> ratelimited = new HashMap<>();
+    protected final Bot bot;
+    protected final List<String> aliases;
     protected List<CommandPrivilege> defaultPrivileges = null;
     protected long cooldown;
     protected int minArgs;
     protected int maxArgs;
-    protected Bot bot;
-    protected List<String> aliases;
-    protected boolean isRegistered;
 
     public BotCommandImpl(Bot bot, String name, String description, String... aliases) {
         super(name, description);
         this.bot = bot;
-        this.aliases = new ArrayList<>();
-        Collections.addAll(this.aliases, aliases);
+        this.aliases = List.of(aliases);
+        bot.getPrimaryShard().getRateLimitPool().scheduleWithFixedDelay(() -> ratelimited.forEach((id, rl) -> {
+            if (!rl.isRatelimited()) {
+                ratelimited.remove(id);
+            }
+        }), 1, 1, TimeUnit.MINUTES);
     }
 
     @Override
     public void register() {
-        if (!isRegistered) {
-            bot.registerCommand(getName(), this);
-            aliases.forEach(alias -> bot.registerCommand(alias, this));
-        }
+        bot.registerCommand(getName(), this);
+        aliases.forEach(alias -> bot.registerCommand(alias, this));
     }
 
     @Override
@@ -59,12 +62,6 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
     @Override
     public List<String> getAliases() {
         return aliases;
-    }
-
-    @Override
-    public void removeAlias(String alias) {
-        if (aliases.remove(alias))
-            bot.removeCommand(alias);
     }
 
     @Override
@@ -105,11 +102,11 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
 
     @Override
     public void run(CommandReceivedEvent e) {
-        long uid = e.getUser().getIdLong();
-        if (checkRatelimited(uid, e) || !runChecks(e)) {
-            return;
-        }
         try {
+            long id = e.getUser().getIdLong();
+            if (checkRatelimited(id, e) || !runChecks(e)) {
+                return;
+            }
             if (e instanceof TextCommandReceivedEvent) {
                 TextCommandReceivedEvent text = (TextCommandReceivedEvent) e;
                 int args = text.getArgs().size();
@@ -121,10 +118,10 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
             } else {
                 onSlashCommandRun((SlashCommandReceivedEvent) e);
             }
-            ratelimit(uid);
+            ratelimit(id);
         } catch (Exception exc) {
             e.setTrouble(exc);
-            if (e.isReplySent()) {
+            if (!e.isReplySent()) {
                 e.send("There was some trouble processing your request. Please contact the developer.")
                     .setEphemeral(true)
                     .queue();
