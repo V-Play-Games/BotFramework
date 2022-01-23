@@ -42,28 +42,31 @@ public class EventHandlerProxy implements EventListener {
     public void onEvent(@Nonnull GenericEvent e) {
         subject.onEvent(e);
         ClassWalker.range(e.getClass(), GenericEvent.class).forEach(clazz ->
-            hooks.getOrDefault(clazz, EventHook.NO_OP_HOOK).execute(e)
+            {
+                EventHook<? extends GenericEvent> hook = hooks.get(clazz);
+                if (hook != null)
+                    hook.execute(e);
+            }
         );
     }
 
-    static class EventHook<T extends GenericEvent> {
-        static final EventHook<? extends GenericEvent> NO_OP_HOOK = new EventHook<>();
-        final Map<String, Consumer<T>> subscribers = new HashMap<>();
+    private static class EventHook<T extends GenericEvent> {
+        private final Map<String, Consumer<T>> subscribers = new HashMap<>();
 
         @SuppressWarnings("unchecked")
-        void addSubscriber(String id, Consumer<?> action) {
+        private void addSubscriber(String id, Consumer<?> action) {
             subscribers.put(id, (Consumer<T>) action);
         }
 
-        void removeSubscriber(String id) {
+        private void removeSubscriber(String id) {
             subscribers.remove(id);
         }
 
-        Map<String, Consumer<T>> getSubscribers() {
+        private Map<String, Consumer<T>> getSubscribers() {
             return subscribers;
         }
 
-        void execute(GenericEvent event) {
+        private void execute(GenericEvent event) {
             // noinspection unchecked
             subscribers.values().forEach(c -> c.accept((T) event));
         }
