@@ -50,8 +50,8 @@ public class EventHandlerProxy implements EventListener {
         static final EventHook<? extends GenericEvent> NO_OP_HOOK = new EventHook<>();
         final Map<String, Consumer<T>> subscribers = new HashMap<>();
 
+        @SuppressWarnings("unchecked")
         void addSubscriber(String id, Consumer<?> action) {
-            // noinspection unchecked
             subscribers.put(id, (Consumer<T>) action);
         }
 

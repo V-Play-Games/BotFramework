@@ -61,15 +61,12 @@ public class Database {
     }
 
     public MongoCollection<Document> getCollection(String name) {
-        var collection = collections.get(name);
-        if (collection == null) {
-            collection = registerCollection(name);
-        }
-        return collection;
+        MongoCollection<Document> collection = collections.get(name);
+        return collection == null ? registerCollection(name) : collection;
     }
 
     private MongoCollection<Document> registerCollection(String name) {
-        var collection = db.getCollection(name);
+        MongoCollection<Document> collection = db.getCollection(name);
         collection.createIndex(Indexes.ascending("id"));
         collections.put(name, collection);
         return collection;

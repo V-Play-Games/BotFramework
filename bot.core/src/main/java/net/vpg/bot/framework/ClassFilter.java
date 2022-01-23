@@ -45,9 +45,7 @@ public class ClassFilter {
     }
 
     public Predicate<Class<?>> asPredicate() {
-        Pattern enablePattern = Pattern.compile(String.join("|", enabled));
-        Pattern disablePattern = Pattern.compile(String.join("|", disabled));
-        Predicate<String> predicate = enablePattern.asMatchPredicate().and(disablePattern.asMatchPredicate().negate());
-        return clazz -> predicate.test(clazz.getName());
+        return clazz -> Pattern.matches(String.join("|", enabled), clazz.getName())
+            && !Pattern.matches(String.join("|", disabled), clazz.getName());
     }
 }
