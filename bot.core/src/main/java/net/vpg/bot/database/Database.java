@@ -30,6 +30,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Database {
+    static {
+        ((Logger) LoggerFactory.getLogger("org.org.mongodb.driver.connection")).setLevel(Level.INFO);
+        ((Logger) LoggerFactory.getLogger("org.mongodb.driver.cluster")).setLevel(Level.INFO);
+        ((Logger) LoggerFactory.getLogger("org.mongodb.driver.protocol.command")).setLevel(Level.INFO);
+    }
+
     private final Map<String, MongoCollection<Document>> collections = new HashMap<>();
     private final MongoClient client;
     private final MongoDatabase db;
@@ -40,8 +46,6 @@ public class Database {
         this.client = MongoClients.create(connectionString);
         this.db = client.getDatabase(dbName);
         db.listCollectionNames().forEach(this::registerCollection);
-        ((Logger) LoggerFactory.getLogger("org.mongodb.driver.cluster")).setLevel(Level.INFO);
-        ((Logger) LoggerFactory.getLogger("org.mongodb.driver.protocol.command")).setLevel(Level.INFO);
     }
 
     public Bot getBot() {
