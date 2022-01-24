@@ -2,8 +2,8 @@ package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.action.CommandReplyAction;
+import net.vpg.bot.commands.BotCommand;
 
 import java.util.List;
 

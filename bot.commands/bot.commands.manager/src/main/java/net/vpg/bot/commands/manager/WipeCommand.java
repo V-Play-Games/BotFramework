@@ -17,25 +17,26 @@ package net.vpg.bot.commands.manager;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
-import net.vpg.bot.core.Bot;
 
 public abstract class WipeCommand extends BotCommandImpl implements ManagerCommand {
     public WipeCommand(Bot bot) {
         super(bot, "wipe", "Wipes data from the bot");
-        addOption(OptionType.STRING, "key", "Key of the data to wipe", true);
+        setMaxArgs(1);
+        addOption(OptionType.STRING, "arg", "the data to wipe", true);
     }
 
     @Override
     public void onTextCommandRun(TextCommandReceivedEvent e) {
-        execute(e, e.getArg(0));
+        execute(e, e.getArgsFrom(0, " "));
     }
 
     @Override
     public void onSlashCommandRun(SlashCommandReceivedEvent e) {
-        execute(e, e.getString("key"));
+        execute(e, e.getString("arg"));
     }
 
     public abstract void execute(CommandReceivedEvent e, String key);

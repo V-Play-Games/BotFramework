@@ -18,10 +18,10 @@ package net.vpg.bot.commands.fun.meme;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
-import net.vpg.bot.core.Bot;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

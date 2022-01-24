@@ -17,10 +17,10 @@ package net.vpg.bot.commands.manager;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
-import net.vpg.bot.core.Bot;
 
 public abstract class RetrieveCommand extends BotCommandImpl implements ManagerCommand {
     public RetrieveCommand(Bot bot) {

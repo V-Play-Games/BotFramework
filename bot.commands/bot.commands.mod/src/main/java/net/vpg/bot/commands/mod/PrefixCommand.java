@@ -18,12 +18,12 @@ package net.vpg.bot.commands.mod;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.core.Bot;
+import net.vpg.bot.core.Util;
+import net.vpg.bot.entities.GuildSettings;
 import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
-import net.vpg.bot.core.Bot;
-import net.vpg.bot.entities.GuildSettings;
-import net.vpg.bot.core.Util;
 
 public class PrefixCommand extends BotCommandImpl implements ModCommand {
     public PrefixCommand(Bot bot) {

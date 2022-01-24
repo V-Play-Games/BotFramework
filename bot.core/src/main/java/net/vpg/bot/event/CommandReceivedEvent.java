@@ -21,10 +21,10 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.action.CommandReplyAction;
-import net.vpg.bot.core.Bot;
 import net.vpg.bot.action.Sender;
+import net.vpg.bot.commands.BotCommand;
+import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.Util;
 
 import javax.annotation.Nonnull;
@@ -149,6 +149,11 @@ public abstract class CommandReceivedEvent implements Sender {
         return trouble;
     }
 
+    public void setTrouble(Throwable trouble) {
+        this.trouble = trouble;
+        trouble.printStackTrace();
+    }
+
     public String getPrefix() {
         return prefix;
     }
@@ -193,11 +198,6 @@ public abstract class CommandReceivedEvent implements Sender {
     @Override
     public CommandReplyAction deferSend() {
         return action == null ? action = actionSupplier.get().setTask(this::log) : action;
-    }
-
-    public void setTrouble(Throwable trouble) {
-        this.trouble = trouble;
-        trouble.printStackTrace();
     }
 
     protected abstract String getInput();

@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.InteractionType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.action.CommandReplyAction;
+import net.vpg.bot.commands.BotCommand;
 
 import java.util.List;
 import java.util.Optional;

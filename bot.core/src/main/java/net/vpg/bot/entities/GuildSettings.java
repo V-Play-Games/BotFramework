@@ -16,8 +16,8 @@
 package net.vpg.bot.entities;
 
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.database.DatabaseObject;
 import net.vpg.bot.core.Bot;
+import net.vpg.bot.database.DatabaseObject;
 
 import java.util.HashMap;
 import java.util.Map;

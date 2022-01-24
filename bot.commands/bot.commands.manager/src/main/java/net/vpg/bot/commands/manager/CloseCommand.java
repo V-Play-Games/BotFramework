@@ -17,8 +17,8 @@ package net.vpg.bot.commands.manager;
 
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
-import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.core.Bot;
+import net.vpg.bot.event.CommandReceivedEvent;
 
 public class CloseCommand extends BotCommandImpl implements NoArgsCommand, ManagerCommand {
     public CloseCommand(Bot bot) {

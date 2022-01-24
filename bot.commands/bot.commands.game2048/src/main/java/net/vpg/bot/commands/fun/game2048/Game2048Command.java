@@ -23,10 +23,10 @@ import net.dv8tion.jda.api.requests.restaction.interactions.UpdateInteractionAct
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
-import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.core.Bot;
-import net.vpg.bot.event.BotButtonEvent;
 import net.vpg.bot.core.ButtonHandler;
+import net.vpg.bot.event.BotButtonEvent;
+import net.vpg.bot.event.CommandReceivedEvent;
 
 import java.util.List;
 

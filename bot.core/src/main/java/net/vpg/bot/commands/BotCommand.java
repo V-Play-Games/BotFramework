@@ -19,10 +19,10 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
+import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
-import net.vpg.bot.core.Bot;
 import net.vpg.bot.ratelimit.Ratelimit;
 
 import java.util.List;

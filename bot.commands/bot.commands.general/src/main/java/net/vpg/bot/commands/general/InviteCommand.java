@@ -19,8 +19,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
-import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.core.Bot;
+import net.vpg.bot.event.CommandReceivedEvent;
 
 public abstract class InviteCommand extends BotCommandImpl implements NoArgsCommand {
     public InviteCommand(Bot bot) {

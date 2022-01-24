@@ -19,9 +19,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.entities.Entity;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.Util;
+import net.vpg.bot.entities.Entity;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
