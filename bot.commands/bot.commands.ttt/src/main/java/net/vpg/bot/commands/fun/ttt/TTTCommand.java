@@ -20,12 +20,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.event.CommandReceivedEvent;
-import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
-import net.vpg.bot.commands.event.TextCommandReceivedEvent;
-import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.BotButtonEvent;
-import net.vpg.bot.framework.ButtonHandler;
+import net.vpg.bot.event.CommandReceivedEvent;
+import net.vpg.bot.event.SlashCommandReceivedEvent;
+import net.vpg.bot.event.TextCommandReceivedEvent;
+import net.vpg.bot.core.Bot;
+import net.vpg.bot.event.BotButtonEvent;
+import net.vpg.bot.core.ButtonHandler;
 
 import java.util.List;
 

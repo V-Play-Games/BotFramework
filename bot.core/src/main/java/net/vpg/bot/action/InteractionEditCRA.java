@@ -1,10 +1,10 @@
-package net.vpg.bot.commands.action;
+package net.vpg.bot.action;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.UpdateInteractionAction;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 
 import javax.annotation.Nonnull;
@@ -15,8 +15,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class InteractionReplyCRA extends AbstractCRA<ReplyAction> {
-    protected InteractionReplyCRA(ReplyAction action) {
+public class InteractionEditCRA extends AbstractCRA<UpdateInteractionAction> {
+    public InteractionEditCRA(UpdateInteractionAction action) {
         super(action);
     }
 
@@ -28,28 +28,26 @@ public class InteractionReplyCRA extends AbstractCRA<ReplyAction> {
     @Nonnull
     @Override
     public CommandReplyAction setEmbeds(Collection<? extends MessageEmbed> embeds) {
-        action.addEmbeds(embeds);
+        action.setEmbeds(embeds);
         return this;
     }
 
     @Nonnull
     @Override
     public CommandReplyAction setActionRows(ActionRow... rows) {
-        action.addActionRows(rows);
+        action.setActionRows(rows);
         return this;
     }
 
     @Nonnull
     @Override
     public CommandReplyAction setTTS(boolean tts) {
-        action.setTTS(tts);
         return this;
     }
 
     @Nonnull
     @Override
     public CommandReplyAction setEphemeral(boolean ephemeral) {
-        action.setEphemeral(ephemeral);
         return this;
     }
 
@@ -62,7 +60,6 @@ public class InteractionReplyCRA extends AbstractCRA<ReplyAction> {
     @Nonnull
     @Override
     public CommandReplyAction mentionRepliedUser(boolean mention) {
-        action.mentionRepliedUser(mention);
         return this;
     }
 

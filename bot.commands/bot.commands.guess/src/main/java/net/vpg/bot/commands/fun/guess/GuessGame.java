@@ -18,10 +18,10 @@ package net.vpg.bot.commands.fun.guess;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.entities.GuessPokemon;
-import net.vpg.bot.framework.Sender;
-import net.vpg.bot.framework.Util;
+import net.vpg.bot.action.Sender;
+import net.vpg.bot.core.Util;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -22,7 +22,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
-import net.vpg.bot.framework.Bot;
+import net.vpg.bot.core.Bot;
 import org.bson.Document;
 import org.slf4j.LoggerFactory;
 

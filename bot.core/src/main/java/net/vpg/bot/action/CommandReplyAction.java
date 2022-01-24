@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.vpg.bot.commands.action;
+package net.vpg.bot.action;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -65,7 +65,7 @@ public interface CommandReplyAction extends RestAction<Message>, Appendable {
     }
 
     static CommandReplyAction edit(ComponentInteraction interaction) {
-        return new InteractionEditAction(new UpdateInteractionActionImpl((InteractionHookImpl) interaction.getHook()));
+        return new InteractionEditCRA(new UpdateInteractionActionImpl((InteractionHookImpl) interaction.getHook()));
     }
 
     @Nonnull

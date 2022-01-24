@@ -16,7 +16,7 @@
 package net.vpg.bot.entities;
 
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.framework.Bot;
+import net.vpg.bot.core.Bot;
 
 import java.net.URL;
 import java.util.Map;

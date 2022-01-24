@@ -18,9 +18,9 @@ package net.vpg.bot.commands.general;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
-import net.vpg.bot.commands.event.CommandReceivedEvent;
-import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.Util;
+import net.vpg.bot.event.CommandReceivedEvent;
+import net.vpg.bot.core.Bot;
+import net.vpg.bot.core.Util;
 
 public abstract class InfoCommand extends BotCommandImpl implements NoArgsCommand {
     public InfoCommand(Bot bot) {

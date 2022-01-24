@@ -17,7 +17,7 @@ package net.vpg.bot.commands.fun.game2048;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.vpg.bot.framework.Util;
+import net.vpg.bot.core.Util;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -18,11 +18,11 @@ package net.vpg.bot.commands.fun;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.event.CommandReceivedEvent;
-import net.vpg.bot.commands.event.SlashCommandReceivedEvent;
-import net.vpg.bot.commands.event.TextCommandReceivedEvent;
-import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.Util;
+import net.vpg.bot.event.CommandReceivedEvent;
+import net.vpg.bot.event.SlashCommandReceivedEvent;
+import net.vpg.bot.event.TextCommandReceivedEvent;
+import net.vpg.bot.core.Bot;
+import net.vpg.bot.core.Util;
 
 import java.util.stream.Collectors;
 

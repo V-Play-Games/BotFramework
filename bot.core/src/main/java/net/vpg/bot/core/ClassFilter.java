@@ -1,4 +1,4 @@
-package net.vpg.bot.framework;
+package net.vpg.bot.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;

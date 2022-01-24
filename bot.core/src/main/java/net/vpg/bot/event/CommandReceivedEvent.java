@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.vpg.bot.commands.event;
+package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -22,10 +22,10 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.commands.BotCommand;
-import net.vpg.bot.commands.action.CommandReplyAction;
-import net.vpg.bot.framework.Bot;
-import net.vpg.bot.framework.Sender;
-import net.vpg.bot.framework.Util;
+import net.vpg.bot.action.CommandReplyAction;
+import net.vpg.bot.core.Bot;
+import net.vpg.bot.action.Sender;
+import net.vpg.bot.core.Util;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

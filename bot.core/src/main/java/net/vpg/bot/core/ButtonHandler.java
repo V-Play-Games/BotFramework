@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.vpg.bot.commands;
+package net.vpg.bot.core;
 
-import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
+import net.vpg.bot.event.BotButtonEvent;
 
-public interface NoArgsCommand extends BotCommand {
-    @Override
-    default void onTextCommandRun(TextCommandReceivedEvent e) throws Exception {
-        execute(e);
-    }
+public interface ButtonHandler {
+    String getName();
 
-    @Override
-    default void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception {
-        execute(e);
-    }
-
-    void execute(CommandReceivedEvent e) throws Exception;
+    void handle(BotButtonEvent e);
 }

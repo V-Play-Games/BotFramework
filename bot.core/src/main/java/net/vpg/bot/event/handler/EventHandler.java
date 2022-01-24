@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.vpg.bot.commands;
+package net.vpg.bot.event.handler;
 
-import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.vpg.bot.core.Bot;
 
-public interface NoArgsCommand extends BotCommand {
-    @Override
-    default void onTextCommandRun(TextCommandReceivedEvent e) throws Exception {
-        execute(e);
+public class EventHandler extends ListenerAdapter {
+    protected final Bot bot;
+    protected boolean closed;
+
+    public EventHandler(Bot bot) {
+        this.bot = bot;
     }
 
-    @Override
-    default void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception {
-        execute(e);
+    public Bot getBot() {
+        return bot;
     }
 
-    void execute(CommandReceivedEvent e) throws Exception;
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
 }

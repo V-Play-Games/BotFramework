@@ -1,4 +1,4 @@
-package net.vpg.bot.framework;
+package net.vpg.bot.event.handler;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.ExceptionEvent;
@@ -7,7 +7,10 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.vpg.bot.commands.BotCommand;
-import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.event.CommandReceivedEvent;
+import net.vpg.bot.core.Bot;
+import net.vpg.bot.event.BotButtonEvent;
+import net.vpg.bot.core.Util;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;

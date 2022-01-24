@@ -17,7 +17,7 @@ package net.vpg.bot.commands.manager;
 
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.vpg.bot.commands.BotCommand;
-import net.vpg.bot.commands.event.CommandReceivedEvent;
+import net.vpg.bot.event.CommandReceivedEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;

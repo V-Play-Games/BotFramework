@@ -15,7 +15,7 @@
  */
 package net.vpg.bot.commands.fun.game2048;
 
-import net.vpg.bot.framework.Util;
+import net.vpg.bot.core.Util;
 
 import java.util.Arrays;
 import java.util.List;

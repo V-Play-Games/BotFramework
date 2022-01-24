@@ -1,4 +1,4 @@
-package net.vpg.bot.commands.event;
+package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.InteractionType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommand;
-import net.vpg.bot.commands.action.CommandReplyAction;
+import net.vpg.bot.action.CommandReplyAction;
 
 import java.util.List;
 import java.util.Optional;

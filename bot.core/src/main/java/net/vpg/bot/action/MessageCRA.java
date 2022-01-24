@@ -1,4 +1,4 @@
-package net.vpg.bot.commands.action;
+package net.vpg.bot.action;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;

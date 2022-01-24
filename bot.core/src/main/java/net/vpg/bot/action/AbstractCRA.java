@@ -1,4 +1,4 @@
-package net.vpg.bot.commands.action;
+package net.vpg.bot.action;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -13,7 +13,7 @@ public abstract class AbstractCRA<R extends RestAction<?>> implements CommandRep
     protected Consumer<CommandReplyAction> task;
     protected String content;
 
-    protected AbstractCRA(R action) {
+    protected AbstractCRA(@Nonnull R action) {
         this.action = action;
     }
 

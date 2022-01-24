@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.vpg.bot.framework;
+package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.vpg.bot.commands.action.CommandReplyAction;
+import net.vpg.bot.action.CommandReplyAction;
+import net.vpg.bot.action.Sender;
+import net.vpg.bot.core.Bot;
+import net.vpg.bot.core.Util;
 
 import javax.annotation.Nonnull;
 
