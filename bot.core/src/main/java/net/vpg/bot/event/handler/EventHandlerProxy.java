@@ -66,8 +66,8 @@ public class EventHandlerProxy implements EventListener {
             return subscribers;
         }
 
+        @SuppressWarnings("unchecked")
         private void execute(GenericEvent event) {
-            // noinspection unchecked
             subscribers.values().forEach(c -> c.accept((T) event));
         }
     }

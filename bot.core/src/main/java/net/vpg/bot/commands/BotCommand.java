@@ -16,8 +16,8 @@
 package net.vpg.bot.commands;
 
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
@@ -63,7 +63,7 @@ public interface BotCommand {
 
     Map<Long, Ratelimit> getRateLimited();
 
-    CommandData toCommandData();
+    SlashCommandData toCommandData();
 
     List<CommandPrivilege> getDefaultPrivileges();
 }

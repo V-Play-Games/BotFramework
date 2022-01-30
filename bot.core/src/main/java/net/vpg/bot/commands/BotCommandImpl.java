@@ -16,7 +16,7 @@
 package net.vpg.bot.commands;
 
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.dv8tion.jda.internal.interactions.CommandDataImpl;
 import net.vpg.bot.action.Sender;
@@ -169,7 +169,7 @@ public abstract class BotCommandImpl extends CommandDataImpl implements BotComma
     }
 
     @Override
-    public CommandData toCommandData() {
+    public SlashCommandData toCommandData() {
         return this;
     }
 
