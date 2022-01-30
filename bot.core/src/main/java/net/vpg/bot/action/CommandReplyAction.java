@@ -18,17 +18,17 @@ package net.vpg.bot.action;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.interactions.components.ActionComponent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Component;
-import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 import net.dv8tion.jda.api.utils.MiscUtil;
 import net.dv8tion.jda.internal.interactions.InteractionHookImpl;
 import net.dv8tion.jda.internal.requests.restaction.MessageActionImpl;
-import net.dv8tion.jda.internal.requests.restaction.interactions.ReplyActionImpl;
-import net.dv8tion.jda.internal.requests.restaction.interactions.UpdateInteractionActionImpl;
+import net.dv8tion.jda.internal.requests.restaction.interactions.MessageEditCallbackActionImpl;
+import net.dv8tion.jda.internal.requests.restaction.interactions.ReplyCallbackActionImpl;
 import net.dv8tion.jda.internal.utils.Checks;
 
 import javax.annotation.Nonnull;
@@ -52,20 +52,16 @@ public interface CommandReplyAction extends RestAction<Message>, Appendable {
         return new MessageCRA(new MessageActionImpl(message.getJDA(), null, message.getChannel()));
     }
 
-    static CommandReplyAction reply(Interaction interaction) {
-        return new InteractionReplyCRA(new ReplyActionImpl((InteractionHookImpl) interaction.getHook()));
-    }
-
-    static CommandReplyAction reply(ComponentInteraction interaction) {
-        return new InteractionReplyCRA(new ReplyActionImpl((InteractionHookImpl) interaction.getHook()));
+    static CommandReplyAction reply(IReplyCallback callback) {
+        return new InteractionReplyCRA(new ReplyCallbackActionImpl((InteractionHookImpl) callback.getHook()));
     }
 
     static CommandReplyAction edit(Message message) {
         return new MessageCRA(new MessageActionImpl(message.getJDA(), message.getId(), message.getChannel()));
     }
 
-    static CommandReplyAction edit(ComponentInteraction interaction) {
-        return new InteractionEditCRA(new UpdateInteractionActionImpl((InteractionHookImpl) interaction.getHook()));
+    static CommandReplyAction edit(IMessageEditCallback callback) {
+        return new InteractionEditCRA(new MessageEditCallbackActionImpl((InteractionHookImpl) callback.getHook()));
     }
 
     @Nonnull
@@ -92,12 +88,12 @@ public interface CommandReplyAction extends RestAction<Message>, Appendable {
     CommandReplyAction setEmbeds(Collection<? extends MessageEmbed> embeds);
 
     @Nonnull
-    default CommandReplyAction setActionRow(Component... components) {
+    default CommandReplyAction setActionRow(ActionComponent... components) {
         return setActionRows(ActionRow.of(components));
     }
 
     @Nonnull
-    default CommandReplyAction setActionRow(Collection<? extends Component> components) {
+    default CommandReplyAction setActionRow(Collection<? extends ActionComponent> components) {
         return setActionRows(ActionRow.of(components));
     }
 

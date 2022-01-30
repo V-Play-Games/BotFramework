@@ -18,6 +18,7 @@ package net.vpg.bot.commands;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
+import net.dv8tion.jda.internal.interactions.CommandDataImpl;
 import net.vpg.bot.action.Sender;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.Util;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public abstract class BotCommandImpl extends CommandData implements BotCommand, Ratelimiter {
+public abstract class BotCommandImpl extends CommandDataImpl implements BotCommand, Ratelimiter {
     protected final Map<Long, Ratelimit> ratelimited = new HashMap<>();
     protected final Bot bot;
     protected final List<String> aliases;

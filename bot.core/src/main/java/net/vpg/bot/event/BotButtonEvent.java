@@ -15,7 +15,7 @@
  */
 package net.vpg.bot.event;
 
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.vpg.bot.action.CommandReplyAction;
 import net.vpg.bot.action.Sender;
 import net.vpg.bot.core.Bot;
@@ -23,13 +23,13 @@ import net.vpg.bot.core.Util;
 
 import javax.annotation.Nonnull;
 
-public class BotButtonEvent extends ButtonClickEvent implements Sender {
+public class BotButtonEvent extends ButtonInteractionEvent implements Sender {
     final String method;
     final String[] args;
     final Bot bot;
     CommandReplyAction action;
 
-    public BotButtonEvent(ButtonClickEvent e, Bot bot) {
+    public BotButtonEvent(ButtonInteractionEvent e, Bot bot) {
         super(e.getJDA(), e.getResponseNumber(), e.getInteraction());
         this.bot = bot;
         this.method = Util.getMethod(getComponentId());

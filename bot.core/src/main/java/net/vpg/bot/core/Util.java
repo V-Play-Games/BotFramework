@@ -20,8 +20,8 @@ import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.entities.GuildSettings;
 import org.bson.Document;
@@ -124,7 +124,7 @@ public class Util {
         return array[random.nextInt(array.length)];
     }
 
-    public static boolean equals(CommandData data, Command cmd) {
+    public static boolean equals(SlashCommandData data, Command cmd) {
         return cmd != null &&
             data.getName().equals(cmd.getName()) &&
             data.getDescription().equals(cmd.getDescription()) &&

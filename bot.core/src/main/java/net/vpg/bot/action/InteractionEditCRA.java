@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.requests.restaction.interactions.UpdateInteractionAction;
 import net.dv8tion.jda.api.utils.AttachmentOption;
+import net.dv8tion.jda.internal.requests.restaction.interactions.MessageEditCallbackActionImpl;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -15,8 +15,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class InteractionEditCRA extends AbstractCRA<UpdateInteractionAction> {
-    public InteractionEditCRA(UpdateInteractionAction action) {
+public class InteractionEditCRA extends AbstractCRA<MessageEditCallbackActionImpl> {
+    public InteractionEditCRA(MessageEditCallbackActionImpl action) {
         super(action);
     }
 

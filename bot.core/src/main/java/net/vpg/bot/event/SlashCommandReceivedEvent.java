@@ -1,7 +1,7 @@
 package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.InteractionType;
@@ -15,9 +15,9 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class SlashCommandReceivedEvent extends CommandReceivedEvent {
-    private final SlashCommandEvent slash;
+    private final SlashCommandInteractionEvent slash;
 
-    public SlashCommandReceivedEvent(SlashCommandEvent e, BotCommand command) {
+    public SlashCommandReceivedEvent(SlashCommandInteractionEvent e, BotCommand command) {
         super(e.getJDA(),
             e.getChannel(),
             e.getGuild(),
@@ -130,7 +130,7 @@ public class SlashCommandReceivedEvent extends CommandReceivedEvent {
         return getOptions().stream().filter(opt -> opt.getName().equals(name)).findFirst();
     }
 
-    public SlashCommandEvent getSlash() {
+    public SlashCommandInteractionEvent getSlash() {
         return slash;
     }
 

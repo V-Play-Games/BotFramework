@@ -18,8 +18,8 @@ package net.vpg.bot.action;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.interactions.Interaction;
-import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
+import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -39,23 +39,15 @@ public interface Sender {
         return of(message, CommandReplyAction::edit);
     }
 
-    static Sender of(Interaction interaction) {
+    static Sender of(IReplyCallback interaction) {
         return of(interaction, CommandReplyAction::reply);
     }
 
-    static Sender ofReply(Interaction interaction) {
+    static Sender ofReply(IReplyCallback interaction) {
         return of(interaction, CommandReplyAction::reply);
     }
 
-    static Sender of(ComponentInteraction interaction) {
-        return ofReply(interaction);
-    }
-
-    static Sender ofReply(ComponentInteraction interaction) {
-        return of(interaction, CommandReplyAction::reply);
-    }
-
-    static Sender ofEdit(ComponentInteraction interaction) {
+    static Sender ofEdit(IMessageEditCallback interaction) {
         return of(interaction, CommandReplyAction::edit);
     }
 

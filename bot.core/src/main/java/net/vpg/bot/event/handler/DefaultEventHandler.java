@@ -3,8 +3,8 @@ package net.vpg.bot.event.handler;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.ExceptionEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.core.Bot;
@@ -12,6 +12,7 @@ import net.vpg.bot.core.Util;
 import net.vpg.bot.event.BotButtonEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -80,7 +81,7 @@ public class DefaultEventHandler extends EventHandler {
     }
 
     @Override
-    public void onSlashCommand(@Nonnull SlashCommandEvent e) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent e) {
         if (closed) {
             if (e.getName().equalsIgnoreCase("activate") && bot.isManager(e.getUser().getIdLong())) {
                 closed = false;
@@ -111,7 +112,7 @@ public class DefaultEventHandler extends EventHandler {
     }
 
     @Override
-    public void onButtonClick(@Nonnull ButtonClickEvent e) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent e)  {
         new BotButtonEvent(e, bot).execute();
     }
 }

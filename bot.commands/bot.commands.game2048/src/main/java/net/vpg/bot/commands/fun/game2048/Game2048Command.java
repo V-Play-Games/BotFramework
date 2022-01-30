@@ -18,8 +18,8 @@ package net.vpg.bot.commands.fun.game2048;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.requests.restaction.interactions.UpdateInteractionAction;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
@@ -77,7 +77,7 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
             }
             Board board = Board.fromEmbed(embeds.get(0));
             board.move(move);
-            UpdateInteractionAction action = e.deferEdit().setEmbeds(board.toEmbed());
+            MessageEditCallbackAction action = e.deferEdit().setEmbeds(board.toEmbed());
             if (board.checkWin()) {
                 action.setContent("GG! You won!").setActionRows().queue();
             } else if (board.checkLose()) {
