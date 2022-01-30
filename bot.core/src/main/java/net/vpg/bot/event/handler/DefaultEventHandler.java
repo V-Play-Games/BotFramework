@@ -12,7 +12,6 @@ import net.vpg.bot.core.Util;
 import net.vpg.bot.event.BotButtonEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -81,7 +80,7 @@ public class DefaultEventHandler extends EventHandler {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent e) {
+    public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent e) {
         if (closed) {
             if (e.getName().equalsIgnoreCase("activate") && bot.isManager(e.getUser().getIdLong())) {
                 closed = false;
@@ -112,7 +111,7 @@ public class DefaultEventHandler extends EventHandler {
     }
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent e)  {
+    public void onButtonInteraction(@Nonnull ButtonInteractionEvent e) {
         new BotButtonEvent(e, bot).execute();
     }
 }

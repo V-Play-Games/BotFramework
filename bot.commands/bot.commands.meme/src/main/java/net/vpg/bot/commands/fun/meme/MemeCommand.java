@@ -59,7 +59,8 @@ public class MemeCommand extends BotCommandImpl {
 
     public void execute(CommandReceivedEvent e, String subreddit) throws IOException {
         Meme meme = connection.getMeme(subreddit);
-        if (meme.isNsfw() && !((BaseGuildMessageChannel) (e.getChannelType().isThread() ? e.getThreadChannel().getParentChannel() : e.getGuildChannel())).isNSFW()) return;
+        if (meme.isNsfw() && !((BaseGuildMessageChannel) (e.getChannelType().isThread() ? e.getThreadChannel().getParentChannel() : e.getGuildChannel())).isNSFW())
+            return;
         e.sendEmbeds(new EmbedBuilder()
             .setTitle(meme.getTitle(), meme.getPostLink())
             .setDescription("Meme by u/" + meme.getAuthor() + " in r/" + meme.getSubreddit())
