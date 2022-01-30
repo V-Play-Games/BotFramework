@@ -16,7 +16,7 @@
 package net.vpg.bot.commands.fun.ttt;
 
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.vpg.bot.action.Sender;
 
 import java.util.Arrays;
