@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 public class GuessPokemon implements Entity {
     public static final Map<String, GuessPokemon> CACHE = new HashMap<>();
+    public static final EntityInfo<GuessPokemon> INFO = new EntityInfo<>(GuessPokemon.class.getResource("guesses.json"), GuessPokemon::new, CACHE);
     private final String id;
     private final String name;
     private final List<String> flavorTexts;
@@ -42,10 +43,6 @@ public class GuessPokemon implements Entity {
         this.type = index == -1
             ? Util.toProperCase(type)
             : Util.toProperCase(type.substring(0, index + 1)) + Util.toProperCase(type.substring(index + 1));
-    }
-
-    public static EntityInfo<GuessPokemon> getInfo() {
-        return new EntityInfo<>(GuessPokemon.class.getResource("guesses.json"), GuessPokemon::new, CACHE);
     }
 
     public static GuessPokemon get(String id) {

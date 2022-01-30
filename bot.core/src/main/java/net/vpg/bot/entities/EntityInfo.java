@@ -24,27 +24,43 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class EntityInfo<T extends Entity> {
-    public final String identifier;
-    public final BiFunction<DataObject, Bot, T> entityConstructor;
-    public final Map<String, T> entityMap;
-    public final boolean isDBObject;
+    private final String identifier;
+    private final BiFunction<DataObject, Bot, T> constructor;
+    private final Map<String, T> map;
+    private final boolean isDatabaseEntity;
 
-    public EntityInfo(URL fileUrl, Function<DataObject, T> entityConstructor, Map<String, T> entityMap) {
-        this(fileUrl.toString(), (data, bot) -> entityConstructor.apply(data), entityMap, false);
+    public EntityInfo(URL fileUrl, Function<DataObject, T> constructor, Map<String, T> map) {
+        this(fileUrl.toString(), (data, bot) -> constructor.apply(data), map, false);
     }
 
-    public EntityInfo(URL fileUrl, BiFunction<DataObject, Bot, T> entityConstructor, Map<String, T> entityMap) {
-        this(fileUrl.toString(), entityConstructor, entityMap, false);
+    public EntityInfo(URL fileUrl, BiFunction<DataObject, Bot, T> constructor, Map<String, T> map) {
+        this(fileUrl.toString(), constructor, map, false);
     }
 
-    public EntityInfo(String collectionId, BiFunction<DataObject, Bot, T> entityConstructor, Map<String, T> entityMap) {
-        this(collectionId, entityConstructor, entityMap, true);
+    public EntityInfo(String collectionId, BiFunction<DataObject, Bot, T> constructor, Map<String, T> map) {
+        this(collectionId, constructor, map, true);
     }
 
-    public EntityInfo(String identifier, BiFunction<DataObject, Bot, T> entityConstructor, Map<String, T> entityMap, boolean isDBObject) {
+    public EntityInfo(String identifier, BiFunction<DataObject, Bot, T> constructor, Map<String, T> map, boolean isDatabaseEntity) {
         this.identifier = identifier;
-        this.entityConstructor = entityConstructor;
-        this.entityMap = entityMap;
-        this.isDBObject = isDBObject;
+        this.constructor = constructor;
+        this.map = map;
+        this.isDatabaseEntity = isDatabaseEntity;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public BiFunction<DataObject, Bot, T> getConstructor() {
+        return constructor;
+    }
+
+    public Map<String, T> getMap() {
+        return map;
+    }
+
+    public boolean isDatabaseEntity() {
+        return isDatabaseEntity;
     }
 }

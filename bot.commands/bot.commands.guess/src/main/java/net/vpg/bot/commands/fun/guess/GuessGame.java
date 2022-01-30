@@ -22,6 +22,7 @@ import net.vpg.bot.action.Sender;
 import net.vpg.bot.core.Util;
 import net.vpg.bot.entities.GuessPokemon;
 import net.vpg.bot.event.CommandReceivedEvent;
+import org.intellij.lang.annotations.MagicConstant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class GuessGame {
-    public static final Random random = new Random();
+    public static final Random RANDOM = new Random();
     public static final Map<String, GuessGame> games = new HashMap<>();
     public static final int TIMEOUT = 0;
     public static final int FORFEIT = 1;
@@ -44,10 +45,9 @@ public class GuessGame {
 
     public GuessGame(CommandReceivedEvent e) {
         this.id = e.getUser().getId();
-        this.pokemon = GuessPokemon.get(String.valueOf(random.nextInt(GuessPokemon.CACHE.size()) + 1));
-        this.text = Util.getRandom(pokemon.getFlavorTexts(), random);
-        this.timeout = e.getJDA().getRateLimitPool()
-            .schedule(() -> close(Sender.of(e.getChannel()), TIMEOUT), 30, TimeUnit.SECONDS);
+        this.pokemon = GuessPokemon.get(String.valueOf(RANDOM.nextInt(GuessPokemon.CACHE.values().size()) + 1));
+        this.text = Util.getRandom(pokemon.getFlavorTexts(), RANDOM);
+        this.timeout = e.getJDA().getRateLimitPool().schedule(() -> close(Sender.of(e.getChannel()), GuessGame.TIMEOUT), 30, TimeUnit.SECONDS);
         games.put(id, this);
     }
 
@@ -76,7 +76,7 @@ public class GuessGame {
         return pokemon;
     }
 
-    public void close(Sender sender, int reason) {
+    public void close(Sender sender, @MagicConstant(flagsFromClass = GuessGame.class) int reason) {
         if (closed) return;
         closed = true;
         games.remove(id);

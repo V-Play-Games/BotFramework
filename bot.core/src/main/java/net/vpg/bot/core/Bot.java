@@ -64,18 +64,18 @@ public class Bot implements Entity {
     private final String token;
     private final String prefix;
     private final long ownerId;
-    private final long resourceServer;
-    private final long logCategory;
+    private final long resourceServerId;
+    private final long logCategoryId;
     private final int maxShards;
     private final AtomicLong lastCommandId = new AtomicLong(1);
     private final Map<String, ButtonHandler> buttonHandlers = new HashMap<>();
     private final Map<String, BotCommand> commands = new CaseInsensitiveMap<>();
-    private final Map<Class<?>, EntityInfo<?>> entityInfoMap = new HashMap<>();
+    private final Map<Class<?>, EntityInfo<?>> entityInfoCache = new HashMap<>();
     private final Map<Integer, Long> loggers = new HashMap<>();
     private final AtomicInteger syncCount = new AtomicInteger(0);
     private final DataObject properties;
     private final ShardManager shardManager;
-    private final List<Long> managers = new ArrayList<>();
+    private final Set<Long> managers = new HashSet<>();
     private final ClassFilter classFilter = new ClassFilter();
     private final EventHandlerProxy eventHandlerProxy = new EventHandlerProxy();
     private long syncMessageId;
@@ -90,8 +90,8 @@ public class Bot implements Entity {
         prefix = properties.getString("prefix");
         ownerId = properties.getLong("ownerId");
         maxShards = properties.getInt("maxShards");
-        resourceServer = properties.getLong("resourceServer");
-        logCategory = properties.getLong("logCategory");
+        resourceServerId = properties.getLong("resourceServer");
+        logCategoryId = properties.getLong("logCategory");
         classFilter.enable("net.vpg.bot.*");
         eventHandlerProxy.setSubject(new DefaultEventHandler(this));
         try {
@@ -115,9 +115,8 @@ public class Bot implements Entity {
         return database;
     }
 
-    public Bot setDatabase(Database database) {
+    public void setDatabase(Database database) {
         this.database = database;
-        return this;
     }
 
     public boolean isDatabaseEnabled() {
@@ -148,20 +147,16 @@ public class Bot implements Entity {
         return ownerId;
     }
 
-    public long getResourceServer() {
-        return resourceServer;
+    public long getResourceServerId() {
+        return resourceServerId;
     }
 
-    public long getLogCategory() {
-        return logCategory;
+    public long getLogCategoryId() {
+        return logCategoryId;
     }
 
     public int getMaxShards() {
         return maxShards;
-    }
-
-    public AtomicLong getLastCommandId() {
-        return lastCommandId;
     }
 
     public Map<String, ButtonHandler> getButtonHandlers() {
@@ -172,8 +167,8 @@ public class Bot implements Entity {
         return commands;
     }
 
-    public Map<Class<?>, EntityInfo<?>> getEntityInfoMap() {
-        return entityInfoMap;
+    public Map<Class<?>, EntityInfo<?>> getEntityInfoCache() {
+        return entityInfoCache;
     }
 
     public Map<Integer, Long> getLoggers() {
@@ -229,16 +224,12 @@ public class Bot implements Entity {
         setDefaultActivity();
     }
 
-    public TextChannel getLogChannel(JDA jda) {
-        return getLogChannel(jda.getShardInfo().getShardId());
-    }
-
-    public TextChannel getLogChannel(int shardId) {
-        return shardManager.getTextChannelById(loggers.get(shardId));
+    public TextChannel getLogChannel(int id) {
+        return shardManager.getTextChannelById(loggers.get(id));
     }
 
     public TextChannel getSyncChannel() {
-        return shardManager.getTextChannelById(loggers.get(-1));
+        return getLogChannel(-1);
     }
 
     public ShardManager getShardManager() {
@@ -249,8 +240,8 @@ public class Bot implements Entity {
         return shardManager.getShardById(0);
     }
 
-    public void loadData() {
-        entityInfoMap.putAll(getScanResult()
+    private void loadData() {
+        entityInfoCache.putAll(getScanResult()
             .getAllClasses()
             .stream()
             .filter(x -> !x.isAbstract() && x.isStandardClass() && x.implementsInterface(Entity.class.getName()))
@@ -271,37 +262,37 @@ public class Bot implements Entity {
             })
             .filter(pair -> pair.getValue() != null)
             .collect(Collectors.toMap(DefaultKeyValue::getKey, DefaultKeyValue::getValue)));
-        entityInfoMap.values().forEach(info -> {
-            if (info.isDBObject) {
-                loadDBEntity(info);
+        entityInfoCache.values().forEach(info -> {
+            if (info.isDatabaseEntity()) {
+                loadDatabaseEntity(info);
             } else {
                 loadEntity(info);
             }
+            logger.info("Loaded " + info.getIdentifier());
         });
     }
 
-    public <T extends Entity> void loadEntity(EntityInfo<T> info) {
-        try (InputStream stream = new URL(info.identifier).openStream()) {
+    private <T extends Entity> void loadEntity(EntityInfo<T> info) {
+        try (InputStream stream = new URL(info.getIdentifier()).openStream()) {
             DataArray.fromJson(stream)
                 .stream(DataArray::getObject)
                 .filter(data -> !data.keys().isEmpty())
-                .map(data -> info.entityConstructor.apply(data, this))
-                .forEach(entity -> info.entityMap.put(entity.getId(), entity));
-            logger.info("Loaded " + info.identifier);
+                .map(data -> info.getConstructor().apply(data, this))
+                .forEach(entity -> info.getMap().put(entity.getId(), entity));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public <T extends Entity> void loadDBEntity(EntityInfo<T> info) {
+    private <T extends Entity> void loadDatabaseEntity(EntityInfo<T> info) {
         if (!isDatabaseEnabled()) return;
-        getDatabase().getCollection(info.identifier).find().forEach(document -> {
-            T entity = info.entityConstructor.apply(Util.toDataObject(document), this);
-            info.entityMap.put(entity.getId(), entity);
+        getDatabase().getCollection(info.getIdentifier()).find().forEach(document -> {
+            T entity = info.getConstructor().apply(Util.toDataObject(document), this);
+            info.getMap().put(entity.getId(), entity);
         });
     }
 
-    public void startSync() {
+    private void startSync() {
         getPrimaryShard().getRateLimitPool().scheduleAtFixedRate(() -> {
             syncCount.incrementAndGet();
             String message = "Sync [" + syncCount + "]";
@@ -313,10 +304,10 @@ public class Bot implements Entity {
         }, 0, 1, TimeUnit.MINUTES);
     }
 
-    public void loadLoggers() {
-        Guild resources = shardManager.getGuildById(resourceServer);
+    private void loadLoggers() {
+        Guild resources = shardManager.getGuildById(resourceServerId);
         if (resources == null) return;
-        Category category = resources.getCategoryById(logCategory);
+        Category category = resources.getCategoryById(logCategoryId);
         if (category == null) return;
         shardManager.getShardCache()
             .stream()
@@ -346,7 +337,7 @@ public class Bot implements Entity {
         managers.remove(id);
     }
 
-    public List<Long> getManagers() {
+    public Set<Long> getManagers() {
         return managers;
     }
 
@@ -354,7 +345,7 @@ public class Bot implements Entity {
         return id == ownerId || managers.contains(id);
     }
 
-    public void loadCommands() {
+    private void loadCommands() {
         loadAllInstancesOf(BotCommand.class, command -> {
             command.register();
             logger.info("Loaded " + command + " Command");
@@ -383,30 +374,26 @@ public class Bot implements Entity {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void loadAllInstancesOf(Class<T> _interface, Consumer<T> newInstanceProcessor, Object... parameters) {
+    public <T> void loadAllInstancesOf(Class<T> interfaceClass, Consumer<T> newInstanceProcessor, Object... parameters) {
         Class<?>[] paramTypes = Arrays.stream(parameters).map(Object::getClass).toArray(Class[]::new);
-        Map<Class<?>, Exception> errors = new HashMap<>();
+        Map<Class<?>, Throwable> errors = new HashMap<>();
         getScanResult()
             .getAllClasses()
             .stream()
-            .filter(x -> !x.isAbstract() && !x.isInterface() && x.implementsInterface(_interface.getName()))
+            .filter(x -> !x.isAbstract() && !x.isInterface() && x.implementsInterface(interfaceClass.getName()))
             .map(ClassInfo::loadClass)
             .filter(classFilter.asPredicate())
             .forEach(c -> {
                 try {
-                    T newObject = (T) c.getConstructor(paramTypes).newInstance(parameters);
-                    newInstanceProcessor.accept(newObject);
-                } catch (Exception e) {
-                    errors.put(c, e);
+                    newInstanceProcessor.accept((T) c.getConstructor(paramTypes).newInstance(parameters));
+                } catch (Throwable t) {
+                    errors.put(c, t);
                 }
             });
-        errors.forEach((k, v) -> {
-            logger.info("Failed to load " + k.getName() + "\n");
-            v.printStackTrace();
-        });
+        errors.forEach((k, v) -> logger.error("Failed to load " + k.getName() + "\n", v));
     }
 
-    public void setDefaultActivity() {
+    private void setDefaultActivity() {
         String activity = "with " + shardManager.getGuildCache()
             .stream()
             .mapToInt(Guild::getMemberCount)

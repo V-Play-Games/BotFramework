@@ -25,7 +25,8 @@ import java.util.Map;
 public class GuildSettings extends DatabaseObject {
     public static final String COLLECTION_NAME = "gSettings";
     public static final Map<String, GuildSettings> CACHE = new HashMap<>();
-    String prefix;
+    public static final EntityInfo<GuildSettings> INFO = new EntityInfo<>(COLLECTION_NAME, GuildSettings::new, CACHE);
+    protected String prefix;
 
     private GuildSettings(DataObject data, Bot bot) {
         super(data, bot);
@@ -54,10 +55,6 @@ public class GuildSettings extends DatabaseObject {
         GuildSettings settings = new GuildSettings(id, prefix, bot);
         settings.ensureInserted();
         return settings;
-    }
-
-    public static EntityInfo<GuildSettings> getInfo() {
-        return new EntityInfo<>(COLLECTION_NAME, GuildSettings::new, CACHE);
     }
 
     public static GuildSettings get(String id, Bot bot) {

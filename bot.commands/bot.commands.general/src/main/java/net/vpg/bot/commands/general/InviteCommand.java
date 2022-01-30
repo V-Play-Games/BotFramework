@@ -16,13 +16,16 @@
 package net.vpg.bot.commands.general;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-public abstract class InviteCommand extends BotCommandImpl implements NoArgsCommand {
+public class InviteCommand extends BotCommandImpl implements NoArgsCommand {
+    private static final String INVITE_FORMAT = "[Add the bot to your server](%s+applications.commands)\n[Join the bot's support server](%s)";
+
     public InviteCommand(Bot bot) {
         super(bot, "invite", "Sends a link to add the bot in the server and other links");
     }
@@ -41,8 +44,11 @@ public abstract class InviteCommand extends BotCommandImpl implements NoArgsComm
     }
 
     protected MessageEmbed getEmbed(CommandReceivedEvent e) {
+        JDA jda = e.getJDA();
         return new EmbedBuilder()
-            .setDescription(String.format("[Add the bot to your server](%s+applications.commands)\n[Join the bot's support server](%s)", e.getJDA().getInviteUrl(), bot.getProperty("support_server_invite")))
+            .setTitle(jda.getSelfUser().getName())
+            .setThumbnail(jda.getSelfUser().getAvatarUrl())
+            .setDescription(String.format(INVITE_FORMAT, jda.getInviteUrl(), bot.getProperty("support_server_invite")))
             .build();
     }
 }

@@ -24,7 +24,7 @@ public class EntityReference<T extends Entity> implements Supplier<T> {
 
     public EntityReference(EntityInfo<T> info, String id) {
         this.id = id;
-        this.map = info.entityMap;
+        this.map = info.getMap();
     }
 
     @Override

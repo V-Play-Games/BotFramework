@@ -21,18 +21,17 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Connection implements Closeable {
-    final static String MEME_URL_ENDPOINT = "https://meme-api.herokuapp.com/gimme/";
-    OkHttpClient client;
+public class Connection {
+    public final static String MEME_URL_ENDPOINT = "https://meme-api.herokuapp.com/gimme/";
+    private final OkHttpClient client;
 
-    public Connection() {
-        client = new OkHttpClient();
+    public Connection(OkHttpClient client) {
+        this.client = client;
     }
 
     public Meme getMeme() throws IOException {
@@ -48,29 +47,19 @@ public class Connection implements Closeable {
     }
 
     public List<Meme> getMemes(int amount, String subReddit) throws IOException {
-        String tor;
         String url = MEME_URL_ENDPOINT + ("".equals(subReddit) ? "" : subReddit + "/") + (amount < 2 ? "" : amount);
-        try (Response response = requestData(url)) {
-            assert response.code() < 400 : new IOException("An unexpected error has occurred! " + url + " returned HTTP Code " + response.code());
-            tor = response.body().string();
-        }
-        DataObject jo = DataObject.fromJson(tor);
-        if (jo.hasKey("memes"))
-            return jo.getArray("memes")
+        DataObject data = DataObject.fromJson(requestData(url));
+        if (data.hasKey("memes"))
+            return data.getArray("memes")
                 .stream(DataArray::getObject)
                 .map(Meme::new)
                 .collect(Collectors.toList());
         else
-            return Collections.singletonList(new Meme(jo));
+            return Collections.singletonList(new Meme(data));
     }
 
-    private Response requestData(String url) throws IOException {
-        assert client != null : new IllegalStateException("The Connection was closed!");
-        return client.newCall(new Request.Builder().url(url).build()).execute();
-    }
-
-    @Override
-    public void close() {
-        client = null;
+    private String requestData(String url) throws IOException {
+        Response response = client.newCall(new Request.Builder().url(url).build()).execute();
+        return response.body().string();
     }
 }

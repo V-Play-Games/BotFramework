@@ -18,8 +18,6 @@ package net.vpg.bot.event;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.action.CommandReplyAction;
 import net.vpg.bot.action.Sender;
@@ -30,7 +28,6 @@ import net.vpg.bot.core.Util;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -75,18 +72,10 @@ public abstract class CommandReceivedEvent implements Sender {
         this.selfMember = guild != null ? guild.getMember(jda.getSelfUser()) : null;
     }
 
-    public static void run(MessageReceivedEvent e, List<String> args, BotCommand command, String prefix) {
-        command.run(new TextCommandReceivedEvent(e, args, command, prefix));
-    }
-
-    public static void run(SlashCommandEvent e, BotCommand command) {
-        command.run(new SlashCommandReceivedEvent(e, command));
-    }
-
-    public GuildChannel getGuildChannel() {
-        if (channel instanceof GuildChannel)
-            return (GuildChannel) channel;
-        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to GuildChannel");
+    public GuildMessageChannel getGuildChannel() {
+        if (channel instanceof GuildMessageChannel)
+            return (GuildMessageChannel) channel;
+        throw conversionError("GuildMessageChannel");
     }
 
     public MessageChannel getMessageChannel() {
@@ -96,25 +85,29 @@ public abstract class CommandReceivedEvent implements Sender {
     public TextChannel getTextChannel() {
         if (channel instanceof TextChannel)
             return (TextChannel) channel;
-        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to TextChannel");
+        throw conversionError("TextChannel");
     }
 
     public NewsChannel getNewsChannel() {
         if (channel instanceof NewsChannel)
             return (NewsChannel) channel;
-        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to NewsChannel");
+        throw conversionError("NewsChannel");
     }
 
-    public VoiceChannel getVoiceChannel() {
-        if (channel instanceof VoiceChannel)
-            return (VoiceChannel) channel;
-        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to VoiceChannel");
+    public ThreadChannel getThreadChannel() {
+        if (channel instanceof ThreadChannel)
+            return (ThreadChannel) channel;
+        throw conversionError("ThreadChannel");
     }
 
     public PrivateChannel getPrivateChannel() {
         if (channel instanceof PrivateChannel)
             return (PrivateChannel) channel;
-        throw new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to PrivateChannel");
+        throw conversionError("PrivateChannel");
+    }
+
+    private IllegalStateException conversionError(String type) {
+        return new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to " + type);
     }
 
     public Bot getBot() {
@@ -151,7 +144,6 @@ public abstract class CommandReceivedEvent implements Sender {
 
     public void setTrouble(Throwable trouble) {
         this.trouble = trouble;
-        trouble.printStackTrace();
     }
 
     public String getPrefix() {
@@ -220,7 +212,7 @@ public abstract class CommandReceivedEvent implements Sender {
             .put("channel", getChannel().toString())
             .put("error", error)
             .put("guild", Objects.toString(getGuild(), null));
-        bot.getLogChannel(getJDA()).sendMessageEmbeds(new EmbedBuilder()
+        bot.getLogChannel(getJDA().getShardInfo().getShardId()).sendMessageEmbeds(new EmbedBuilder()
             .setTitle("Process id " + processId)
             .setDescription(String.format("Error: %s\nUsed in %s by %s", error, getChannel(), getUser()))
             .addField("Input", in.length() > 1024 ? in.substring(0, 1021) + "..." : in, false)

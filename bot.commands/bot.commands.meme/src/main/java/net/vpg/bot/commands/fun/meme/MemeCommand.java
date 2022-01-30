@@ -16,6 +16,7 @@
 package net.vpg.bot.commands.fun.meme;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.core.Bot;
@@ -27,13 +28,14 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class MemeCommand extends BotCommandImpl {
-    private final Connection connection = new Connection();
+    private final Connection connection;
 
     public MemeCommand(Bot bot) {
         super(bot, "meme", "Pulls a random meme from Reddit");
+        connection = new Connection(bot.getPrimaryShard().getHttpClient());
         addOption(OptionType.STRING, "subreddit", "The subreddit to pull a meme from");
-        setCooldown(10, TimeUnit.SECONDS);
         setMaxArgs(1);
+        setCooldown(10, TimeUnit.SECONDS);
     }
 
     @Override
@@ -57,11 +59,11 @@ public class MemeCommand extends BotCommandImpl {
 
     public void execute(CommandReceivedEvent e, String subreddit) throws IOException {
         Meme meme = connection.getMeme(subreddit);
-        if (meme.nsfw && !e.getTextChannel().isNSFW()) return;
+        if (meme.isNsfw() && !((BaseGuildMessageChannel) (e.getChannelType().isThread() ? e.getThreadChannel().getParentChannel() : e.getGuildChannel())).isNSFW()) return;
         e.sendEmbeds(new EmbedBuilder()
-            .setTitle(meme.title, meme.postLink)
-            .setDescription("Meme by u/" + meme.author + " in r/" + meme.subreddit)
-            .setImage(meme.url)
-            .setFooter(meme.ups + " Upvotes").build()).queue();
+            .setTitle(meme.getTitle(), meme.getPostLink())
+            .setDescription("Meme by u/" + meme.getAuthor() + " in r/" + meme.getSubreddit())
+            .setImage(meme.getUrl())
+            .setFooter(meme.getUps() + " Upvotes").build()).queue();
     }
 }

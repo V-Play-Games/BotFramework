@@ -10,7 +10,8 @@ import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.Util;
 import net.vpg.bot.event.BotButtonEvent;
-import net.vpg.bot.event.CommandReceivedEvent;
+import net.vpg.bot.event.SlashCommandReceivedEvent;
+import net.vpg.bot.event.TextCommandReceivedEvent;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -71,7 +72,7 @@ public class DefaultEventHandler extends EventHandler {
                 List<String> finalArgs = firstArg == argLen
                     ? Collections.emptyList()
                     : Arrays.asList(args).subList(firstArg, argLen);
-                CommandReceivedEvent.run(e, finalArgs, botCommand, prefix);
+                botCommand.run(new TextCommandReceivedEvent(e, finalArgs, botCommand, prefix));
             }
         } else if (getSelfMentionPattern().matcher(content).find()) {
             e.getChannel().sendMessage("Prefix: " + prefix).queue();
@@ -88,7 +89,7 @@ public class DefaultEventHandler extends EventHandler {
         } else {
             BotCommand command = bot.getCommands().get(e.getName());
             if (command != null) {
-                CommandReceivedEvent.run(e, command);
+                command.run(new SlashCommandReceivedEvent(e, command));
             }
         }
     }

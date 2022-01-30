@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
-import net.vpg.bot.core.Util;
 import net.vpg.bot.event.CommandReceivedEvent;
 
 public abstract class InfoCommand extends BotCommandImpl implements NoArgsCommand {
@@ -37,7 +36,7 @@ public abstract class InfoCommand extends BotCommandImpl implements NoArgsComman
 
     @Override
     public void execute(CommandReceivedEvent e) {
-        e.send("Prefix: " + Util.getPrefix(e)).setEmbeds(getEmbed(e)).queue();
+        e.send("Prefix: " + e.getPrefix()).setEmbeds(getEmbed(e)).queue();
     }
 
     protected abstract MessageEmbed getEmbed(CommandReceivedEvent e);

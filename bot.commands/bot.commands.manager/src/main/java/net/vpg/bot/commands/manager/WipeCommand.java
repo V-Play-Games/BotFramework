@@ -39,5 +39,5 @@ public abstract class WipeCommand extends BotCommandImpl implements ManagerComma
         execute(e, e.getString("arg"));
     }
 
-    public abstract void execute(CommandReceivedEvent e, String key);
+    public abstract void execute(CommandReceivedEvent e, String arg);
 }

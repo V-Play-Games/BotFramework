@@ -125,6 +125,7 @@ public abstract class BotCommandImpl extends CommandData implements BotCommand, 
             ratelimit(id);
         } catch (Exception exc) {
             e.setTrouble(exc);
+            exc.printStackTrace();
             if (!e.isReplySent()) {
                 e.send("There was some trouble processing your request. Please contact the developer.")
                     .setEphemeral(true)

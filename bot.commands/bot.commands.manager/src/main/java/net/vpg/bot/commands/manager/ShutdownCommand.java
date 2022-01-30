@@ -28,6 +28,5 @@ public class ShutdownCommand extends BotCommandImpl implements NoArgsCommand, Ma
     public void execute(CommandReceivedEvent e) {
         e.send("Shutting Down!").queue();
         System.exit(0);
-        bot.getShardManager().shutdown();
     }
 }

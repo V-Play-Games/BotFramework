@@ -22,6 +22,8 @@ import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
 public class PingCommand extends BotCommandImpl implements NoArgsCommand {
+    public static final String PING_FORMAT = "Pong!\n**Shard**: %d\n**Response Time**: %d ms\n**Heartbeat**: %d ms";
+
     public PingCommand(Bot bot) {
         super(bot, "ping", "gets the current ping (response time) of the command");
     }
@@ -30,7 +32,7 @@ public class PingCommand extends BotCommandImpl implements NoArgsCommand {
     public void execute(CommandReceivedEvent e) {
         JDA jda = e.getJDA();
         jda.getRestPing()
-            .flatMap(ping -> e.send(String.format("Pong!\n**Shard**: %s\n**Response Time**: %d ms\n**Heartbeat**: %d ms", jda.getShardInfo(), ping, jda.getGatewayPing())))
+            .flatMap(ping -> e.send(String.format(PING_FORMAT, jda.getShardInfo().getShardId(), ping, jda.getGatewayPing())))
             .queue();
     }
 }

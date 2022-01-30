@@ -52,11 +52,12 @@ public class ShiftCommand extends BotCommandImpl {
             boolean upperCase = Character.isUpperCase(c);
             char a = upperCase ? 'A' : 'a';
             char z = upperCase ? 'Z' : 'z';
-            if (c <= z && c >= a) {
+            if (a <= c && c <= z) {
                 int shifted = c + shift;
-                c = (char) (shifted > z ? shifted - 1 - z + a : shifted);
+                sb.append((char) (shifted > z ? shifted - 26 : shifted));
+            } else {
+                sb.append(c);
             }
-            sb.append(c);
         }
         e.send(sb.toString()).queue();
     }

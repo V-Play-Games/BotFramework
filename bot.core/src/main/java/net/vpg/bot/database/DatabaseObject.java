@@ -26,9 +26,12 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import javax.annotation.Nonnull;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
 public abstract class DatabaseObject implements Entity {
+    private static final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(4);
     protected final String id;
     protected final DataObject data;
     protected final Bson filter;
@@ -65,7 +68,7 @@ public abstract class DatabaseObject implements Entity {
     public void computeOnCollection(Consumer<MongoCollection<Document>> action) {
         getCollection();
         if (collection != null)
-            action.accept(collection);
+            executor.execute(() -> action.accept(collection));
     }
 
     @Override
@@ -76,22 +79,22 @@ public abstract class DatabaseObject implements Entity {
     public void ensureInserted() {
         computeOnCollection(c -> {
             if (c.find(filter).first() == null) {
-                c.insertOne(this.toDocument());
+                c.insertOne(toDocument());
             }
         });
     }
 
     public void update() {
-        getCollection().replaceOne(filter, this.toDocument());
+        computeOnCollection(c -> c.replaceOne(filter, toDocument()));
     }
 
     public void update(String field, Object value) {
         data.put(field, value);
-        getCollection().updateOne(filter, Updates.set(field, value));
+        computeOnCollection(c -> c.updateOne(filter, Updates.set(field, value)));
     }
 
     public void delete() {
-        getCollection().deleteOne(filter);
+        computeOnCollection(c -> c.deleteOne(filter));
     }
 
     @Nonnull

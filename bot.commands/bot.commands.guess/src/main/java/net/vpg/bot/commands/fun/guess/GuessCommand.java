@@ -54,7 +54,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
         if (game.isCorrect(e.getMessage().getContentRaw())) {
             game.close(Sender.of(e.getMessage()), GuessGame.WON);
         } else {
-            e.getMessage().addReaction("U+274C").queue();
+            e.getMessage().addReaction("\u274C").queue(); // CROSS
         }
     }
 
@@ -78,7 +78,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
                     e.editComponents(ActionRow.of(Button.primary("guess:" + game.getUserId() + ":x", "Give up")))
                         .setEmbeds(new EmbedBuilder()
                             .setTitle("Who's that Pokemon?")
-                            .setDescription(String.format("Guess the Pokemon based on its given description in 30 seconds or less!\n> %s\nType: %s", game.getText(), game.getPokemon().getType()))
+                            .setDescription("Guess the Pokemon based on its given description in 30 seconds or less!\n> " + game.getText() + "\nType: " + game.getPokemon().getType())
                             .build())
                         .queue();
                     break;

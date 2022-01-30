@@ -35,7 +35,7 @@ public class TerminalCommand extends BotCommandImpl implements ManagerCommand {
 
     @Override
     public void onSlashCommandRun(SlashCommandReceivedEvent e) {
-        execute(e, e.getString("key"));
+        execute(e, e.getString("message"));
     }
 
     public void execute(CommandReceivedEvent e, String content) {

@@ -21,14 +21,14 @@ import net.dv8tion.jda.api.utils.data.SerializableData;
 import javax.annotation.Nonnull;
 
 public class Meme implements SerializableData {
-    public final String postLink;
-    public final String subreddit;
-    public final String title;
-    public final String url;
-    public final boolean nsfw;
-    public final boolean spoiler;
-    public final String author;
-    public final int ups;
+    private final String postLink;
+    private final String subreddit;
+    private final String title;
+    private final String url;
+    private final boolean nsfw;
+    private final boolean spoiler;
+    private final String author;
+    private final int ups;
 
     public Meme(DataObject data) {
         this.postLink = data.getString("postLink");
@@ -41,20 +41,41 @@ public class Meme implements SerializableData {
         this.spoiler = data.getBoolean("spoiler");
     }
 
-    public String toJSONString() {
-        return "{\"postLink\":\"" + postLink +
-            "\",\"subreddit\":\" " + subreddit +
-            "\",\"title\":\"" + title +
-            "\",\"url\":\"" + url +
-            "\",\"nsfw\":" + nsfw +
-            ",\"spoiler\":" + spoiler +
-            ",\"author\":\"" + author +
-            "\",\"ups\":" + ups + "}";
-    }
-
     @Nonnull
     @Override
     public DataObject toData() {
         return DataObject.empty();
+    }
+
+    public String getPostLink() {
+        return postLink;
+    }
+
+    public String getSubreddit() {
+        return subreddit;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public boolean isNsfw() {
+        return nsfw;
+    }
+
+    public boolean isSpoiler() {
+        return spoiler;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public int getUps() {
+        return ups;
     }
 }

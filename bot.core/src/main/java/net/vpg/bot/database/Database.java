@@ -38,14 +38,14 @@ public class Database {
 
     private final Map<String, MongoCollection<Document>> collections = new HashMap<>();
     private final MongoClient client;
-    private final MongoDatabase db;
+    private final MongoDatabase mongoDatabase;
     private final Bot bot;
 
     public Database(String connectionString, String dbName, Bot bot) {
         this.bot = bot;
         this.client = MongoClients.create(connectionString);
-        this.db = client.getDatabase(dbName);
-        db.listCollectionNames().forEach(this::registerCollection);
+        this.mongoDatabase = client.getDatabase(dbName);
+        mongoDatabase.listCollectionNames().forEach(this::registerCollection);
     }
 
     public Bot getBot() {
@@ -56,8 +56,8 @@ public class Database {
         return client;
     }
 
-    public MongoDatabase getDB() {
-        return db;
+    public MongoDatabase getMongoDatabase() {
+        return mongoDatabase;
     }
 
     public MongoCollection<Document> getCollection(String name) {
@@ -66,8 +66,10 @@ public class Database {
     }
 
     private MongoCollection<Document> registerCollection(String name) {
-        MongoCollection<Document> collection = db.getCollection(name);
-        collection.createIndex(Indexes.ascending("id"));
+        MongoCollection<Document> collection = mongoDatabase.getCollection(name);
+        if (collection.listIndexes().first() != null) {
+            collection.createIndex(Indexes.ascending("id"));
+        }
         collections.put(name, collection);
         return collection;
     }
