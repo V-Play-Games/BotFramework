@@ -16,23 +16,23 @@
 package net.vpg.bot.commands.fun.ttt;
 
 public class AI {
-    public static void makeMove(Board board, CellType type) {
-        Cell bestPlace = getBestMove(board, type);
+    public static void makeMove(Board board) {
+        Cell bestPlace = getBestMove(board, board.player1.type);
         if (bestPlace != null) {
-            bestPlace.setType(type);
+            bestPlace.setType(board.player1.type);
         }
     }
 
-    private static Cell getBestMove(Board board, CellType ai) {
-        Cell safeMove = getWinningMove(board, ai.other());
+    private static Cell getBestMove(Board board, CellType type) {
+        Cell safeMove = getWinningMove(board, type.other());
         if (safeMove != null) {
             return safeMove;
         }
         Cell bestMove = null;
         int bestScore = -100;
         for (Cell cell : board.getCellsOfType(CellType.BLANK)) {
-            cell.setType(ai);
-            int score = getScore(board, ai);
+            cell.setType(type);
+            int score = getScore(board, type);
             cell.setType(CellType.BLANK);
             if (score > bestScore) {
                 bestScore = score;
@@ -64,12 +64,25 @@ public class AI {
     }
 
     private static Cell getWinningMove(Board board, CellType type) {
-        // check rows
+        Cell tor = checkStraight(board, type, true);
+        if (tor == null) {
+            tor = checkStraight(board, type, false);
+        }
+        if (tor == null) {
+            tor = checkDiagonal(board, type, true);
+        }
+        if (tor == null) {
+            tor = checkDiagonal(board, type, false);
+        }
+        return tor;
+    }
+
+    private static Cell checkStraight(Board board, CellType type, boolean row) {
         for (int i = 0; i < 3; i++) {
             int count = 0;
             Cell emptyPosition = null;
             for (int j = 0; j < 3; j++) {
-                Cell cell = board.cells[i][j];
+                Cell cell = row ? board.cells[i][j] : board.cells[j][i];
                 if (cell.isBlank()) {
                     emptyPosition = cell;
                 } else if (cell.type == type) {
@@ -80,43 +93,14 @@ public class AI {
                 return emptyPosition;
             }
         }
+        return null;
+    }
 
-        // check columns
-        for (int i = 0; i < 3; i++) {
-            int count = 0;
-            Cell emptyPosition = null;
-            for (int j = 0; j < 3; j++) {
-                Cell cell = board.cells[j][i];
-                if (cell.isBlank()) {
-                    emptyPosition = cell;
-                } else if (cell.type == type) {
-                    count++;
-                }
-            }
-            if (count == 2) {
-                return emptyPosition;
-            }
-        }
-
-        // check diagonals
+    private static Cell checkDiagonal(Board board, CellType type, boolean b) {
         int count = 0;
         Cell emptyPosition = null;
         for (int i = 0; i < 3; i++) {
-            Cell cell = board.cells[i][i];
-            if (cell.isBlank()) {
-                emptyPosition = cell;
-            } else if (cell.type == type) {
-                count++;
-            }
-            if (count == 2) {
-                return emptyPosition;
-            }
-        }
-
-        count = 0;
-        emptyPosition = null;
-        for (int i = 0; i < 3; i++) {
-            Cell cell = board.cells[i][2 - i];
+            Cell cell = board.cells[i][b ? i : 2 - i];
             if (cell.isBlank()) {
                 emptyPosition = cell;
             } else if (cell.type == type) {

@@ -106,7 +106,7 @@ public class Board {
         player2 = player1;
         player1 = next;
         if (player1.id.equals("ai")) {
-            AI.makeMove(this, player1.type);
+            AI.makeMove(this);
             return switchSides();
         }
         return player1;
