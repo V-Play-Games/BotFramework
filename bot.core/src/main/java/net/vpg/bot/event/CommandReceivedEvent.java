@@ -68,7 +68,7 @@ public abstract class CommandReceivedEvent implements Sender {
         this.prefix = prefix;
         this.actionSupplier = actionSupplier;
         this.bot = command.getBot();
-        this.processId = bot.getProcessId(jda);
+        this.processId = Util.getProcessId(jda);
         this.selfMember = guild != null ? guild.getMember(jda.getSelfUser()) : null;
     }
 
@@ -198,6 +198,8 @@ public abstract class CommandReceivedEvent implements Sender {
         if (replySent) return;
         replySent = true;
         if (loggingAllowed) return;
+        TextChannel logChannel = bot.getLogChannel(getJDA().getShardInfo().getShardId());
+        if (logChannel == null) return;
         String in = getInput();
         String out = action.getContent();
         String error = trouble == null
@@ -212,7 +214,7 @@ public abstract class CommandReceivedEvent implements Sender {
             .put("channel", getChannel().toString())
             .put("error", error)
             .put("guild", Objects.toString(getGuild(), null));
-        bot.getLogChannel(getJDA().getShardInfo().getShardId()).sendMessageEmbeds(new EmbedBuilder()
+        logChannel.sendMessageEmbeds(new EmbedBuilder()
             .setTitle("Process id " + processId)
             .setDescription(String.format("Error: %s\nUsed in %s by %s", error, getChannel(), getUser()))
             .addField("Input", in.length() > 1024 ? in.substring(0, 1021) + "..." : in, false)

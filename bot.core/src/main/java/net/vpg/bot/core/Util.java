@@ -15,13 +15,11 @@
  */
 package net.vpg.bot.core;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.entities.GuildSettings;
 import org.bson.Document;
@@ -124,18 +122,6 @@ public class Util {
         return array[random.nextInt(array.length)];
     }
 
-    public static boolean equals(SlashCommandData data, Command cmd) {
-        return cmd != null &&
-            data.getName().equals(cmd.getName()) &&
-            data.getDescription().equals(cmd.getDescription()) &&
-            data.getOptions()
-                .stream()
-                .map(OptionData::toData)
-                .map(Command.Option::new)
-                .collect(Collectors.toList())
-                .equals(cmd.getOptions());
-    }
-
     public static <T extends GenericEvent> EventListener subscribeTo(Class<T> eventType, Consumer<T> action) {
         return e -> {
             if (eventType.isAssignableFrom(e.getClass())) {
@@ -150,5 +136,9 @@ public class Util {
 
     public static <T, K> Map<K, T> group(List<T> list, Function<? super T, ? extends K> keyMapper) {
         return list.stream().collect(groupingBy(keyMapper));
+    }
+
+    public static String getProcessId(JDA jda) {
+        return System.nanoTime() + "-" + jda.getShardInfo().getShardId();
     }
 }

@@ -25,6 +25,10 @@ public class ClassFilter {
     private final List<String> disabled = new ArrayList<>();
     private final List<String> enabled = new ArrayList<>();
 
+    public static ClassFilter getDefault() {
+        return new ClassFilter().enable("net.vpg.bot.*");
+    }
+
     public ClassFilter disable(Class<?>... classes) {
         return setEnabled(false, classes);
     }

@@ -16,7 +16,6 @@
 package net.vpg.bot.commands;
 
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.vpg.bot.core.Bot;
@@ -28,18 +27,12 @@ import net.vpg.bot.ratelimit.Ratelimit;
 import java.util.List;
 import java.util.Map;
 
-public interface BotCommand {
+public interface BotCommand extends SlashCommandData {
     void register();
 
     Bot getBot();
 
     List<String> getAliases();
-
-    String getName();
-
-    String getDescription();
-
-    List<OptionData> getOptions();
 
     int getMaxArgs();
 

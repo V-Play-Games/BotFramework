@@ -30,7 +30,7 @@ import net.vpg.bot.event.CommandReceivedEvent;
 public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
     public GuessCommand(Bot bot) {
         super(bot, "guess", "Guess a Pokemon name by the given description of it");
-        bot.subscribeTo("guess", MessageReceivedEvent.class, this::checkGuess);
+        bot.getEventProcessor().addListener("guess", MessageReceivedEvent.class, this::checkGuess);
     }
 
     @Override

@@ -17,7 +17,6 @@ package net.vpg.bot.event.handler;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.ExceptionEvent;
-import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -32,11 +31,9 @@ import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class DefaultEventHandler extends EventHandler {
-    private final AtomicInteger shardsInit = new AtomicInteger();
     private Pattern selfMentionPattern;
     private boolean closed;
 
@@ -112,17 +109,6 @@ public class DefaultEventHandler extends EventHandler {
     @Override
     public void onException(@Nonnull ExceptionEvent e) {
         e.getCause().printStackTrace();
-    }
-
-    @Override
-    public void onReady(@Nonnull ReadyEvent e) {
-        try {
-            // init on last shard only
-            if (shardsInit.incrementAndGet() == e.getJDA().getShardInfo().getShardTotal())
-                bot.load();
-        } catch (Exception exc) {
-            throw new RuntimeException(exc);
-        }
     }
 
     @Override
