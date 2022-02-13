@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class InstanceLoader {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(InstanceLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InstanceLoader.class);
     private static final ScanResult SCAN_RESULT = new ClassGraph().enableClassInfo().scan();
     private ClassFilter filter;
 
@@ -59,7 +59,7 @@ public class InstanceLoader {
         Class<?>[] paramTypes = Arrays.stream(parameters).map(Object::getClass).toArray(Class[]::new);
         getAllClasses(clazz).forEach(c -> {
             try {
-                newInstanceConsumer.accept((T) c.getConstructor(paramTypes).newInstance(parameters));
+                newInstanceConsumer.accept(c.getConstructor(paramTypes).newInstance(parameters));
             } catch (Throwable t) {
                 errorConsumer.accept(c, t);
             }

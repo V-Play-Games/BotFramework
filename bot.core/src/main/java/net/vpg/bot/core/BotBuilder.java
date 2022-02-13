@@ -37,7 +37,7 @@ public class BotBuilder implements SerializableData {
     final Map<String, Object> properties = new HashMap<>();
     final EventProcessor processor;
     final boolean light;
-    int intents = 0;
+    int intents;
     int shardsTotal;
     String id;
     String token;
@@ -50,6 +50,7 @@ public class BotBuilder implements SerializableData {
         setId(id);
         setToken(token);
         this.light = light;
+        this.intents = light ? 0 : GatewayIntent.DEFAULT;
         this.processor = new EventProcessor();
     }
 

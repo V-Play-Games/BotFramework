@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EntityLoader {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(EntityLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntityLoader.class);
     private InstanceLoader loader;
     private Map<Class<?>, EntityInfo<?>> cache;
 
