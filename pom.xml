@@ -32,6 +32,7 @@
   <modules>
     <module>bot.core</module>
     <module>bot.commands</module>
+    <module>bot.runner</module>
   </modules>
   <name>Bot Framework</name>
   <description>Parent POM for all artifacts related to Bot Framework</description>

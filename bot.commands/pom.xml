@@ -34,7 +34,6 @@
     <module>bot.commands.mod</module>
     <module>bot.commands.ttt</module>
     <module>bot.commands.word</module>
-    <module>bot.commands.all</module>
   </modules>
   <name>Bot Commands</name>
   <description>Parent POM for command-specific artifacts</description>
