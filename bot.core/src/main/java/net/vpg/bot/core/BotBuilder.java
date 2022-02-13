@@ -54,10 +54,12 @@ public class BotBuilder implements SerializableData {
         this.processor = new EventProcessor();
     }
 
+    @Nonnull
     public static BotBuilder createLight(@Nonnull String id, @Nonnull String token) {
         return new BotBuilder(id, token, true);
     }
 
+    @Nonnull
     public static BotBuilder createDefault(@Nonnull String id, @Nonnull String token) {
         return new BotBuilder(id, token, false);
     }
