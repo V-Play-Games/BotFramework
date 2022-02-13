@@ -155,6 +155,10 @@ public abstract class Bot implements Entity {
         return properties.getString(property);
     }
 
+    public EntityLoader getEntityLoader() {
+        return entityLoader;
+    }
+
     public void registerCommand(String name, BotCommand command) {
         commands.put(name, command);
     }
