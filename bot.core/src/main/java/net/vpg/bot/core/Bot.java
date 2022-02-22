@@ -182,6 +182,7 @@ public abstract class Bot implements Entity {
         loadCommands();
         loadLoggers();
         setDefaultActivity();
+        setOwnerId();
     }
 
     public TextChannel getLogChannel(int id) {
@@ -245,6 +246,10 @@ public abstract class Bot implements Entity {
     }
 
     protected abstract void setDefaultActivity();
+
+    protected void setOwnerId() {
+        getPrimaryShard().retrieveApplicationInfo().queue(a -> ownerId = a.getOwner().getIdLong());
+    }
 
     @Override
     public String getId() {
