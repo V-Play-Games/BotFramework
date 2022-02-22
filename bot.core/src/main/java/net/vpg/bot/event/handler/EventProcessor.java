@@ -20,13 +20,14 @@ import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.internal.utils.ClassWalker;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class EventProcessor implements EventListener {
-    private final Map<Class<? extends GenericEvent>, ListenerHook<? extends GenericEvent>> hooks = new HashMap<>();
+    private final Map<Class<? extends GenericEvent>, ListenerHook> hooks = new HashMap<>();
     private EventHandler subject;
 
     public EventHandler getSubject() {
@@ -37,53 +38,31 @@ public class EventProcessor implements EventListener {
         this.subject = subject;
     }
 
-    public <T extends GenericEvent> void addListener(String id, Class<T> type, Consumer<T> consumer) {
-        if (hooks.values()
-            .stream()
-            .map(ListenerHook::getListeners)
-            .map(Map::keySet)
-            .flatMap(Set::stream)
-            .anyMatch(_id -> _id.equals(id))) {
-            throw new IllegalArgumentException("Subscription with id " + id + " already exists!");
-        }
-        hooks.computeIfAbsent(type, x -> new ListenerHook<>()).addListener(id, consumer);
-    }
-
-    public void removeListener(String id) {
-        hooks.values().forEach(hook -> hook.removeListener(id));
+    @SuppressWarnings("unchecked")
+    public <T extends GenericEvent> void addListener(Class<T> type, Consumer<T> consumer) {
+        hooks.computeIfAbsent(type, x -> new ListenerHook()).addListener((Consumer<GenericEvent>) consumer);
     }
 
     @Override
     public void onEvent(@Nonnull GenericEvent e) {
         subject.onEvent(e);
-        ClassWalker.range(e.getClass(), GenericEvent.class).forEach(clazz ->
-            {
-                ListenerHook<? extends GenericEvent> hook = hooks.get(clazz);
+        ClassWalker.range(e.getClass(), GenericEvent.class).forEach(clazz -> {
+                ListenerHook hook = hooks.get(clazz);
                 if (hook != null)
                     hook.execute(e);
             }
         );
     }
 
-    private static class ListenerHook<T extends GenericEvent> {
-        private final Map<String, Consumer<T>> listeners = new HashMap<>();
+    private static class ListenerHook {
+        private final List<Consumer<GenericEvent>> listeners = new ArrayList<>();
 
-        @SuppressWarnings("unchecked")
-        private void addListener(String id, Consumer<?> action) {
-            listeners.put(id, (Consumer<T>) action);
+        private void addListener(Consumer<GenericEvent> action) {
+            listeners.add(action);
         }
 
-        private void removeListener(String id) {
-            listeners.remove(id);
-        }
-
-        private Map<String, Consumer<T>> getListeners() {
-            return listeners;
-        }
-
-        @SuppressWarnings("unchecked")
         private void execute(GenericEvent event) {
-            listeners.values().forEach(c -> c.accept((T) event));
+            listeners.forEach(c -> c.accept(event));
         }
     }
 }

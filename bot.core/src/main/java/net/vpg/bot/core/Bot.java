@@ -78,7 +78,7 @@ public abstract class Bot implements Entity {
         this.database = builder.database;
         this.managers = new HashSet<>(builder.managers);
         AtomicInteger shardsInit = new AtomicInteger();
-        processor.addListener("ready_hook", ReadyEvent.class, e -> {
+        processor.addListener(ReadyEvent.class, e -> {
             if (shardsInit.incrementAndGet() == e.getJDA().getShardInfo().getShardTotal())
                 load();
         });

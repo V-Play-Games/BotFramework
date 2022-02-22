@@ -217,8 +217,8 @@ public class BotBuilder implements SerializableData {
         return this;
     }
 
-    public <T extends GenericEvent> BotBuilder addListener(String id, Class<T> type, Consumer<T> action) {
-        processor.addListener(id, type, action);
+    public <T extends GenericEvent> BotBuilder addListener(Class<T> type, Consumer<T> action) {
+        processor.addListener(type, action);
         return this;
     }
 
