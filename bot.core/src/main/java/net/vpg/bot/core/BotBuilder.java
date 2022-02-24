@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class BotBuilder implements SerializableData {
     final Map<String, ButtonHandler> buttonHandlers = new CaseInsensitiveMap<>();
@@ -37,6 +38,7 @@ public class BotBuilder implements SerializableData {
     final Map<String, Object> properties = new HashMap<>();
     final EventProcessor processor;
     final boolean light;
+    Function<Bot, EventHandler> handlerProvider;
     int intents;
     int shardsTotal;
     String id;
@@ -144,8 +146,13 @@ public class BotBuilder implements SerializableData {
     }
 
     @Nonnull
-    public BotBuilder setEventHandler(EventHandler eventHandler) {
-        processor.setSubject(eventHandler);
+    public BotBuilder setEventHandler(EventHandler handler) {
+        return setEventHandler(bot -> handler);
+    }
+
+    @Nonnull
+    public BotBuilder setEventHandler(Function<Bot, EventHandler> handlerProvider) {
+        this.handlerProvider = handlerProvider;
         return this;
     }
 

@@ -19,16 +19,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.vpg.bot.core.Bot;
 
 public class EventHandler extends ListenerAdapter {
-    protected final Bot bot;
     protected boolean closed;
-
-    public EventHandler(Bot bot) {
-        this.bot = bot;
-    }
-
-    public Bot getBot() {
-        return bot;
-    }
 
     public boolean isClosed() {
         return closed;

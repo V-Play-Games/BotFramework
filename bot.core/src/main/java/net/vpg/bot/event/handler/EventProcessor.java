@@ -34,8 +34,9 @@ public class EventProcessor implements EventListener {
         return subject;
     }
 
-    public void setSubject(EventHandler subject) {
+    public EventProcessor setSubject(EventHandler subject) {
         this.subject = subject;
+        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -45,7 +46,9 @@ public class EventProcessor implements EventListener {
 
     @Override
     public void onEvent(@Nonnull GenericEvent e) {
-        subject.onEvent(e);
+        if (subject != null) {
+            subject.onEvent(e);
+        }
         ClassWalker.range(e.getClass(), GenericEvent.class).forEach(clazz -> {
                 ListenerHook hook = hooks.get(clazz);
                 if (hook != null)

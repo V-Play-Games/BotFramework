@@ -34,11 +34,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class DefaultEventHandler extends EventHandler {
+    protected final Bot bot;
     private Pattern selfMentionPattern;
     private boolean closed;
 
     public DefaultEventHandler(Bot bot) {
-        super(bot);
+        this.bot = bot;
     }
 
     public Pattern getSelfMentionPattern() {
