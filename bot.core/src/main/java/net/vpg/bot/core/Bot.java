@@ -74,7 +74,7 @@ public abstract class Bot implements Entity {
         this.logCategoryId = properties.getLong("logCategory", 0L);
         this.filter = builder.filter == null ? ClassFilter.getDefault() : builder.filter;
         this.entityLoader = new EntityLoader(new InstanceLoader(filter));
-        this.managers = new HashSet<>(builder.managers);
+        this.managers = builder.managers == null ? new HashSet<>() : new HashSet<>(builder.managers);
         processor.setSubject(Optional.ofNullable(builder.handlerProvider).map(p -> p.apply(this)).orElseGet(() -> new DefaultEventHandler(this)));
         AtomicInteger shardsInit = new AtomicInteger();
         processor.addListener(ReadyEvent.class, e -> {
