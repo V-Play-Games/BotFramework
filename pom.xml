@@ -27,7 +27,7 @@
     <bot.framework.version>${project.version}</bot.framework.version>
   </properties>
   <artifactId>bot.framework</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.2</version>
   <packaging>pom</packaging>
   <modules>
     <module>bot.core</module>

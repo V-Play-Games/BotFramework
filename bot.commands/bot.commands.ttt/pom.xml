@@ -21,7 +21,7 @@
   <parent>
     <artifactId>bot.commands</artifactId>
     <groupId>com.github.v-play-games</groupId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
   </parent>
   <artifactId>bot.commands.ttt</artifactId>
   <name>TicTacToe Command</name>
