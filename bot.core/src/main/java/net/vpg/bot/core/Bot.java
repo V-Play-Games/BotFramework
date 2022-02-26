@@ -241,7 +241,7 @@ public abstract class Bot implements Entity {
             buttonHandlers.put(handler.getName(), handler);
             LOGGER.info("Loaded " + handler.getName() + " button handler");
         }, (c, t) -> LOGGER.error("Unable to load button handler from " + c, t));
-        getPrimaryShard().updateCommands().addCommands(commands.values()).queue();
+        getPrimaryShard().updateCommands().addCommands(new HashSet<>(commands.values())).queue();
     }
 
     protected abstract void setDefaultActivity();
