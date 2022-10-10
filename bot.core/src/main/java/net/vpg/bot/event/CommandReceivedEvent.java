@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.action.CommandReplyAction;
+import net.dv8tion.jda.api.utils.messages.MessageRequest;
+import net.vpg.bot.action.cra.CommandReplyAction;
 import net.vpg.bot.action.Sender;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.core.Bot;
@@ -36,7 +42,7 @@ public abstract class CommandReceivedEvent implements Sender {
     private final String prefix;
     private final Bot bot;
     private final String processId;
-    private final MessageChannel channel;
+    private final MessageChannelUnion channel;
     private final JDA jda;
     private final Guild guild;
     private final User user;
@@ -44,21 +50,21 @@ public abstract class CommandReceivedEvent implements Sender {
     private final OffsetDateTime timeCreated;
     private final BotCommand command;
     private final Member selfMember;
-    private final Supplier<CommandReplyAction> actionSupplier;
+    private final Supplier<CommandReplyAction<?>> actionSupplier;
     private boolean replySent;
     private boolean loggingAllowed;
-    private CommandReplyAction action;
+    private CommandReplyAction<?> action;
     private Throwable trouble;
 
     public CommandReceivedEvent(@Nonnull JDA jda,
-                                @Nonnull MessageChannel channel,
+                                @Nonnull MessageChannelUnion channel,
                                 @Nullable Guild guild,
                                 @Nonnull User user,
                                 @Nullable Member member,
                                 @Nonnull BotCommand command,
                                 @Nonnull OffsetDateTime timeCreated,
                                 @Nonnull String prefix,
-                                @Nonnull Supplier<CommandReplyAction> actionSupplier) {
+                                @Nonnull Supplier<CommandReplyAction<?>> actionSupplier) {
         this.channel = channel;
         this.jda = jda;
         this.guild = guild;
@@ -71,44 +77,6 @@ public abstract class CommandReceivedEvent implements Sender {
         this.bot = command.getBot();
         this.processId = Util.getProcessId(jda);
         this.selfMember = guild != null ? guild.getMember(jda.getSelfUser()) : null;
-    }
-
-    public GuildMessageChannel getGuildChannel() {
-        if (channel instanceof GuildMessageChannel)
-            return (GuildMessageChannel) channel;
-        throw conversionError("GuildMessageChannel");
-    }
-
-    public MessageChannel getMessageChannel() {
-        return channel;
-    }
-
-    public TextChannel getTextChannel() {
-        if (channel instanceof TextChannel)
-            return (TextChannel) channel;
-        throw conversionError("TextChannel");
-    }
-
-    public NewsChannel getNewsChannel() {
-        if (channel instanceof NewsChannel)
-            return (NewsChannel) channel;
-        throw conversionError("NewsChannel");
-    }
-
-    public ThreadChannel getThreadChannel() {
-        if (channel instanceof ThreadChannel)
-            return (ThreadChannel) channel;
-        throw conversionError("ThreadChannel");
-    }
-
-    public PrivateChannel getPrivateChannel() {
-        if (channel instanceof PrivateChannel)
-            return (PrivateChannel) channel;
-        throw conversionError("PrivateChannel");
-    }
-
-    private IllegalStateException conversionError(String type) {
-        return new IllegalStateException("Cannot convert channel of type " + getChannelType() + " to " + type);
     }
 
     public Bot getBot() {
@@ -159,7 +127,7 @@ public abstract class CommandReceivedEvent implements Sender {
         return jda;
     }
 
-    public MessageChannel getChannel() {
+    public MessageChannelUnion getChannel() {
         return channel;
     }
 
@@ -189,17 +157,17 @@ public abstract class CommandReceivedEvent implements Sender {
 
     @Nonnull
     @Override
-    public CommandReplyAction deferSend() {
-        return action == null ? action = actionSupplier.get().setTask(this::log) : action;
+    public CommandReplyAction<?> deferSend() {
+        return action == null ? action = actionSupplier.get() : action;
     }
 
     protected abstract String getInput();
 
-    public void log(CommandReplyAction action) {
+    public void log(MessageRequest<?> action) {
         if (replySent) return;
         replySent = true;
         if (loggingAllowed) return;
-        TextChannel logChannel = bot.getLogChannel(getJDA().getShardInfo().getShardId());
+        MessageChannel logChannel = bot.getLogChannel(getJDA().getShardInfo().getShardId());
         if (logChannel == null) return;
         String in = getInput();
         String out = action.getContent();
@@ -221,7 +189,7 @@ public abstract class CommandReceivedEvent implements Sender {
             .addField("Input", in.length() > 1024 ? in.substring(0, 1021) + "..." : in, false)
             .addField("Output", out.length() > 1024 ? out.substring(0, 1021) + "..." : out, false)
             .build())
-            .addFile(Util.makeFileOf(log, "log-file-" + processId + ".json"))
+            .addFiles(FileUpload.fromData(Util.makeFileOf(log, "log-file-" + processId + ".json")))
             .queue();
         action.setContent("");
     }

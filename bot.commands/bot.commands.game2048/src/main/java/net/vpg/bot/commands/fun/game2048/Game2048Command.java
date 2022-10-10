@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.game2048;
 
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
@@ -51,7 +50,7 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
     @Override
     public void execute(CommandReceivedEvent e) {
         e.sendEmbeds(new Board(4).spawn().spawn().toEmbed())
-            .setActionRows(getButtons(e.getUser().getId())).queue();
+            .setComponents(getButtons(e.getUser().getId())).queue();
     }
 
     public static class ButtonHandler2048 implements ButtonHandler {
@@ -67,7 +66,7 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
             }
             Move move = Move.fromKey(e.getArg(1).charAt(0));
             if (move == null) {
-                e.editMessage("The game was cancelled!").setActionRows().queue();
+                e.editMessage("The game was cancelled!").setActionRow().queue();
                 return;
             }
             List<MessageEmbed> embeds = e.getMessage().getEmbeds();
@@ -80,9 +79,9 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
             board.move(move);
             MessageEditCallbackAction action = e.deferEdit().setEmbeds(board.toEmbed());
             if (board.checkWin()) {
-                action.setContent("GG! You won!").setActionRows().queue();
+                action.setContent("GG! You won!").setActionRow().queue();
             } else if (board.checkLose()) {
-                action.setContent("You're out of moves! Game Over.").setActionRows().queue();
+                action.setContent("You're out of moves! Game Over.").setActionRow().queue();
             } else {
                 action.queue();
             }

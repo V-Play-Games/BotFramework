@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.ttt;
 
 import net.dv8tion.jda.api.entities.User;
@@ -62,7 +61,7 @@ public class TTTCommand extends BotCommandImpl {
 
     @Override
     public void onTextCommandRun(TextCommandReceivedEvent e) {
-        List<User> mentions = e.getMessage().getMentionedUsers();
+        List<User> mentions = e.getMessage().getMentions().getUsers();
         execute(e, e.getArgs().isEmpty() ? null : e.getArg(0), mentions.isEmpty() ? null : mentions.get(0).getId());
     }
 
@@ -90,7 +89,7 @@ public class TTTCommand extends BotCommandImpl {
                         board.send(e);
                     break;
                 case "x":
-                    e.editMessage("<@" + clicker + "> cancelled the challenge!").setActionRows().queue();
+                    e.editMessage("<@" + clicker + "> cancelled the challenge!").setComponents().queue();
                     break;
                 case "c":
                     Player thisTurn = board.getThisTurn();
@@ -103,12 +102,12 @@ public class TTTCommand extends BotCommandImpl {
                     Player winner = board.getWinner();
                     if (winner == null) {
                         if (board.checkTie()) {
-                            e.editMessage("It's a tie! Nobody won.").setActionRows(board.getActionRows()).queue();
+                            e.editMessage("It's a tie! Nobody won.").setComponents(board.getComponents()).queue();
                         } else {
                             board.send(e);
                         }
                     } else {
-                        e.editMessage("<@" + winner.id + "> won the match!").setActionRows(board.getActionRows()).queue();
+                        e.editMessage("<@" + winner.id + "> won the match!").setComponents(board.getComponents()).queue();
                         board.remove();
                     }
                     break;

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.vpg.bot.action.CommandReplyAction;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.vpg.bot.action.cra.CommandReplyAction;
 import net.vpg.bot.action.Sender;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.Util;
@@ -28,8 +28,7 @@ public class BotButtonEvent extends ButtonInteractionEvent implements Sender {
     private final String method;
     private final String[] args;
     private final Bot bot;
-    CommandReplyAction action;
-    Sender edit;
+    private CommandReplyAction<InteractionHook> action;
 
     public BotButtonEvent(ButtonInteractionEvent e, Bot bot) {
         super(e.getJDA(), e.getResponseNumber(), e.getInteraction());
@@ -60,15 +59,7 @@ public class BotButtonEvent extends ButtonInteractionEvent implements Sender {
 
     @Nonnull
     @Override
-    public CommandReplyAction deferSend() {
+    public CommandReplyAction<InteractionHook> deferSend() {
         return action == null ? action = CommandReplyAction.reply(this) : action;
-    }
-
-    public Sender asReplySender() {
-        return this;
-    }
-
-    public Sender asEditSender() {
-        return edit == null ? edit = Sender.ofEdit(this) : edit;
     }
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.game2048;
 
 public enum Move {
@@ -39,16 +38,12 @@ public enum Move {
     public static Move fromKey(char key) {
         switch (key) {
             case 'u':
-            case 'U':
                 return UP;
             case 'd':
-            case 'D':
                 return DOWN;
             case 'l':
-            case 'L':
                 return LEFT;
             case 'r':
-            case 'R':
                 return RIGHT;
             default:
                 return null;

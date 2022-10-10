@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.meme;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.attribute.IAgeRestrictedChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.core.Bot;
@@ -25,15 +26,14 @@ import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class MemeCommand extends BotCommandImpl {
-    private final Connection connection;
+    protected final MemeApi api;
 
     public MemeCommand(Bot bot) {
         super(bot, "meme", "Pulls a random meme from Reddit");
-        connection = new Connection(bot.getPrimaryShard().getHttpClient());
+        api = new MemeApi(bot.getPrimaryShard().getHttpClient());
         addOption(OptionType.STRING, "subreddit", "The subreddit to pull a meme from");
         setMaxArgs(1);
         setCooldown(10, TimeUnit.SECONDS);
@@ -49,23 +49,37 @@ public class MemeCommand extends BotCommandImpl {
     }
 
     @Override
-    public void onTextCommandRun(TextCommandReceivedEvent e) throws IOException {
+    public void onTextCommandRun(TextCommandReceivedEvent e) {
         execute(e, e.getArgs().size() == 1 ? e.getArg(0) : "");
     }
 
     @Override
-    public void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception {
+    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
         execute(e, e.getString("subreddit"));
     }
 
-    public void execute(CommandReceivedEvent e, String subreddit) throws IOException {
-        Meme meme = connection.getMeme(subreddit);
-        if (meme.isNsfw() && !((BaseGuildMessageChannel) (e.getChannelType().isThread() ? e.getThreadChannel().getParentChannel() : e.getGuildChannel())).isNSFW())
-            return;
-        e.sendEmbeds(new EmbedBuilder()
-            .setTitle(meme.getTitle(), meme.getPostLink())
-            .setDescription("Meme by u/" + meme.getAuthor() + " in r/" + meme.getSubreddit())
-            .setImage(meme.getUrl())
-            .setFooter(meme.getUps() + " Upvotes").build()).queue();
+    public void execute(CommandReceivedEvent e, String subreddit) {
+        api.getMeme(subreddit).queue(meme -> {
+            if (meme.isNsfw()) {
+                GuildMessageChannel gmc;
+                MessageChannelUnion channel = e.getChannel();
+                if (channel.getType().isThread()) {
+                    gmc = channel.asThreadChannel().getParentChannel().asGuildMessageChannel();
+                } else {
+                    gmc = channel.asGuildMessageChannel();
+                }
+                if (!(gmc instanceof IAgeRestrictedChannel)) {
+                    return;
+                }
+                if (!((IAgeRestrictedChannel) gmc).isNSFW()) {
+                    return;
+                }
+            }
+            e.sendEmbeds(new EmbedBuilder()
+                .setTitle(meme.getTitle(), meme.getPostLink())
+                .setDescription("Meme by u/" + meme.getAuthor() + " in r/" + meme.getSubreddit())
+                .setImage(meme.getUrl())
+                .setFooter(meme.getUps() + " Upvotes").build()).queue();
+        });
     }
 }

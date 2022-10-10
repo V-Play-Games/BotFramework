@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.ttt;
 
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 public enum CellType {
     BLANK("<:00:905666298648866846>", "b"),
@@ -27,7 +26,7 @@ public enum CellType {
     final String identifier;
 
     CellType(String emoji, String identifier) {
-        this.emoji = Emoji.fromMarkdown(emoji);
+        this.emoji = Emoji.fromFormatted(emoji);
         this.identifier = identifier;
     }
 

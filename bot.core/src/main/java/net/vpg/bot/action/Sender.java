@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.action;
 
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.vpg.bot.action.cra.CommandReplyAction;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
@@ -28,45 +27,29 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface Sender {
+    static Sender of(MessageChannel tc) {
+        return of(tc, CommandReplyAction::send);
+    }
+
     static Sender of(Message message) {
-        return ofReply(message);
-    }
-
-    static Sender ofReply(Message message) {
         return of(message, CommandReplyAction::reply);
-    }
-
-    static Sender ofEdit(Message message) {
-        return of(message, CommandReplyAction::edit);
     }
 
     static Sender of(IReplyCallback interaction) {
         return of(interaction, CommandReplyAction::reply);
     }
 
-    static Sender ofReply(IReplyCallback interaction) {
-        return of(interaction, CommandReplyAction::reply);
-    }
-
-    static Sender ofEdit(IMessageEditCallback interaction) {
-        return of(interaction, CommandReplyAction::edit);
-    }
-
-    static Sender of(MessageChannel tc) {
-        return of(tc, CommandReplyAction::send);
-    }
-
-    static <T> Sender of(T t, Function<T, CommandReplyAction> converter) {
+    static <T> Sender of(T t, Function<T, CommandReplyAction<?>> converter) {
         return of(() -> converter.apply(t));
     }
 
-    static Sender of(Supplier<CommandReplyAction> supplier) {
+    static Sender of(Supplier<CommandReplyAction<?>> supplier) {
         return new Sender() {
-            CommandReplyAction action;
+            CommandReplyAction<?> action;
 
             @Nonnull
             @Override
-            public CommandReplyAction deferSend() {
+            public CommandReplyAction<?> deferSend() {
                 return action == null ? action = supplier.get() : action;
             }
         };
@@ -74,17 +57,17 @@ public interface Sender {
 
     @Nonnull
     @CheckReturnValue
-    default CommandReplyAction send(String message) {
+    default CommandReplyAction<?> send(String message) {
         return deferSend().setContent(message);
     }
 
     @Nonnull
     @CheckReturnValue
-    default CommandReplyAction sendEmbeds(MessageEmbed... embeds) {
+    default CommandReplyAction<?> sendEmbeds(MessageEmbed... embeds) {
         return deferSend().setEmbeds(embeds);
     }
 
     @Nonnull
     @CheckReturnValue
-    CommandReplyAction deferSend();
+    CommandReplyAction<?> deferSend();
 }

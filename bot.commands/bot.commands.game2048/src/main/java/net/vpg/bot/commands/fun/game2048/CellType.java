@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.game2048;
 
 public enum CellType {
@@ -32,10 +31,10 @@ public enum CellType {
     C2048(2048, false, 0);
     //@formatter:on
 
-    static final CellType[] values = values();
-    final int value;
-    final boolean spawn;
-    final int spawnRate;
+    private static final CellType[] values = values();
+    private final int value;
+    private final boolean spawn;
+    private final int spawnRate;
 
     CellType(int value, boolean spawn, int spawnRate) {
         this.value = value;

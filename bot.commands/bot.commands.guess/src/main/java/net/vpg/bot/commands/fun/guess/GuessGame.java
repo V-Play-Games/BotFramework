@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.guess;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.action.Sender;
 import net.vpg.bot.core.Util;
 import net.vpg.bot.entities.GuessPokemon;
@@ -97,16 +95,16 @@ public class GuessGame {
                 toSend = "Correct Answer!";
                 break;
             default:
-                return;
+                throw new IllegalStateException("Unknown close reason - " + reason);
         }
-        sender.deferSend().setActionRows().setEmbeds(getEmbed(toSend)).queue();
-    }
-
-    public MessageEmbed getEmbed(String title) {
-        return getEmbed().setTitle(title).build();
-    }
-
-    public EmbedBuilder getEmbed() {
-        return new EmbedBuilder().setDescription("The answer was **" + pokemon.getName() + "**!").setThumbnail(pokemon.getSprite());
+        sender.deferSend()
+            .setComponents()
+            .setEmbeds(
+                new EmbedBuilder()
+                    .setDescription("The answer was **" + pokemon.getName() + "**!")
+                    .setThumbnail(pokemon.getSprite())
+                    .setTitle(toSend)
+                    .build()
+            ).queue();
     }
 }

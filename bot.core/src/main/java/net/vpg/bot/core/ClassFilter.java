@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.core;
 
 import java.util.ArrayList;
@@ -64,8 +63,16 @@ public class ClassFilter {
         return this;
     }
 
+    // this generates a new pattern for enabled and disabled classes everytime to reflect the changes done to the class
     public Predicate<Class<?>> asPredicate() {
         return clazz -> Pattern.matches(String.join("|", enabled), clazz.getName())
             && !Pattern.matches(String.join("|", disabled), clazz.getName());
+    }
+
+    public Predicate<Class<?>> asSnapshotPredicate() {
+        String enabledClasses = String.join("|", enabled);
+        String disabledClasses = String.join("|", disabled);
+        return clazz -> Pattern.matches(enabledClasses, clazz.getName())
+            && !Pattern.matches(disabledClasses, clazz.getName());
     }
 }

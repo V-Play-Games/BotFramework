@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.manager;
 
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public interface ManagerCommand extends BotCommand {
-    @Override
-    default List<CommandPrivilege> getDefaultPrivileges() {
-        return getBot().getManagers().stream().map(CommandPrivilege::enableUser).collect(Collectors.toList());
-    }
-
     default boolean runChecks(CommandReceivedEvent e) {
         if (!getBot().isManager(e.getUser().getIdLong())) {
             e.send("You do not have the permission to do that!").queue();

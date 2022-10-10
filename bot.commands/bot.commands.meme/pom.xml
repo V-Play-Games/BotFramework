@@ -21,9 +21,16 @@
   <parent>
     <groupId>com.github.v-play-games</groupId>
     <artifactId>bot.commands</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
   <artifactId>bot.commands.meme</artifactId>
   <name>Meme Command</name>
   <description>Meme Command, which fetches and sends a random meme from the internet</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.v-play-games</groupId>
+      <artifactId>RAWF</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+  </dependencies>
 </project>

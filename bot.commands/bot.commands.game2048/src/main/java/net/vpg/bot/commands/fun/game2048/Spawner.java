@@ -13,34 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.game2048;
 
 import net.vpg.bot.core.Util;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Collections;
 
 public class Spawner {
     private static final Spawner instance = new Spawner();
-    final Random random;
-    final List<CellType> spawnables;
-    final int size;
+    private final CellType[] spawnList;
 
     private Spawner() {
-        this.random = new Random();
-        this.spawnables = Arrays.stream(CellType.values())
+        this.spawnList = Arrays.stream(CellType.values())
             .filter(CellType::isSpawn)
-            .map(cell -> {
-                CellType[] cells = new CellType[cell.getSpawnRate()];
-                Arrays.fill(cells, cell);
-                return cells;
-            })
-            .flatMap(Arrays::stream)
-            .collect(Collectors.toList());
-        size = spawnables.size();
+            .map(cell -> Collections.nCopies(cell.getSpawnRate(), cell))
+            .flatMap(Collection::stream)
+            .toArray(CellType[]::new);
     }
 
     public static Spawner getInstance() {
@@ -48,7 +38,7 @@ public class Spawner {
     }
 
     public CellType spawn() {
-        return Util.getRandom(spawnables, random);
+        return Util.getRandom(spawnList);
     }
 
     public void spawn(Cell cell) {

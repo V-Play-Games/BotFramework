@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.core;
 
 import net.dv8tion.jda.api.JDA;
@@ -41,6 +40,7 @@ import java.util.stream.Collectors;
 public class Util {
     public static Pattern SPACE = Pattern.compile("\\s");
     public static Pattern SPACE_WITH_LINE = Pattern.compile("[\\r\\n\\s]");
+    private static Random random;
 
     private Util() {
         // Utility Class
@@ -108,11 +108,11 @@ public class Util {
     }
 
     public static <T> T getRandom(List<T> list) {
-        return getRandom(list, new Random());
+        return getRandom(list, getRandom());
     }
 
     public static <T> T getRandom(T[] array) {
-        return getRandom(array, new Random());
+        return getRandom(array, getRandom());
     }
 
     public static <T> T getRandom(List<T> list, Random random) {
@@ -121,6 +121,10 @@ public class Util {
 
     public static <T> T getRandom(T[] array, Random random) {
         return array[random.nextInt(array.length)];
+    }
+
+    private static Random getRandom() {
+        return random == null ? random = new Random() : random;
     }
 
     public static <T extends GenericEvent> EventListener subscribeTo(Class<T> eventType, Consumer<T> action) {

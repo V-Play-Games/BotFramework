@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.general;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,10 +24,6 @@ import net.vpg.bot.event.CommandReceivedEvent;
 public abstract class InfoCommand extends BotCommandImpl implements NoArgsCommand {
     public InfoCommand(Bot bot) {
         super(bot, "info", "info about the bot");
-    }
-
-    public InfoCommand(Bot bot, String description) {
-        super(bot, "info", description);
     }
 
     public InfoCommand(Bot bot, String description, String... aliases) {

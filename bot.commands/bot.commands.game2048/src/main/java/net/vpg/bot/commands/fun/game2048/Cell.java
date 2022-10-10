@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.game2048;
 
 public class Cell {
-    final Board board;
-    final int limit;
-    Cell[][] cells;
-    int row;
-    int column;
-    CellType type;
-    boolean modified;
+    private final Board board;
+    private final int limit;
+    private final Cell[][] cells;
+    private int row;
+    private int column;
+    private CellType type;
+    private boolean modified;
 
     public Cell(int row, int column, Board board) {
         this(row, column, board, CellType.C0);
@@ -54,24 +53,28 @@ public class Cell {
         }
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public void moveDown() {
         int initial = row;
         while (row != limit && tryMerge(cells[row + 1][column])) ;
         if (initial != 0) cells[initial - 1][column].moveDown();
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public void moveUp() {
         int initial = row;
         while (row != 0 && tryMerge(cells[row - 1][column])) ;
         if (initial != limit) cells[initial + 1][column].moveUp();
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public void moveRight() {
         int initial = column;
         while (column != limit && tryMerge(cells[row][column + 1])) ;
         if (initial != 0) cells[row][initial - 1].moveRight();
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public void moveLeft() {
         int initial = column;
         while (column != 0 && tryMerge(cells[row][column - 1])) ;
@@ -136,21 +139,21 @@ public class Cell {
         return false;
     }
 
-    void setCoordinates(int row, int column) {
+    private void setCoordinates(int row, int column) {
         this.row = row;
         this.column = column;
         cells[row][column] = this;
     }
 
     public boolean canMove() {
-        return (row != board.size - 1 && checkMove(cells[row + 1][column])) ||
-            (row != 0 && checkMove(cells[row - 1][column])) ||
-            (column != board.size - 1 && checkMove(cells[row][column + 1])) ||
-            (column != 0 && checkMove(cells[row][column - 1]));
+        return (row != board.size - 1 && canMerge(cells[row + 1][column])) ||
+            (row != 0 && canMerge(cells[row - 1][column])) ||
+            (column != board.size - 1 && canMerge(cells[row][column + 1])) ||
+            (column != 0 && canMerge(cells[row][column - 1]));
     }
 
-    private boolean checkMove(Cell target) {
-        return target.type.isEmpty() || this.type == target.type;
+    private boolean canMerge(Cell target) {
+        return target.isEmpty() || this.type == target.type;
     }
 
     public boolean isEmpty() {

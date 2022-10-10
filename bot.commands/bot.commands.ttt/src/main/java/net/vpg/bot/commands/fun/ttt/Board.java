@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.ttt;
 
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.vpg.bot.action.Sender;
+import net.vpg.bot.commands.fun.ttt.Cell;
+import net.vpg.bot.commands.fun.ttt.CellType;
+import net.vpg.bot.commands.fun.ttt.Player;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,7 +65,7 @@ public class Board {
         return cells[row][column];
     }
 
-    public ActionRow[] getActionRows() {
+    public LayoutComponent[] getComponents() {
         return Arrays.stream(cells)
             .map(row -> Arrays.stream(row)
                 .map(Cell::getButton)
@@ -115,7 +118,7 @@ public class Board {
 
     public void send(Sender sender) {
         sender.send(String.format("It is <@%s>'s turn! (Playing as %s)", player1.id, player1.type))
-            .setActionRows(getActionRows())
+            .setComponents(getComponents())
             .queue();
     }
 

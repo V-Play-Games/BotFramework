@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.meme;
 
-import net.dv8tion.jda.api.utils.data.DataObject;
-import net.dv8tion.jda.api.utils.data.SerializableData;
+import net.vpg.rawf.api.utils.data.DataObject;
 
-import javax.annotation.Nonnull;
-
-public class Meme implements SerializableData {
+public class Meme {
     private final String postLink;
     private final String subreddit;
     private final String title;
@@ -40,12 +36,6 @@ public class Meme implements SerializableData {
         this.ups = data.getInt("ups");
         this.nsfw = data.getBoolean("nsfw");
         this.spoiler = data.getBoolean("spoiler");
-    }
-
-    @Nonnull
-    @Override
-    public DataObject toData() {
-        return DataObject.empty();
     }
 
     public String getPostLink() {

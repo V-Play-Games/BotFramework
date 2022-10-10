@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands;
 
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.dv8tion.jda.internal.interactions.CommandDataImpl;
 import net.vpg.bot.action.Sender;
 import net.vpg.bot.core.Bot;
-import net.vpg.bot.core.Util;
 import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
 import net.vpg.bot.event.TextCommandReceivedEvent;
@@ -38,7 +35,6 @@ public abstract class BotCommandImpl extends CommandDataImpl implements BotComma
     protected final Map<Long, Ratelimit> ratelimited = new HashMap<>();
     protected final Bot bot;
     protected final List<String> aliases;
-    protected List<CommandPrivilege> defaultPrivileges = null;
     protected long cooldown;
     protected int minArgs;
     protected int maxArgs;
@@ -138,21 +134,14 @@ public abstract class BotCommandImpl extends CommandDataImpl implements BotComma
 
     @Override
     public void finalizeCommand(Command c) {
-        if (getDefaultPrivileges() == null) return;
-        Map<Long, CommandPrivilege> defaultPrivilegeMap = Util.group(defaultPrivileges, CommandPrivilege::getIdLong);
-        c.getJDA().getGuildCache().forEach(guild -> c.retrievePrivileges(guild).queue(privileges -> {
-            if (!defaultPrivilegeMap.equals(Util.group(privileges, CommandPrivilege::getIdLong))) {
-                c.updatePrivileges(guild, defaultPrivileges).queue();
-            }
-        }));
     }
 
     @Override
     public void onRatelimit(Sender e, Ratelimit ratelimit) {
         if (!ratelimit.isInformed()) {
             e.send("You have to wait for **")
-                .append(ratelimit.getCooldownString())
-                .append("** before using this command again.")
+                .addContent(ratelimit.getCooldownString())
+                .addContent("** before using this command again.")
                 .setEphemeral(true)
                 .queue();
             ratelimit.setInformed(true);
@@ -172,14 +161,5 @@ public abstract class BotCommandImpl extends CommandDataImpl implements BotComma
     @Override
     public SlashCommandData toCommandData() {
         return this;
-    }
-
-    @Override
-    public List<CommandPrivilege> getDefaultPrivileges() {
-        return defaultPrivileges;
-    }
-
-    public void setDefaultPrivileges(List<CommandPrivilege> defaultPrivileges) {
-        this.defaultPrivileges = defaultPrivileges;
     }
 }

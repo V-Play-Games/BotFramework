@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.core;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.sharding.ShardManager;
-import net.dv8tion.jda.api.utils.AllowedMentions;
 import net.dv8tion.jda.api.utils.data.DataObject;
+import net.dv8tion.jda.api.utils.messages.MessageRequest;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.database.Database;
 import net.vpg.bot.entities.Entity;
@@ -82,7 +81,7 @@ public abstract class Bot implements Entity {
             if (shardsInit.incrementAndGet() == e.getJDA().getShardInfo().getShardTotal())
                 load();
         });
-        AllowedMentions.setDefaultMentionRepliedUser(false);
+        MessageRequest.setDefaultMentionRepliedUser(false);
     }
 
     public Database getDatabase() {
@@ -185,12 +184,12 @@ public abstract class Bot implements Entity {
         setOwnerId();
     }
 
-    public TextChannel getLogChannel(int id) {
+    public MessageChannel getLogChannel(int id) {
         Guild resourceServer = getResourceServer();
         return resourceServer == null ? null : resourceServer.getTextChannelById(loggers.get(id));
     }
 
-    public TextChannel getSyncChannel() {
+    public MessageChannel getSyncChannel() {
         return getLogChannel(-1);
     }
 

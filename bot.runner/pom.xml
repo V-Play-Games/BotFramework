@@ -21,7 +21,7 @@
   <parent>
     <artifactId>bot.framework</artifactId>
     <groupId>com.github.v-play-games</groupId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
   <properties>
     <bot.runner.mainClass>net.vpg.bot.Driver</bot.runner.mainClass>

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.entities.User;
@@ -23,9 +22,10 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.InteractionType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.vpg.bot.action.CommandReplyAction;
+import net.vpg.bot.action.cra.CommandReplyAction;
 import net.vpg.bot.commands.BotCommand;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -153,5 +153,12 @@ public class SlashCommandReceivedEvent extends CommandReceivedEvent {
     @Override
     protected String getInput() {
         return getCommandString();
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("unchecked")
+    public CommandReplyAction<InteractionHook> deferSend() {
+        return (CommandReplyAction<InteractionHook>) super.deferSend();
     }
 }

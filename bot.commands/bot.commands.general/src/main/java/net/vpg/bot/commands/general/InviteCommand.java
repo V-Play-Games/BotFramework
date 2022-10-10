@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.general;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,14 +24,8 @@ import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
 public class InviteCommand extends BotCommandImpl implements NoArgsCommand {
-    private static final String INVITE_FORMAT = "[Add the bot to your server](%s+applications.commands)\n[Join the bot's support server](%s)";
-
     public InviteCommand(Bot bot) {
         super(bot, "invite", "Sends a link to add the bot in the server and other links");
-    }
-
-    public InviteCommand(Bot bot, String description) {
-        super(bot, "invite", description);
     }
 
     public InviteCommand(Bot bot, String description, String... aliases) {
@@ -46,10 +39,12 @@ public class InviteCommand extends BotCommandImpl implements NoArgsCommand {
 
     protected MessageEmbed getEmbed(CommandReceivedEvent e) {
         JDA jda = e.getJDA();
+        String serverInvite = bot.getProperties().getString("support_server_invite", null);
         return new EmbedBuilder()
             .setTitle(jda.getSelfUser().getName())
             .setThumbnail(jda.getSelfUser().getAvatarUrl())
-            .setDescription(String.format(INVITE_FORMAT, jda.getInviteUrl(), bot.getProperty("support_server_invite")))
+            .setDescription("[Add the bot to your server](" + jda.getInviteUrl() + ")" +
+                (serverInvite == null ? "" : "\n[Join the bot's support server](" + serverInvite + ")"))
             .build();
     }
 }

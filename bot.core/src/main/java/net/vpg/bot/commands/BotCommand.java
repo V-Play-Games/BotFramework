@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands;
 
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 import net.vpg.bot.event.SlashCommandReceivedEvent;
@@ -59,5 +57,19 @@ public interface BotCommand extends SlashCommandData {
 
     SlashCommandData toCommandData();
 
-    List<CommandPrivilege> getDefaultPrivileges();
+    enum Type {
+        TEXT, SLASH, HYBRID;
+
+        public boolean isText() {
+            return this == TEXT || isHybrid();
+        }
+
+        public boolean isSlash() {
+            return this == SLASH || isHybrid();
+        }
+
+        public boolean isHybrid() {
+            return this == HYBRID;
+        }
+    }
 }

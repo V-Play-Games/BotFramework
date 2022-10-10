@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.vpg.bot.action.CommandReplyAction;
+import net.vpg.bot.action.cra.CommandReplyAction;
 import net.vpg.bot.commands.BotCommand;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class TextCommandReceivedEvent extends CommandReceivedEvent {
@@ -70,5 +70,12 @@ public class TextCommandReceivedEvent extends CommandReceivedEvent {
     @Override
     protected String getInput() {
         return content;
+    }
+
+    @Nonnull
+    @Override
+    @SuppressWarnings("unchecked")
+    public CommandReplyAction<Message> deferSend() {
+        return (CommandReplyAction<Message>) super.deferSend();
     }
 }

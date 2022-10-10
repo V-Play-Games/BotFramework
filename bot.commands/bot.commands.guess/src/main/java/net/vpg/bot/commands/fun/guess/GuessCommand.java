@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package net.vpg.bot.commands.fun.guess;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.internal.interactions.InteractionHookImpl;
 import net.vpg.bot.action.Sender;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.NoArgsCommand;
@@ -46,7 +49,15 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
                 Button.primary("guess:" + game.getUserId() + ":h", "Get a hint"),
                 Button.primary("guess:" + game.getUserId() + ":x", "Give up")
             )
-            .queue(game::setMessage);
+            .queue(x -> {
+                if (x instanceof Message) {
+                    game.setMessage((Message) x);
+                } else if (x instanceof InteractionHook) {
+                    ((InteractionHook) x).retrieveOriginal().queue(game::setMessage);
+                } else {
+                    throw new IllegalStateException("Ran into an unexpected CommandReplyAction type, should be either Message or InteractionHook");
+                }
+            });
     }
 
     public void checkGuess(MessageReceivedEvent e) {
@@ -55,7 +66,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
         if (game.isCorrect(e.getMessage().getContentRaw())) {
             game.close(Sender.of(e.getMessage()), GuessGame.WON);
         } else {
-            e.getMessage().addReaction("\u274C").queue(); // CROSS
+            e.getMessage().addReaction(Emoji.fromUnicode("\u274C")).queue(); // CROSS
         }
     }
 
@@ -71,7 +82,7 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
             if (!e.getArg(0).equals(userId)) return;
             GuessGame game = GuessGame.get(userId);
             if (game == null) {
-                e.deferEdit().setActionRows().queue();
+                e.deferEdit().setComponents().queue();
                 return;
             }
             switch (e.getArg(1)) {
