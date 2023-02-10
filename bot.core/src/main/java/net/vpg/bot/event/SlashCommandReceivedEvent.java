@@ -94,8 +94,8 @@ public class SlashCommandReceivedEvent extends CommandReceivedEvent {
         return slash.getType();
     }
 
-    public String getCommandPath() {
-        return slash.getCommandPath();
+    public String getFullCommandName() {
+        return slash.getFullCommandName();
     }
 
     public String getCommandId() {
