@@ -20,14 +20,12 @@ import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.internal.utils.ClassWalker;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.StreamSupport;
 
 public class EventProcessor implements EventListener {
-    private final Map<Class<? extends GenericEvent>, ListenerHook> hooks = new HashMap<>();
+    private final Map<Class<?>, List<Consumer<GenericEvent>>> hooks = new HashMap<>();
     private EventHandler subject;
 
     public EventHandler getSubject() {
@@ -41,7 +39,7 @@ public class EventProcessor implements EventListener {
 
     @SuppressWarnings("unchecked")
     public <T extends GenericEvent> void addListener(Class<T> type, Consumer<T> consumer) {
-        hooks.computeIfAbsent(type, x -> new ListenerHook()).addListener((Consumer<GenericEvent>) consumer);
+        hooks.computeIfAbsent(type, x -> new ArrayList<>()).add((Consumer<GenericEvent>) consumer);
     }
 
     @Override
@@ -49,23 +47,15 @@ public class EventProcessor implements EventListener {
         if (subject != null) {
             subject.onEvent(e);
         }
-        ClassWalker.range(e.getClass(), GenericEvent.class).forEach(clazz -> {
-                ListenerHook hook = hooks.get(clazz);
-                if (hook != null)
-                    hook.execute(e);
-            }
-        );
-    }
-
-    private static class ListenerHook {
-        private final List<Consumer<GenericEvent>> listeners = new ArrayList<>();
-
-        private void addListener(Consumer<GenericEvent> action) {
-            listeners.add(action);
-        }
-
-        private void execute(GenericEvent event) {
-            listeners.forEach(c -> c.accept(event));
-        }
+        StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(
+                ClassWalker.range(e.getClass(), GenericEvent.class).iterator(),
+                Spliterator.ORDERED
+            ),
+            false)
+            .map(hooks::get)
+            .filter(Objects::nonNull)
+            .flatMap(List::stream)
+            .forEach(c -> c.accept(e));
     }
 }

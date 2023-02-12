@@ -17,63 +17,36 @@ package net.vpg.bot.event;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.dv8tion.jda.api.utils.messages.MessageRequest;
-import net.vpg.bot.action.cra.CommandReplyAction;
-import net.vpg.bot.action.Sender;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.Util;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.time.OffsetDateTime;
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.Optional;
+import java.util.function.Function;
 
-public abstract class CommandReceivedEvent implements Sender {
-    private final String prefix;
+public class CommandReceivedEvent extends SlashCommandInteractionEvent {
     private final Bot bot;
     private final String processId;
-    private final MessageChannelUnion channel;
-    private final JDA jda;
-    private final Guild guild;
-    private final User user;
-    private final Member member;
-    private final OffsetDateTime timeCreated;
     private final BotCommand command;
     private final Member selfMember;
-    private final Supplier<CommandReplyAction<?>> actionSupplier;
-    private boolean replySent;
-    private boolean loggingAllowed;
-    private CommandReplyAction<?> action;
+    private boolean loggingAllowed = true;
     private Throwable trouble;
 
-    public CommandReceivedEvent(@Nonnull JDA jda,
-                                @Nonnull MessageChannelUnion channel,
-                                @Nullable Guild guild,
-                                @Nonnull User user,
-                                @Nullable Member member,
-                                @Nonnull BotCommand command,
-                                @Nonnull OffsetDateTime timeCreated,
-                                @Nonnull String prefix,
-                                @Nonnull Supplier<CommandReplyAction<?>> actionSupplier) {
-        this.channel = channel;
-        this.jda = jda;
-        this.guild = guild;
-        this.user = user;
-        this.member = member;
+    public CommandReceivedEvent(SlashCommandInteractionEvent e, BotCommand command) {
+        super(e.getJDA(), e.getResponseNumber(), e.getInteraction());
+        JDA jda = e.getJDA();
+        Guild guild = e.getGuild();
         this.command = command;
-        this.timeCreated = timeCreated;
-        this.prefix = prefix;
-        this.actionSupplier = actionSupplier;
         this.bot = command.getBot();
         this.processId = Util.getProcessId(jda);
         this.selfMember = guild != null ? guild.getMember(jda.getSelfUser()) : null;
@@ -87,10 +60,6 @@ public abstract class CommandReceivedEvent implements Sender {
         return processId;
     }
 
-    public OffsetDateTime getTimeCreated() {
-        return timeCreated;
-    }
-
     public BotCommand getCommand() {
         return command;
     }
@@ -99,12 +68,8 @@ public abstract class CommandReceivedEvent implements Sender {
         return loggingAllowed;
     }
 
-    public void setForceNotLog() {
-        loggingAllowed = true;
-    }
-
-    public boolean isReplySent() {
-        return replySent;
+    public void setLoggingAllowed() {
+        loggingAllowed = false;
     }
 
     public Throwable getTrouble() {
@@ -115,58 +80,121 @@ public abstract class CommandReceivedEvent implements Sender {
         this.trouble = trouble;
     }
 
-    public String getPrefix() {
-        return prefix;
-    }
-
     public Member getSelfMember() {
         return selfMember;
     }
 
-    public JDA getJDA() {
-        return jda;
+    public <T> T getOption(String name, Function<OptionMapping, T> converter, T def) {
+        return optOption(name).map(converter).orElse(def);
     }
 
-    public MessageChannelUnion getChannel() {
-        return channel;
+    public Optional<OptionMapping> optOption(String name) {
+        return getOptions().stream().filter(opt -> opt.getName().equals(name)).findFirst();
     }
 
-    public boolean isFromType(ChannelType type) {
-        return getChannelType() == type;
+    public Message.Attachment getAttachment(String name) {
+        return getAttachment(name, null);
     }
 
-    public boolean isFromGuild() {
-        return getChannelType().isGuild();
+    public Message.Attachment getAttachment(String name, Message.Attachment def) {
+        return getOption(name, OptionMapping::getAsAttachment, def);
     }
 
-    public ChannelType getChannelType() {
-        return channel.getType();
+    public String getString(String name) {
+        return getString(name, null);
     }
 
-    public Guild getGuild() {
-        return guild;
+    public String getString(String name, String def) {
+        return getOption(name, OptionMapping::getAsString, def);
     }
 
-    public User getUser() {
-        return user;
+    public boolean getBoolean(String name) {
+        return getBoolean(name, false);
     }
 
-    public Member getMember() {
-        return member;
+    public boolean getBoolean(String name, boolean def) {
+        return getOption(name, OptionMapping::getAsBoolean, def);
     }
 
+    public long getLong(String name) {
+        return getLong(name, 0L);
+    }
+
+    public long getLong(String name, long def) {
+        return getOption(name, OptionMapping::getAsLong, def);
+    }
+
+    public int getInt(String name) {
+        return getInt(name, 0);
+    }
+
+    public int getInt(String name, int def) {
+        return getOption(name, OptionMapping::getAsInt, def);
+    }
+
+    public double getDouble(String name) {
+        return getDouble(name, 0d);
+    }
+
+    public double getDouble(String name, double def) {
+        return getOption(name, OptionMapping::getAsDouble, def);
+    }
+
+    public IMentionable getMentionable(String name) {
+        return getMentionable(name, null);
+    }
+
+    public IMentionable getMentionable(String name, IMentionable def) {
+        return getOption(name, OptionMapping::getAsMentionable, def);
+    }
+
+    public Member getMember(String name) {
+        return getMember(name, null);
+    }
+
+    public Member getMember(String name, Member def) {
+        return getOption(name, OptionMapping::getAsMember, def);
+    }
+
+    public User getUser(String name) {
+        return getUser(name, null);
+    }
+
+    public User getUser(String name, User def) {
+        return getOption(name, OptionMapping::getAsUser, def);
+    }
+
+    public Role getRole(String name) {
+        return getRole(name, null);
+    }
+
+    public Role getRole(String name, Role def) {
+        return getOption(name, OptionMapping::getAsRole, def);
+    }
+
+    public GuildChannelUnion getChannel(String name) {
+        return getChannel(name, null);
+    }
+
+    public GuildChannelUnion getChannel(String name, GuildChannelUnion def) {
+        return getOption(name, OptionMapping::getAsChannel, def);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Nonnull
     @Override
-    public CommandReplyAction<?> deferSend() {
-        return action == null ? action = actionSupplier.get() : action;
+    public ReplyCallbackAction deferReply() {
+        ReplyCallbackAction action = super.deferReply();
+        action.onSuccess(hook -> log(action));
+        return action;
     }
 
-    protected abstract String getInput();
+    public String getInput() {
+        return getCommandString();
+    }
 
-    public void log(MessageRequest<?> action) {
-        if (replySent) return;
-        replySent = true;
-        if (loggingAllowed) return;
+    private void log(ReplyCallbackAction action) {
+        if (!loggingAllowed) return;
         MessageChannel logChannel = bot.getLogChannel(getJDA().getShardInfo().getShardId());
         if (logChannel == null) return;
         String in = getInput();
@@ -189,7 +217,7 @@ public abstract class CommandReceivedEvent implements Sender {
             .addField("Input", in.length() > 1024 ? in.substring(0, 1021) + "..." : in, false)
             .addField("Output", out.length() > 1024 ? out.substring(0, 1021) + "..." : out, false)
             .build())
-            .addFiles(FileUpload.fromData(Util.makeFileOf(log, "log-file-" + processId + ".json")))
+            .addFiles(FileUpload.fromData(log.toJson(), "log-file-" + processId + ".json"))
             .queue();
         action.setContent("");
     }

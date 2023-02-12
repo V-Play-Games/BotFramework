@@ -15,8 +15,8 @@
  */
 package net.vpg.bot.ratelimit;
 
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.vpg.bot.action.Sender;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -41,15 +41,15 @@ public interface Ratelimiter {
         return isRatelimited;
     }
 
-    default boolean checkRatelimited(long id, Sender sender) {
-        return ifRatelimited(id, rl -> onRatelimit(sender, rl));
+    default boolean checkRatelimited(long id, IReplyCallback callback) {
+        return ifRatelimited(id, rl -> onRatelimit(callback, rl));
     }
 
-    default boolean checkRatelimited(long id, Supplier<Sender> supplier) {
+    default boolean checkRatelimited(long id, Supplier<IReplyCallback> supplier) {
         return ifRatelimited(id, rl -> onRatelimit(supplier.get(), rl));
     }
 
-    default boolean checkRatelimited(long id, RestAction<Sender> action) {
+    default boolean checkRatelimited(long id, RestAction<IReplyCallback> action) {
         return ifRatelimited(id, rl -> action.queue(sender -> onRatelimit(sender, rl)));
     }
 
@@ -61,5 +61,5 @@ public interface Ratelimiter {
 
     long getCooldown();
 
-    void onRatelimit(Sender e, Ratelimit ratelimit);
+    void onRatelimit(IReplyCallback callback, Ratelimit ratelimit);
 }

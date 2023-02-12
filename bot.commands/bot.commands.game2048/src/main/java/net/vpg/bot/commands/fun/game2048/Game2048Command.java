@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.interactions.MessageEditCallbackAction;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.ButtonHandler;
 import net.vpg.bot.event.BotButtonEvent;
@@ -30,7 +29,7 @@ import net.vpg.bot.event.CommandReceivedEvent;
 
 import java.util.List;
 
-public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
+public class Game2048Command extends BotCommandImpl {
     public static DataObject emotes = DataObject.fromJson(Game2048Command.class.getResourceAsStream("emotes.json"));
 
     public Game2048Command(Bot bot) {
@@ -49,7 +48,7 @@ public class Game2048Command extends BotCommandImpl implements NoArgsCommand {
 
     @Override
     public void execute(CommandReceivedEvent e) {
-        e.sendEmbeds(new Board(4).spawn().spawn().toEmbed())
+        e.replyEmbeds(new Board(4).spawn().spawn().toEmbed())
             .setComponents(getButtons(e.getUser().getId())).queue();
     }
 

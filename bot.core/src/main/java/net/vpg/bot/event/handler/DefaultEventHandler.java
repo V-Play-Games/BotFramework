@@ -15,81 +15,21 @@
  */
 package net.vpg.bot.event.handler;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.ExceptionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.vpg.bot.commands.BotCommand;
 import net.vpg.bot.core.Bot;
-import net.vpg.bot.core.Util;
 import net.vpg.bot.event.BotButtonEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
+import net.vpg.bot.event.CommandReceivedEvent;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class DefaultEventHandler extends EventHandler {
     protected final Bot bot;
-    private Pattern selfMentionPattern;
-    private boolean closed;
 
     public DefaultEventHandler(Bot bot) {
         this.bot = bot;
-    }
-
-    public Pattern getSelfMentionPattern() {
-        return selfMentionPattern == null
-            ? selfMentionPattern = Pattern.compile("<@!?" + bot.getPrimaryShard().getSelfUser().getIdLong() + ">")
-            : selfMentionPattern;
-    }
-
-    @Override
-    public void onMessageReceived(@Nonnull MessageReceivedEvent e) {
-        if (closed) {
-            if (e.getMessage().getContentRaw().equalsIgnoreCase(bot.getPrefix() + "activate")
-                && bot.isManager(e.getAuthor().getIdLong())) {
-                closed = false;
-                e.getChannel().sendMessage("Thanks for activating me again!").queue();
-            }
-            return;
-        }
-        if (e.getAuthor().isBot() || (e.isFromGuild() && !e.getGuildChannel().canTalk())) {
-            return;
-        }
-        String prefix = Util.getPrefix(e, bot);
-        Message message = e.getMessage();
-        String content = message.getContentRaw();
-        String[] args = Util.SPACE.split(content);
-        int argLen = args.length;
-        if (content.regionMatches(true, 0, prefix, 0, prefix.length())) {
-            boolean spaceAfterPrefix = args[0].length() == prefix.length();
-            String command;
-            int firstArg;
-            if (spaceAfterPrefix) {
-                if (argLen <= 1) return;
-                int i = 1;
-                while (args[i].isBlank()) i++;
-                command = args[i];
-                firstArg = i + 1;
-            } else {
-                command = args[0].substring(prefix.length());
-                firstArg = 1;
-            }
-            BotCommand botCommand = bot.getCommands().get(command);
-            if (botCommand != null) {
-                List<String> finalArgs = firstArg == argLen
-                    ? Collections.emptyList()
-                    : Arrays.asList(args).subList(firstArg, argLen);
-                botCommand.run(new TextCommandReceivedEvent(e, finalArgs, botCommand, prefix));
-            }
-        } else if (getSelfMentionPattern().matcher(content).find()) {
-            e.getChannel().sendMessage("Prefix: " + prefix).queue();
-        }
     }
 
     @Override
@@ -99,11 +39,11 @@ public class DefaultEventHandler extends EventHandler {
                 closed = false;
                 e.getChannel().sendMessage("Thanks for activating me again!").queue();
             }
-        } else {
-            BotCommand command = bot.getCommands().get(e.getName());
-            if (command != null) {
-                command.run(new SlashCommandReceivedEvent(e, command));
-            }
+            return;
+        }
+        BotCommand command = bot.getCommands().get(e.getName());
+        if (command != null) {
+            command.run(new CommandReceivedEvent(e, command));
         }
     }
 

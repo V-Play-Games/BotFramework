@@ -17,22 +17,21 @@ package net.vpg.bot.commands.general;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-public abstract class InfoCommand extends BotCommandImpl implements NoArgsCommand {
+public abstract class InfoCommand extends BotCommandImpl {
     public InfoCommand(Bot bot) {
-        super(bot, "info", "info about the bot");
+        this(bot, "Info about the bot");
     }
 
-    public InfoCommand(Bot bot, String description, String... aliases) {
-        super(bot, "info", description, aliases);
+    public InfoCommand(Bot bot, String description) {
+        super(bot, "info", description);
     }
 
     @Override
     public void execute(CommandReceivedEvent e) {
-        e.send("Prefix: " + e.getPrefix()).setEmbeds(getEmbed(e)).queue();
+        e.replyEmbeds(getEmbed(e)).queue();
     }
 
     protected abstract MessageEmbed getEmbed(CommandReceivedEvent e);

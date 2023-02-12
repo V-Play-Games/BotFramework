@@ -21,8 +21,6 @@ import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.Util;
 import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
 
 import java.util.stream.Collectors;
 
@@ -36,36 +34,27 @@ public class CaseCommand extends BotCommandImpl {
                 .addChoice("lower", "Lower Case")
                 .addChoice("proper", "Proper Case")
         );
-        setMinArgs(2);
     }
 
     @Override
-    public void onTextCommandRun(TextCommandReceivedEvent e) {
-        execute(e, e.getArgsFrom(1, " "), e.getArg(0).toLowerCase());
-    }
-
-    @Override
-    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
-        execute(e, e.getString("text"), e.getString("case"));
-    }
-
-    public void execute(CommandReceivedEvent e, String input, String theCase) {
-        switch (theCase) {
+    public void execute(CommandReceivedEvent e) {
+        String text = e.getString("text");
+        switch (e.getString("case")) {
             case "upper":
             case "u":
-                input = input.toUpperCase();
+                text = text.toUpperCase();
                 break;
             case "lower":
             case "l":
-                input = input.toLowerCase();
+                text = text.toLowerCase();
                 break;
             case "proper":
             case "p":
-                input = input.lines().map(Util::toProperCase).collect(Collectors.joining("\n"));
+                text = text.lines().map(Util::toProperCase).collect(Collectors.joining("\n"));
                 break;
             default:
-                input = "Invalid Case!";
+                text = "Invalid Case!";
         }
-        e.send(input).queue();
+        e.reply(text).queue();
     }
 }

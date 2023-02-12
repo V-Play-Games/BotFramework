@@ -18,13 +18,12 @@ package net.vpg.bot.commands.general;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.TimeFormat;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
 import java.time.Instant;
 
-public class UptimeCommand extends BotCommandImpl implements NoArgsCommand {
+public class UptimeCommand extends BotCommandImpl {
     public UptimeCommand(Bot bot) {
         super(bot, "uptime", "Gives the uptime of the bot i.e. the amount of time the bot has been online since last startup");
     }
@@ -32,7 +31,7 @@ public class UptimeCommand extends BotCommandImpl implements NoArgsCommand {
     @Override
     public void execute(CommandReceivedEvent e) {
         Instant bootTime = bot.getBootTime();
-        e.sendEmbeds(new EmbedBuilder()
+        e.replyEmbeds(new EmbedBuilder()
             .appendDescription("Online since: ")
             .appendDescription(TimeFormat.RELATIVE.atInstant(bootTime).toString())
             .setFooter("Last boot ")

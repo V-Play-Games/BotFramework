@@ -19,22 +19,21 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-public class InviteCommand extends BotCommandImpl implements NoArgsCommand {
+public class InviteCommand extends BotCommandImpl {
     public InviteCommand(Bot bot) {
-        super(bot, "invite", "Sends a link to add the bot in the server and other links");
+        this(bot, "Sends a link to add the bot in the server and other links");
     }
 
-    public InviteCommand(Bot bot, String description, String... aliases) {
-        super(bot, "invite", description, aliases);
+    public InviteCommand(Bot bot, String description) {
+        super(bot, "invite", description);
     }
 
     @Override
     public void execute(CommandReceivedEvent e) {
-        e.sendEmbeds(getEmbed(e)).queue();
+        e.replyEmbeds(getEmbed(e)).queue();
     }
 
     protected MessageEmbed getEmbed(CommandReceivedEvent e) {

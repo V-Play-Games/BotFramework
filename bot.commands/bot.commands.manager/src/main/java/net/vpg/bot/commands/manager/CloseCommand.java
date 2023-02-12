@@ -16,17 +16,19 @@
 package net.vpg.bot.commands.manager;
 
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
+import net.vpg.bot.commands.Check;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-public class CloseCommand extends BotCommandImpl implements NoArgsCommand, ManagerCommand {
+public class CloseCommand extends BotCommandImpl {
     public CloseCommand(Bot bot) {
         super(bot, "close", "Closes the bot");
+        addCheck(Check.requiresManager(getBot()));
     }
 
+    @Override
     public void execute(CommandReceivedEvent e) {
         bot.getEventHandler().setClosed(true);
-        e.send("Successfully Closed Event Manger!").queue();
+        e.reply("Successfully Closed Event Manger!").queue();
     }
 }

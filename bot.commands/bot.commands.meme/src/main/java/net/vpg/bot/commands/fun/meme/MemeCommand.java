@@ -21,10 +21,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.commands.Check;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,31 +34,13 @@ public class MemeCommand extends BotCommandImpl {
         super(bot, "meme", "Pulls a random meme from Reddit");
         api = new MemeApi(bot.getPrimaryShard().getHttpClient());
         addOption(OptionType.STRING, "subreddit", "The subreddit to pull a meme from");
-        setMaxArgs(1);
         setCooldown(10, TimeUnit.SECONDS);
+        addCheck(Check.requiresGuild());
     }
 
     @Override
-    public boolean runChecks(CommandReceivedEvent e) {
-        if (!e.isFromGuild()) {
-            e.send("Sorry, but this command cannot be used in DMs.").queue();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onTextCommandRun(TextCommandReceivedEvent e) {
-        execute(e, e.getArgs().size() == 1 ? e.getArg(0) : "");
-    }
-
-    @Override
-    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
-        execute(e, e.getString("subreddit"));
-    }
-
-    public void execute(CommandReceivedEvent e, String subreddit) {
-        api.getMeme(subreddit).queue(meme -> {
+    public void execute(CommandReceivedEvent e) {
+        api.getMeme(e.getString("subreddit")).queue(meme -> {
             if (meme.isNsfw()) {
                 GuildMessageChannel gmc;
                 MessageChannelUnion channel = e.getChannel();
@@ -75,7 +56,7 @@ public class MemeCommand extends BotCommandImpl {
                     return;
                 }
             }
-            e.sendEmbeds(new EmbedBuilder()
+            e.replyEmbeds(new EmbedBuilder()
                 .setTitle(meme.getTitle(), meme.getPostLink())
                 .setDescription("Meme by u/" + meme.getAuthor() + " in r/" + meme.getSubreddit())
                 .setImage(meme.getUrl())

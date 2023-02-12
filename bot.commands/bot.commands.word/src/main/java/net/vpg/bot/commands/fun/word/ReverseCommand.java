@@ -19,27 +19,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
 
 public class ReverseCommand extends BotCommandImpl {
     public ReverseCommand(Bot bot) {
         super(bot, "reverse", "Reverses the given text");
         addOption(OptionType.STRING, "text", "the text to reverse", true);
-        setMinArgs(1);
     }
 
     @Override
-    public void onTextCommandRun(TextCommandReceivedEvent e) {
-        execute(e, e.getArgsFrom(0, " "));
-    }
-
-    @Override
-    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
-        execute(e, e.getString("text"));
-    }
-
-    public void execute(CommandReceivedEvent e, String input) {
-        e.send(new StringBuilder(input).reverse().toString()).queue();
+    public void execute(CommandReceivedEvent e) {
+        e.reply(new StringBuilder(e.getString("text")).reverse().toString()).queue();
     }
 }

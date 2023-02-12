@@ -16,57 +16,50 @@
 package net.vpg.bot.commands.fun.guess;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.internal.interactions.InteractionHookImpl;
-import net.vpg.bot.action.Sender;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.ButtonHandler;
 import net.vpg.bot.event.BotButtonEvent;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
+public class GuessCommand extends BotCommandImpl {
     public GuessCommand(Bot bot) {
         super(bot, "guess", "Guess a Pokemon name by the given description of it");
-        bot.getEventProcessor().addListener(MessageReceivedEvent.class, this::checkGuess);
+        bot.getEventProcessor().addListener(ModalInteractionEvent.class, this::checkGuess);
     }
 
     @Override
     public void execute(CommandReceivedEvent e) {
         if (GuessGame.get(e.getUser().getId()) != null) return;
         GuessGame game = new GuessGame(e);
-        e.sendEmbeds(new EmbedBuilder()
+        e.replyEmbeds(new EmbedBuilder()
             .setTitle("Who's that Pokemon?")
             .setDescription("Guess the Pokemon based on its given description in 30 seconds or less!\n> " + game.getText())
             .build())
             .setActionRow(
                 Button.primary("guess:" + game.getUserId() + ":h", "Get a hint"),
+                Button.primary("guess:" + game.getUserId() + ":g", "Guess"),
                 Button.primary("guess:" + game.getUserId() + ":x", "Give up")
             )
-            .queue(x -> {
-                if (x instanceof Message) {
-                    game.setMessage((Message) x);
-                } else if (x instanceof InteractionHook) {
-                    ((InteractionHook) x).retrieveOriginal().queue(game::setMessage);
-                } else {
-                    throw new IllegalStateException("Ran into an unexpected CommandReplyAction type, should be either Message or InteractionHook");
-                }
-            });
+            .queue(x -> x.retrieveOriginal().queue(game::setMessage));
     }
 
-    public void checkGuess(MessageReceivedEvent e) {
-        GuessGame game = GuessGame.get(e.getAuthor().getId());
+    public void checkGuess(ModalInteractionEvent e) {
+        if (!e.getId().equals("guess")) return;
+        GuessGame game = GuessGame.get(e.getUser().getId());
         if (game == null) return;
-        if (game.isCorrect(e.getMessage().getContentRaw())) {
-            game.close(Sender.of(e.getMessage()), GuessGame.WON);
+        // noinspection ConstantConditions
+        String input = e.getValue("input").getAsString();
+        if (game.isCorrect(input)) {
+            game.win(e);
         } else {
-            e.getMessage().addReaction(Emoji.fromUnicode("\u274C")).queue(); // CROSS
+            e.reply("\"" + input + "\" is not the correct answer!").queue(); // CROSS
         }
     }
 
@@ -94,9 +87,15 @@ public class GuessCommand extends BotCommandImpl implements NoArgsCommand {
                             .build())
                         .queue();
                     break;
+                case "g":
+                    e.replyModal(Modal.create("guess", "Who's that Pokemon?")
+                        .addActionRow(TextInput.create("input", "Enter your guess here", TextInputStyle.SHORT).build())
+                        .build())
+                        .queue();
+                    break;
                 case "x":
                     e.editComponents().queue();
-                    game.close(Sender.of(e.getChannel()), GuessGame.FORFEIT);
+                    game.forfeit(e);
                     break;
             }
         }

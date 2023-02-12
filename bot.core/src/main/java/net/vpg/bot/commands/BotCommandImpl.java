@@ -15,55 +15,37 @@
  */
 package net.vpg.bot.commands;
 
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.internal.interactions.CommandDataImpl;
-import net.vpg.bot.action.Sender;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
 import net.vpg.bot.ratelimit.Ratelimit;
 import net.vpg.bot.ratelimit.Ratelimiter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 public abstract class BotCommandImpl extends CommandDataImpl implements BotCommand, Ratelimiter {
     protected final Map<Long, Ratelimit> ratelimited = new HashMap<>();
     protected final Bot bot;
-    protected final List<String> aliases;
     protected long cooldown;
-    protected int minArgs;
-    protected int maxArgs;
+    protected Predicate<CommandReceivedEvent> checks = e -> true;
 
-    public BotCommandImpl(Bot bot, String name, String description, String... aliases) {
+    public BotCommandImpl(Bot bot, String name, String description) {
         super(name, description);
         this.bot = bot;
-        this.aliases = List.of(aliases);
-        bot.getPrimaryShard().getRateLimitPool().scheduleWithFixedDelay(() -> ratelimited.forEach((id, rl) -> {
-            if (!rl.isRatelimited()) {
-                ratelimited.remove(id);
-            }
-        }), 1, 1, TimeUnit.MINUTES);
     }
 
     @Override
     public void register() {
         bot.registerCommand(getName(), this);
-        aliases.forEach(alias -> bot.registerCommand(alias, this));
     }
 
     @Override
     public Map<Long, Ratelimit> getRatelimited() {
         return ratelimited;
-    }
-
-    @Override
-    public List<String> getAliases() {
-        return aliases;
     }
 
     @Override
@@ -85,61 +67,36 @@ public abstract class BotCommandImpl extends CommandDataImpl implements BotComma
     }
 
     @Override
-    public int getMaxArgs() {
-        return maxArgs;
-    }
-
-    public void setMaxArgs(int maxArgs) {
-        this.maxArgs = maxArgs;
-    }
-
-    @Override
-    public int getMinArgs() {
-        return minArgs;
-    }
-
-    public void setMinArgs(int minArgs) {
-        this.minArgs = minArgs;
-    }
-
-    @Override
     public void run(CommandReceivedEvent e) {
         try {
             long id = e.getUser().getIdLong();
-            if (checkRatelimited(id, e) || !runChecks(e)) {
+            if (checkRatelimited(id, e) || !checks.test(e))
                 return;
-            }
-            if (e instanceof TextCommandReceivedEvent) {
-                TextCommandReceivedEvent text = (TextCommandReceivedEvent) e;
-                int args = text.getArgs().size();
-                if (minArgs > args || (maxArgs != 0 && args > maxArgs)) {
-                    onInsufficientArgs(e);
-                    return;
-                }
-                onTextCommandRun(text);
-            } else {
-                onSlashCommandRun((SlashCommandReceivedEvent) e);
-            }
+            execute(e);
             ratelimit(id);
+            bot.getPrimaryShard()
+                .getRateLimitPool()
+                .schedule(() -> ratelimited.remove(id), cooldown, TimeUnit.MILLISECONDS);
         } catch (Exception exc) {
             e.setTrouble(exc);
             exc.printStackTrace();
-            if (!e.isReplySent()) {
-                e.send("There was some trouble processing your request. Please contact the developer.")
-                    .setEphemeral(true)
-                    .queue();
-            }
+            e.reply("There was some trouble processing your request. Please contact the developer.")
+                .setEphemeral(true)
+                .queue();
         }
     }
 
+    public abstract void execute(CommandReceivedEvent e) throws Exception;
+
     @Override
-    public void finalizeCommand(Command c) {
+    public void addCheck(Predicate<CommandReceivedEvent> check) {
+        checks = checks.and(check);
     }
 
     @Override
-    public void onRatelimit(Sender e, Ratelimit ratelimit) {
+    public void onRatelimit(IReplyCallback callback, Ratelimit ratelimit) {
         if (!ratelimit.isInformed()) {
-            e.send("You have to wait for **")
+            callback.reply("You have to wait for **")
                 .addContent(ratelimit.getCooldownString())
                 .addContent("** before using this command again.")
                 .setEphemeral(true)
@@ -156,10 +113,5 @@ public abstract class BotCommandImpl extends CommandDataImpl implements BotComma
     @Override
     public Map<Long, Ratelimit> getRateLimited() {
         return ratelimited;
-    }
-
-    @Override
-    public SlashCommandData toCommandData() {
-        return this;
     }
 }

@@ -24,10 +24,6 @@ import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.ButtonHandler;
 import net.vpg.bot.event.BotButtonEvent;
 import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
-
-import java.util.List;
 
 public class TTTCommand extends BotCommandImpl {
     public TTTCommand(Bot bot) {
@@ -38,36 +34,25 @@ public class TTTCommand extends BotCommandImpl {
                 .addChoice("X", "X")
                 .addChoice("O", "O")
         );
-        setMaxArgs(2);
-        setMinArgs(0);
     }
 
-    public void execute(CommandReceivedEvent e, String play_as, String opponent) {
+    public void execute(CommandReceivedEvent e) {
+        String play_as = e.getString("play-as");
+        User opponent = e.getUser("opponent");
         String player1 = e.getUser().getId();
-        String player2 = opponent == null || opponent.equals(player1) ? "ai" : opponent;
+        String player2 = opponent == null || opponent.getId().equals(player1) ? "ai" : opponent.getId();
         boolean firstIsX = "X".equalsIgnoreCase(play_as);
         Board board = new Board(player1, player2, firstIsX);
         if (player2.equals("ai")) { // Single-player: no confirmation needed
             board.send(e);
         } else {
-            e.send(e.getUser().getAsMention() + " has challenged <@" + player2 + "> to a TicTacToe Duel!")
+            e.reply(e.getUser().getAsMention() + " has challenged <@" + player2 + "> to a TicTacToe Duel!")
                 .setActionRow(
                     Button.primary("ttt:" + board.id + ":p", "Play"),
                     Button.primary("ttt:" + board.id + ":x", "Cancel")
                 )
                 .queue();
         }
-    }
-
-    @Override
-    public void onTextCommandRun(TextCommandReceivedEvent e) {
-        List<User> mentions = e.getMessage().getMentions().getUsers();
-        execute(e, e.getArgs().isEmpty() ? null : e.getArg(0), mentions.isEmpty() ? null : mentions.get(0).getId());
-    }
-
-    @Override
-    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
-        execute(e, e.getString("play-as"), e.getUser("opponent").getId());
     }
 
     public static class TTTButtonHandler implements ButtonHandler {

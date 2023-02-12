@@ -16,17 +16,19 @@
 package net.vpg.bot.commands.manager;
 
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
+import net.vpg.bot.commands.Check;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-public class ShutdownCommand extends BotCommandImpl implements NoArgsCommand, ManagerCommand {
+public class ShutdownCommand extends BotCommandImpl {
     public ShutdownCommand(Bot bot) {
         super(bot, "shutdown", "Shuts down the bot");
+        addCheck(Check.requiresManager(getBot()));
     }
 
+    @Override
     public void execute(CommandReceivedEvent e) {
-        e.send("Shutting Down!").queue();
+        e.reply("Shutting Down!").queue();
         System.exit(0);
     }
 }

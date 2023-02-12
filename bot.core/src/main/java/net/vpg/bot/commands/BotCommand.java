@@ -19,43 +19,21 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
 import net.vpg.bot.ratelimit.Ratelimit;
 
-import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public interface BotCommand extends SlashCommandData {
     void register();
 
-    Bot getBot();
-
-    List<String> getAliases();
-
-    int getMaxArgs();
-
-    int getMinArgs();
-
     void run(CommandReceivedEvent e);
 
-    void onTextCommandRun(TextCommandReceivedEvent e) throws Exception;
-
-    void onSlashCommandRun(SlashCommandReceivedEvent e) throws Exception;
-
-    void finalizeCommand(Command c);
-
-    default void onInsufficientArgs(CommandReceivedEvent e) {
-        e.send("Invalid Amount of Inputs!").queue();
-    }
-
-    default boolean runChecks(CommandReceivedEvent e) {
-        return true;
-    }
+    void addCheck(Predicate<CommandReceivedEvent> check);
 
     Map<Long, Ratelimit> getRateLimited();
 
-    SlashCommandData toCommandData();
+    Bot getBot();
 
     enum Type {
         TEXT, SLASH, HYBRID;

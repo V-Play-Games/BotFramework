@@ -17,11 +17,10 @@ package net.vpg.bot.commands.general;
 
 import net.dv8tion.jda.api.JDA;
 import net.vpg.bot.commands.BotCommandImpl;
-import net.vpg.bot.commands.NoArgsCommand;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
-public class PingCommand extends BotCommandImpl implements NoArgsCommand {
+public class PingCommand extends BotCommandImpl {
     public static final String PING_FORMAT = "Pong!\n**Shard**: %d\n**Response Time**: %d ms\n**Heartbeat**: %d ms";
 
     public PingCommand(Bot bot) {
@@ -32,7 +31,7 @@ public class PingCommand extends BotCommandImpl implements NoArgsCommand {
     public void execute(CommandReceivedEvent e) {
         JDA jda = e.getJDA();
         jda.getRestPing()
-            .flatMap(ping -> e.send(String.format(PING_FORMAT, jda.getShardInfo().getShardId(), ping, jda.getGatewayPing())))
+            .flatMap(ping -> e.reply(String.format(PING_FORMAT, jda.getShardInfo().getShardId(), ping, jda.getGatewayPing())))
             .queue();
     }
 }

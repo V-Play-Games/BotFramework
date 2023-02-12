@@ -15,13 +15,10 @@
  */
 package net.vpg.bot.commands.fun.ttt;
 
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.vpg.bot.action.Sender;
-import net.vpg.bot.commands.fun.ttt.Cell;
-import net.vpg.bot.commands.fun.ttt.CellType;
-import net.vpg.bot.commands.fun.ttt.Player;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,18 +72,16 @@ public class Board {
     }
 
     public Player getWinner() {
-        // check rows
         for (int i = 0; i < 3; i++) {
-            Cell[] row = cells[i];
-            CellType mid = row[1].type;
-            if (!mid.isBlank() && row[0].type == mid && row[2].type == mid)
-                return playerOfType(mid);
-        }
-        // check columns
-        for (int i = 0; i < 3; i++) {
-            CellType mid = cells[1][i].type;
-            if (!mid.isBlank() && cells[0][i].type == mid && cells[2][i].type == mid)
-                return playerOfType(mid);
+            CellType cell;
+            // check row
+            cell = cells[i][0].type;
+            if (!cell.isBlank() && cells[i][1].type == cell && cells[i][2].type == cell)
+                return playerOfType(cell);
+            // check column
+            cell = cells[0][i].type;
+            if (!cell.isBlank() && cells[1][i].type == cell && cells[2][i].type == cell)
+                return playerOfType(cell);
         }
         // check diagonals
         CellType mid = cells[1][1].type;
@@ -116,8 +111,8 @@ public class Board {
         return player1;
     }
 
-    public void send(Sender sender) {
-        sender.send(String.format("It is <@%s>'s turn! (Playing as %s)", player1.id, player1.type))
+    public void send(IReplyCallback e) {
+        e.reply(String.format("It is <@%s>'s turn! (Playing as %s)", player1.id, player1.type))
             .setComponents(getComponents())
             .queue();
     }

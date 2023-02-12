@@ -17,24 +17,19 @@ package net.vpg.bot.commands.manager;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
+import net.vpg.bot.commands.Check;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
-import net.vpg.bot.event.SlashCommandReceivedEvent;
-import net.vpg.bot.event.TextCommandReceivedEvent;
 
-public abstract class RetrieveCommand extends BotCommandImpl implements ManagerCommand {
+public abstract class RetrieveCommand extends BotCommandImpl {
     public RetrieveCommand(Bot bot) {
         super(bot, "retrieve", "Request data from the bot");
         addOption(OptionType.STRING, "key", "Key of the information required", true);
+        addCheck(Check.requiresManager(getBot()));
     }
 
     @Override
-    public void onTextCommandRun(TextCommandReceivedEvent e) {
-        execute(e, e.getArg(0));
-    }
-
-    @Override
-    public void onSlashCommandRun(SlashCommandReceivedEvent e) {
+    public void execute(CommandReceivedEvent e) {
         execute(e, e.getString("key"));
     }
 
