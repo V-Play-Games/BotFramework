@@ -107,7 +107,7 @@ public abstract class BotCommandImpl extends CommandDataImpl implements BotComma
 
     @Override
     public String toString() {
-        return bot.getPrefix() + name;
+        return "/" + name;
     }
 
     @Override

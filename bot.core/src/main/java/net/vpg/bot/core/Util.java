@@ -16,12 +16,9 @@
 package net.vpg.bot.core;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.vpg.bot.entities.GuildSettings;
 import org.bson.Document;
 
 import java.io.File;
@@ -44,14 +41,6 @@ public class Util {
 
     private Util() {
         // Utility Class
-    }
-
-    public static String getPrefix(MessageReceivedEvent e, Bot bot) {
-        return Util.getPrefix(e.isFromGuild() ? e.getGuild() : null, bot);
-    }
-
-    public static String getPrefix(Guild guild, Bot bot) {
-        return guild != null ? GuildSettings.get(guild.getId(), bot).getPrefix() : bot.getPrefix();
     }
 
     public static String toString(long ms) {
