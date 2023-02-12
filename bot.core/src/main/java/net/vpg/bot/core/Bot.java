@@ -43,7 +43,6 @@ public abstract class Bot implements Entity {
     private static final Logger LOGGER = LoggerFactory.getLogger(Bot.class);
     protected final String id;
     protected final String token;
-    protected final String prefix;
     protected final long resourceServerId;
     protected final long logCategoryId;
     protected final int shardsTotal;
@@ -64,7 +63,6 @@ public abstract class Bot implements Entity {
         this.properties = builder.toData();
         this.id = builder.id;
         this.token = builder.token;
-        this.prefix = builder.prefix;
         this.shardsTotal = builder.shardsTotal;
         this.buttonHandlers = builder.buttonHandlers;
         this.commands = builder.commands;
@@ -102,10 +100,6 @@ public abstract class Bot implements Entity {
 
     public void setEventHandler(EventHandler eventHandler) {
         processor.setSubject(eventHandler);
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 
     public long getOwnerId() {

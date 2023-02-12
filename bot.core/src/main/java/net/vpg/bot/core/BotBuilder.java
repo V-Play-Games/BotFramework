@@ -43,7 +43,6 @@ public class BotBuilder implements SerializableData {
     int shardsTotal;
     String id;
     String token;
-    String prefix;
     Set<Long> managers;
     ClassFilter filter;
     Database database;
@@ -94,12 +93,6 @@ public class BotBuilder implements SerializableData {
     @Nonnull
     public BotBuilder setId(@Nonnull String id) {
         this.id = Objects.requireNonNull(id);
-        return this;
-    }
-
-    @Nonnull
-    public BotBuilder setPrefix(@Nonnull String prefix) {
-        this.prefix = Objects.requireNonNull(prefix);
         return this;
     }
 
@@ -202,9 +195,6 @@ public class BotBuilder implements SerializableData {
             case "token":
                 setToken((String) value);
                 break;
-            case "prefix":
-                setPrefix((String) value);
-                break;
             case "managers":
                 if (value instanceof long[]) {
                     addManagers((long[]) value);
@@ -245,7 +235,6 @@ public class BotBuilder implements SerializableData {
         properties.forEach(data::put);
         return data.put("id", id)
             .put("token", token)
-            .put("prefix", prefix)
             .put("managers", managers)
             .put("shardsTotal", shardsTotal);
     }
