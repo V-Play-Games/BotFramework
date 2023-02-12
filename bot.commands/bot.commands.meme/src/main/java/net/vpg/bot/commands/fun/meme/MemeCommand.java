@@ -49,10 +49,7 @@ public class MemeCommand extends BotCommandImpl {
                 } else {
                     gmc = channel.asGuildMessageChannel();
                 }
-                if (!(gmc instanceof IAgeRestrictedChannel)) {
-                    return;
-                }
-                if (!((IAgeRestrictedChannel) gmc).isNSFW()) {
+                if (!(gmc instanceof IAgeRestrictedChannel) || !((IAgeRestrictedChannel) gmc).isNSFW()) {
                     return;
                 }
             }

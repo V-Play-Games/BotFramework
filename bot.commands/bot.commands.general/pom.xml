@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.github.v-play-games</groupId>
     <artifactId>bot.commands</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
   </parent>
   <artifactId>bot.commands.general</artifactId>
   <name>General Commands</name>

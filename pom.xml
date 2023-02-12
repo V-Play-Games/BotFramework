@@ -24,10 +24,10 @@
     <version>1.0.1</version>
   </parent>
   <properties>
-    <bot.framework.version>0.0.3</bot.framework.version>
+    <bot.framework.version>0.0.4</bot.framework.version>
   </properties>
   <artifactId>bot.framework</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <packaging>pom</packaging>
   <modules>
     <module>bot.core</module>

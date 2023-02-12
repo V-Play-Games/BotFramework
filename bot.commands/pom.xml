@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.github.v-play-games</groupId>
     <artifactId>bot.framework</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
   </parent>
   <artifactId>bot.commands</artifactId>
   <packaging>pom</packaging>
@@ -31,7 +31,6 @@
     <module>bot.commands.guess</module>
     <module>bot.commands.manager</module>
     <module>bot.commands.meme</module>
-    <module>bot.commands.mod</module>
     <module>bot.commands.ttt</module>
     <module>bot.commands.word</module>
   </modules>
