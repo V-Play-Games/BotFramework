@@ -15,10 +15,11 @@
  */
 package net.vpg.bot.commands.fun.ttt;
 
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -111,10 +112,11 @@ public class Board {
         return player1;
     }
 
-    public void send(IReplyCallback e) {
-        e.reply(String.format("It is <@%s>'s turn! (Playing as %s)", player1.id, player1.type))
+    public MessageCreateData toMessageData() {
+        return new MessageCreateBuilder()
+            .addContent(String.format("It is <@%s>'s turn! (Playing as %s)", player1.id, player1.type))
             .setComponents(getComponents())
-            .queue();
+            .build();
     }
 
     public Cell[] getCellsOfType(CellType type) {

@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.core.Bot;
 import net.vpg.bot.core.ButtonHandler;
@@ -26,6 +27,8 @@ import net.vpg.bot.event.BotButtonEvent;
 import net.vpg.bot.event.CommandReceivedEvent;
 
 public class TTTCommand extends BotCommandImpl {
+    public static final String AI = "ai";
+
     public TTTCommand(Bot bot) {
         super(bot, "ttt", "Play the classic TicTacToe game");
         addOptions(
@@ -40,11 +43,11 @@ public class TTTCommand extends BotCommandImpl {
         String play_as = e.getString("play-as");
         User opponent = e.getUser("opponent");
         String player1 = e.getUser().getId();
-        String player2 = opponent == null || opponent.getId().equals(player1) ? "ai" : opponent.getId();
+        String player2 = opponent == null || opponent.getId().equals(player1) ? AI : opponent.getId();
         boolean firstIsX = "X".equalsIgnoreCase(play_as);
         Board board = new Board(player1, player2, firstIsX);
         if (player2.equals("ai")) { // Single-player: no confirmation needed
-            board.send(e);
+            e.reply(board.toMessageData()).queue();
         } else {
             e.reply(e.getUser().getAsMention() + " has challenged <@" + player2 + "> to a TicTacToe Duel!")
                 .setActionRow(
@@ -71,7 +74,7 @@ public class TTTCommand extends BotCommandImpl {
             switch (e.getArg(1)) {
                 case "p":
                     if (board.player2.id.equals(clicker))
-                        board.send(e);
+                        e.editMessage(MessageEditData.fromCreateData(board.toMessageData())).queue();
                     break;
                 case "x":
                     e.editMessage("<@" + clicker + "> cancelled the challenge!").setComponents().queue();
@@ -89,10 +92,10 @@ public class TTTCommand extends BotCommandImpl {
                         if (board.checkTie()) {
                             e.editMessage("It's a tie! Nobody won.").setComponents(board.getComponents()).queue();
                         } else {
-                            board.send(e);
+                            e.editMessage(MessageEditData.fromCreateData(board.toMessageData())).queue();
                         }
                     } else {
-                        e.editMessage("<@" + winner.id + "> won the match!").setComponents(board.getComponents()).queue();
+                        e.editMessage((winner.id.equals(AI) ? "AI" : "<@" + winner.id + ">") + " won the match!").setComponents(board.getComponents()).queue();
                         board.remove();
                     }
                     break;
