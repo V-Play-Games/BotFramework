@@ -28,11 +28,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MemeApi extends RestApi {
-    public final static String MEME_API_BASE_URL = "https://meme-api.herokuapp.com/";
+    public final static String MEME_API_BASE_URL = "https://meme-api.com/";
 
-    // TODO: workaround for a bug in RAWF, fixed in 0.0.2
     public MemeApi(OkHttpClient client) {
-        super(new AuthorizationConfig(null),
+        super(new AuthorizationConfig(""),
             new ConnectionConfig(client == null ? new OkHttpClient() : client, MEME_API_BASE_URL, ""));
     }
 
