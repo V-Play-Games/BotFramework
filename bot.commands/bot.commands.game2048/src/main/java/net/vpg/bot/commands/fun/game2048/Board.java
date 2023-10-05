@@ -21,12 +21,19 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.vpg.bot.core.Util;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.vpg.bot.commands.fun.game2048.Game2048Command.emotes;
 
 public class Board {
+    private static final CellType[] spawnList = Arrays.stream(CellType.values())
+            .filter(CellType::isSpawn)
+            .map(cell -> Collections.nCopies(cell.getSpawnRate(), cell))
+            .flatMap(Collection::stream)
+            .toArray(CellType[]::new);
     final int size;
     final Cell[][] cells;
     int score;
@@ -44,10 +51,9 @@ public class Board {
     private Board(int size, CellType[] types) {
         this.size = size;
         this.cells = new Cell[size][size];
-        int k = 0;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                new Cell(i, j, this, types[k++]);
+                new Cell(i, j, this, types[i * size + j]);
             }
         }
     }
@@ -56,9 +62,8 @@ public class Board {
     public static Board fromEmbed(MessageEmbed embed) {
         CellType[] values = Message.MentionType.EMOJI.getPattern()
             .matcher(embed.getDescription())
-            .replaceAll(result -> result.group(1) + '\n')
-            .lines()
-            .filter(s -> !s.isBlank())
+            .results()
+            .map(result -> result.group(1))
             .mapToInt(Integer::parseInt)
             .mapToObj(CellType::forValue)
             .toArray(CellType[]::new);
@@ -99,20 +104,16 @@ public class Board {
     }
 
     public Board spawn() {
-        Cell[] emptyCells = getCellsAsStream().filter(Cell::isEmpty).toArray(Cell[]::new);
-        if (emptyCells.length != 0) {
-            Spawner.getInstance().spawn(Util.getRandom(emptyCells));
-        }
+        getCellsAsStream()
+            .unordered()
+            .filter(Cell::isEmpty)
+            .findAny()
+            .ifPresent(cell -> cell.setType(Util.getRandom(spawnList)));
         return this;
     }
 
     public int getScore() {
         return score;
-    }
-
-    public Board setScore(int score) {
-        this.score = score;
-        return this;
     }
 
     public String toString() {

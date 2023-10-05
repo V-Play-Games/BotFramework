@@ -17,6 +17,7 @@ package net.vpg.bot.commands.fun.meme;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.attribute.IAgeRestrictedChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -42,14 +43,12 @@ public class MemeCommand extends BotCommandImpl {
     public void execute(CommandReceivedEvent e) {
         api.getMeme(e.getString("subreddit")).queue(meme -> {
             if (meme.isNsfw()) {
-                GuildMessageChannel gmc;
                 MessageChannelUnion channel = e.getChannel();
-                if (channel.getType().isThread()) {
-                    gmc = channel.asThreadChannel().getParentChannel().asGuildMessageChannel();
-                } else {
-                    gmc = channel.asGuildMessageChannel();
-                }
-                if (!(gmc instanceof IAgeRestrictedChannel) || !((IAgeRestrictedChannel) gmc).isNSFW()) {
+                GuildChannel gc = channel.getType().isThread()
+                    ? channel.asThreadChannel().getParentChannel()
+                    : channel.asGuildMessageChannel();
+                if (!(gc instanceof IAgeRestrictedChannel) || !((IAgeRestrictedChannel) gc).isNSFW()) {
+                    e.reply("Encountered an NSFW meme which cannot be sent because the channel is not marked as age restricted.").queue();
                     return;
                 }
             }

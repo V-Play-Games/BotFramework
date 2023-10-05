@@ -18,7 +18,7 @@ package net.vpg.bot.entities;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class EntityReference<T extends Entity> implements Supplier<T> {
+public class EntityReference<T extends Entity> implements Supplier<T>, Entity {
     public final Map<String, T> map;
     public final String id;
 
@@ -32,6 +32,7 @@ public class EntityReference<T extends Entity> implements Supplier<T> {
         return map.get(id);
     }
 
+    @Override
     public String getId() {
         return id;
     }

@@ -15,6 +15,8 @@
  */
 package net.vpg.bot.commands.manager;
 
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.vpg.bot.commands.BotCommandImpl;
 import net.vpg.bot.commands.Check;
@@ -22,9 +24,20 @@ import net.vpg.bot.core.Bot;
 import net.vpg.bot.event.CommandReceivedEvent;
 
 import javax.script.*;
+import java.util.stream.Collectors;
 
 public class EvalCommand extends BotCommandImpl {
     public static final ScriptEngine ENGINE = new ScriptEngineManager().getEngineByName("groovy");
+    private static final String PACKAGES = new ClassGraph()
+        .enableClassInfo()
+        .scan()
+        .getAllClasses()
+        .stream()
+        .map(ClassInfo::getPackageName)
+        .filter(name -> name.startsWith("net.dv8tion.jda"))
+        .distinct()
+        .map(p -> "import " + p + ";")
+        .collect(Collectors.joining("\n"));
 
     public EvalCommand(Bot bot) {
         super(bot, "eval", "Evaluates an expression, or a piece of code");

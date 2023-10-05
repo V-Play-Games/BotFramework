@@ -15,9 +15,12 @@
  */
 package net.vpg.bot.entities;
 
+import net.dv8tion.jda.api.utils.data.DataArray;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.vpg.bot.core.Bot;
+import net.vpg.bot.core.Util;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -46,6 +49,26 @@ public class EntityInfo<T extends Entity> {
         this.constructor = constructor;
         this.map = map;
         this.isDatabaseEntity = isDatabaseEntity;
+    }
+
+    public void load(Bot bot) {
+        if (isDatabaseEntity) {
+            if (!bot.isDatabaseEnabled()) return;
+            bot.getDatabase().getCollection(identifier).find().forEach(document -> {
+                T entity = constructor.apply(Util.toDataObject(document), bot);
+                map.put(entity.getId(), entity);
+            });
+        } else {
+            try (InputStream stream = new URL(identifier).openStream()) {
+                DataArray.fromJson(stream)
+                    .stream(DataArray::getObject)
+                    .filter(data -> !data.keys().isEmpty())
+                    .map(data -> constructor.apply(data, bot))
+                    .forEach(entity -> map.put(entity.getId(), entity));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public String getIdentifier() {
