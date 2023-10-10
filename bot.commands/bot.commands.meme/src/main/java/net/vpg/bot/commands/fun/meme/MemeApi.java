@@ -17,11 +17,12 @@ package net.vpg.bot.commands.fun.meme;
 
 import net.vpg.rawf.api.RestApi;
 import net.vpg.rawf.api.requests.RestAction;
-import net.vpg.rawf.api.utils.data.DataArray;
+import net.vpg.rawf.api.requests.RestConfig;
+import net.vpg.rawf.api.requests.Route;
 import net.vpg.rawf.internal.requests.RestActionImpl;
-import net.vpg.rawf.internal.requests.Route;
 import net.vpg.rawf.internal.utils.config.AuthorizationConfig;
-import net.vpg.rawf.internal.utils.config.ConnectionConfig;
+import net.vpg.rawf.internal.utils.config.ThreadingConfig;
+import net.vpg.vjson.value.JSONValue;
 import okhttp3.OkHttpClient;
 
 import java.util.List;
@@ -31,8 +32,8 @@ public class MemeApi extends RestApi {
     public final static String MEME_API_BASE_URL = "https://meme-api.com/";
 
     public MemeApi(OkHttpClient client) {
-        super(new AuthorizationConfig(""),
-            new ConnectionConfig(client == null ? new OkHttpClient() : client, MEME_API_BASE_URL, ""));
+        super(new AuthorizationConfig(""), ThreadingConfig.getDefault(),
+            new RestConfig().setHttpClient(client == null ? new OkHttpClient() : client).setBaseUrl(MEME_API_BASE_URL));
     }
 
     public RestAction<Meme> getMeme() {
@@ -53,7 +54,8 @@ public class MemeApi extends RestApi {
         return new RestActionImpl<>(this,
             MemeApiRoute.RANDOM_MEME_MULTIPLE.compile(String.valueOf(amount)),
             (response, request) -> response.getArray()
-                .stream(DataArray::getObject)
+                .stream()
+                .map(JSONValue::toObject)
                 .map(Meme::new)
                 .collect(Collectors.toList())
         );
@@ -63,7 +65,8 @@ public class MemeApi extends RestApi {
         return new RestActionImpl<>(this,
             MemeApiRoute.RANDOM_MEME_SUBREDDIT_MULTIPLE.compile(subReddit, String.valueOf(amount)),
             (response, request) -> response.getArray()
-                .stream(DataArray::getObject)
+                .stream()
+                .map(JSONValue::toObject)
                 .map(Meme::new)
                 .collect(Collectors.toList())
         );

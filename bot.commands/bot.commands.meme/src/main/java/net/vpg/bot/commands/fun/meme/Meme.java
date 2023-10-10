@@ -15,7 +15,7 @@
  */
 package net.vpg.bot.commands.fun.meme;
 
-import net.vpg.rawf.api.utils.data.DataObject;
+import net.vpg.vjson.value.JSONObject;
 
 public class Meme {
     private final String postLink;
@@ -27,7 +27,7 @@ public class Meme {
     private final String author;
     private final int ups;
 
-    public Meme(DataObject data) {
+    public Meme(JSONObject data) {
         this.postLink = data.getString("postLink");
         this.subreddit = data.getString("subreddit");
         this.title = data.getString("title");
