@@ -30,10 +30,10 @@ import static net.vpg.bot.commands.fun.game2048.Game2048Command.emotes;
 
 public class Board {
     private static final CellType[] spawnList = Arrays.stream(CellType.values())
-            .filter(CellType::isSpawn)
-            .map(cell -> Collections.nCopies(cell.getSpawnRate(), cell))
-            .flatMap(Collection::stream)
-            .toArray(CellType[]::new);
+        .filter(CellType::isSpawn)
+        .map(cell -> Collections.nCopies(cell.getSpawnRate(), cell))
+        .flatMap(Collection::stream)
+        .toArray(CellType[]::new);
     final int size;
     final Cell[][] cells;
     int score;
